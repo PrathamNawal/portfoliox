@@ -3,49 +3,49 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Spinner } from '@/components/ui/Misc'
+
+type State = { status: 'loading' | 'done' | 'error'; msg: string }
 
 export default function AuthCallback() {
   const searchParams = useSearchParams()
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [state, setState] = useState<State>({ status: 'loading', msg: 'Checking URL…' })
 
   useEffect(() => {
     const supabase = createClient()
     const code = searchParams.get('code')
 
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
-        if (error) {
-          // Show error — do NOT redirect so we can read the message
-          setErrorMsg(`Exchange failed: ${error.message} (status: ${error.status})`)
-        } else if (data.session) {
-          window.location.href = '/dashboard'
-        } else {
-          setErrorMsg('No session returned after exchange')
-        }
-      })
-    } else {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) window.location.href = '/dashboard'
-        else setErrorMsg('No code in URL and no existing session')
-      })
+    setState({ status: 'loading', msg: `code in URL: ${code ? code.slice(0, 8) + '…' : 'NONE'}` })
+
+    if (!code) {
+      setState({ status: 'error', msg: 'No ?code= in URL. Cannot exchange.' })
+      return
     }
+
+    setState(s => ({ ...s, msg: s.msg + ' → calling exchangeCodeForSession…' }))
+
+    supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+      if (error) {
+        setState({ status: 'error', msg: `EXCHANGE ERROR: ${error.message} | code: ${error.status}` })
+        return
+      }
+      if (!data.session) {
+        setState({ status: 'error', msg: 'Exchange returned no error but session is null' })
+        return
+      }
+      setState({ status: 'done', msg: `Session OK — user: ${data.session.user.email}. Navigating…` })
+      setTimeout(() => { window.location.href = '/dashboard' }, 1500)
+    })
   }, [])
 
-  if (errorMsg) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, background: 'var(--px-bg)', padding: 32 }}>
-        <p style={{ fontSize: 14, fontWeight: 700, color: '#C94040', fontFamily: 'var(--px-font)' }}>Auth error (share this with developer):</p>
-        <p style={{ fontSize: 13, color: 'var(--px-text-2)', fontFamily: 'monospace', background: 'var(--px-surface-2)', padding: '12px 16px', borderRadius: 8, maxWidth: 560, wordBreak: 'break-all' }}>{errorMsg}</p>
-        <a href="/sign-in" style={{ fontSize: 13, color: 'var(--px-accent)', marginTop: 8 }}>Back to sign in</a>
-      </div>
-    )
-  }
+  const bg = state.status === 'error' ? '#fff0f0' : '#f5f5f0'
+  const color = state.status === 'error' ? '#c00' : '#333'
 
   return (
-    <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, background: 'var(--px-bg)' }}>
-      <Spinner size={24} />
-      <p style={{ fontSize: 14, color: 'var(--px-text-3)', fontFamily: 'var(--px-font)' }}>Signing you in…</p>
+    <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: bg }}>
+      <div style={{ maxWidth: 520, padding: 32, fontFamily: 'monospace', fontSize: 13, color, lineHeight: 1.7, background: '#fff', border: '1px solid #ddd', borderRadius: 8 }}>
+        <strong>Auth Callback Diagnostics</strong><br /><br />
+        {state.msg}
+      </div>
     </div>
   )
 }
