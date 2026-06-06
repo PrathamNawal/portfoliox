@@ -15,11 +15,7 @@ export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key) return NextResponse.json({ error: `Missing env: url=${!!url} key=${!!key}` }, { status: 500 })
-
-  const body = await req.json()
+const body = await req.json()
   const { name, bio, discipline, skills, layout, avatar_url } = body
 
   if (!name || name.trim().length < 2) {

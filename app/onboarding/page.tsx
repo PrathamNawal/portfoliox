@@ -123,13 +123,8 @@ export default function OnboardingPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...data, avatar_url: avatarUrl }),
         })
-        if (res.ok) {
-          router.push('/dashboard')
-        } else {
-          const body = await res.json().catch(() => ({}))
-          alert(`Onboarding failed (${res.status}): ${body.error || 'Unknown error'}`)
-          setSaving(false)
-        }
+        if (res.ok) router.push('/dashboard')
+        else setSaving(false)
       } catch { setSaving(false) }
     }
   }
