@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback, use } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { Btn, IconBtn } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -142,10 +142,8 @@ function DynamicBlock({ block, onChange, onDelete, index, draggableProps, dragHa
 }
 
 // ── Main Editor Page ──────────────────────────────────────────────────────────
-interface PageProps { params: Promise<{ id: string }> }
-
-export default function EditorPage({ params }: PageProps) {
-  const { id } = use(params)
+export default function EditorPage() {
+  const { id } = useParams<{ id: string }>()
   const router = useRouter()
 
   const [cs, setCs] = useState<CaseStudy | null>(null)
