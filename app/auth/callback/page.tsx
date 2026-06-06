@@ -1,34 +1,27 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Spinner } from '@/components/ui/Misc'
 
 export default function AuthCallback() {
-  const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     const supabase = createClient()
+    const code = searchParams.get('code')
 
-    // onAuthStateChange fires SIGNED_IN once the hash tokens are processed —
-    // getSession() alone is too early and returns null before the hash is parsed.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        subscription.unsubscribe()
-        router.replace('/dashboard')
-      }
-    })
-
-    // Fallback: if no SIGNED_IN within 6 seconds redirect to sign-in
-    const timeout = setTimeout(() => {
-      subscription.unsubscribe()
-      router.replace('/sign-in')
-    }, 6000)
-
-    return () => {
-      clearTimeout(timeout)
-      subscription.unsubscribe()
+    if (code) {
+      // PKCE flow: exchange the code. Hard-navigate so middleware gets fresh cookies.
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        window.location.href = error ? '/sign-in' : '/dashboard'
+      })
+    } else {
+      // Fallback: check for an existing session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        window.location.href = session ? '/dashboard' : '/sign-in'
+      })
     }
   }, [])
 
