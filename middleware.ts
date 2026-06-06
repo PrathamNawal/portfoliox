@@ -24,10 +24,10 @@ export async function middleware(request: NextRequest) {
     },
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
   const needsAuth = AUTH_REQUIRED.some((r) => pathname.startsWith(r))
-  if (needsAuth && !user) {
+  if (needsAuth && !session) {
     const url = request.nextUrl.clone()
     url.pathname = '/sign-in'
     url.searchParams.set('next', pathname)
