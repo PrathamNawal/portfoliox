@@ -1,12 +1,68 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Btn, IconBtn } from '@/components/ui/Button'
-import { Input, Textarea } from '@/components/ui/Input'
+import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
 import { SectionHead, Toggle } from '@/components/ui/Misc'
 import type { WorkExperience } from '@/types'
+
+// ── Lightweight rich-text editor ─────────────────────────────────────────────
+function RichTextEditor({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const isComposing = useRef(false)
+
+  useEffect(() => {
+    if (ref.current && ref.current.innerHTML !== value) {
+      ref.current.innerHTML = value || ''
+    }
+  }, []) // Only on mount
+
+  const exec = (cmd: string, val?: string) => {
+    document.execCommand(cmd, false, val)
+    ref.current?.focus()
+    if (ref.current) onChange(ref.current.innerHTML)
+  }
+
+  const toolBtn = (label: string, cmd: string, val?: string) => (
+    <button type="button" onMouseDown={e => { e.preventDefault(); exec(cmd, val) }}
+      style={{ height: 26, padding: '0 8px', fontSize: 12, fontWeight: 700, background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', borderRadius: 4, cursor: 'pointer', color: 'var(--px-text)', fontFamily: 'var(--px-font)' }}>
+      {label}
+    </button>
+  )
+
+  return (
+    <div>
+      <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--px-text)', letterSpacing: '-0.01em', display: 'block', marginBottom: 6 }}>Description</label>
+      <div style={{ border: '1px solid var(--px-border)', borderRadius: 'var(--px-r)', overflow: 'hidden', background: 'var(--px-surface)' }}>
+        {/* Toolbar */}
+        <div style={{ display: 'flex', gap: 4, padding: '6px 8px', borderBottom: '1px solid var(--px-border)', background: 'var(--px-surface-2)' }}>
+          {toolBtn('B', 'bold')}
+          {toolBtn('I', 'italic')}
+          {toolBtn('U', 'underline')}
+          {toolBtn('• List', 'insertUnorderedList')}
+        </div>
+        {/* Editable area */}
+        <div
+          ref={ref}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={() => { if (!isComposing.current && ref.current) onChange(ref.current.innerHTML) }}
+          onCompositionStart={() => { isComposing.current = true }}
+          onCompositionEnd={() => { isComposing.current = false; if (ref.current) onChange(ref.current.innerHTML) }}
+          data-placeholder={placeholder}
+          style={{ minHeight: 80, padding: '10px 12px', fontSize: 13, color: 'var(--px-text)', outline: 'none', lineHeight: 1.55, fontFamily: 'var(--px-font)' }}
+        />
+      </div>
+      <style>{`
+        [contenteditable]:empty:before { content: attr(data-placeholder); color: var(--px-text-3); pointer-events: none; }
+        [contenteditable] ul { padding-left: 18px; margin: 4px 0; }
+        [contenteditable] li { margin: 2px 0; }
+      `}</style>
+    </div>
+  )
+}
 
 const DISCIPLINE_TAGS = ['UX Design', 'Brand/Graphic', 'Motion', 'Product Design', 'Research', 'Other']
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -78,7 +134,7 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
         <MonthYearPicker label="Start *" value={startMonth} onChange={setStartMonth} />
         {!isCurrent && <MonthYearPicker label="End" value={endMonth} onChange={setEndMonth} />}
         <Toggle value={isCurrent} onChange={setIsCurrent} label="I currently work here" />
-        <Textarea label="Description" value={description} onChange={setDescription} maxLength={400} rows={3} placeholder="What you did, led, or built…" />
+        <RichTextEditor value={description} onChange={setDescription} placeholder="What you did, led, or built…" />
         {/* Discipline tag */}
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--px-text)', letterSpacing: '-0.01em', display: 'block', marginBottom: 8 }}>Discipline tag</label>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { portfolioUrl } from '@/lib/utils'
 import { Btn, IconBtn } from '@/components/ui/Button'
 import { Badge, Tag } from '@/components/ui/Badge'
@@ -291,41 +292,81 @@ function UpgradeModal({ open, onClose }: { open: boolean; onClose: () => void })
 }
 
 // ── Case Study Card ───────────────────────────────────────────────────────────
-function CaseStudyCard({ cs, onEdit, onDelete }: { cs: CaseStudy; onEdit: () => void; onDelete: () => void }) {
+function CaseStudyCard({
+  cs, dragHandleProps, onEdit, onDelete, onToggleVisible, liveUrl,
+}: {
+  cs: CaseStudy
+  dragHandleProps?: object
+  onEdit: () => void
+  onDelete: () => void
+  onToggleVisible: () => void
+  liveUrl: string | null
+}) {
   const [hover, setHover] = useState(false)
+  const [toggling, setToggling] = useState(false)
   const grad = CASE_GRADS[cs.id.charCodeAt(0) % CASE_GRADS.length]
   const bg = cs.cover_image_url ? `url(${cs.cover_image_url}) center/cover` : grad
 
+  const handleToggle = async () => {
+    setToggling(true)
+    await onToggleVisible()
+    setToggling(false)
+  }
+
   return (
-    <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-      style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', overflow: 'hidden', transition: `box-shadow var(--dur-base) var(--ease-hover), transform var(--dur-base) var(--ease-hover)`, boxShadow: hover ? 'var(--px-shadow-md)' : 'var(--px-shadow-sm)', transform: hover ? 'translateY(-3px)' : 'none' }}>
-      <div style={{ height: 140, background: bg, position: 'relative' }}>
+    <div style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', overflow: 'hidden', transition: 'box-shadow 0.15s', boxShadow: hover ? 'var(--px-shadow-md)' : 'var(--px-shadow-sm)' }}>
+      {/* Cover */}
+      <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+        style={{ height: 150, background: bg, position: 'relative', cursor: 'pointer' }}
+        onClick={onEdit}>
         {cs.nda_enabled && (
           <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 999, padding: '4px 10px', backdropFilter: 'blur(4px)' }}>
             <Icon name="lock" size={12} color="#fff" />
             <span style={{ fontSize: 11, color: '#fff', fontWeight: 600 }}>NDA</span>
           </div>
         )}
-        {!cs.published && (
-          <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.55)', borderRadius: 999, padding: '4px 10px', backdropFilter: 'blur(4px)' }}>
-            <span style={{ fontSize: 11, color: '#fff', fontWeight: 600, letterSpacing: '0.02em' }}>DRAFT</span>
-          </div>
-        )}
         {hover && (
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, animation: 'px-fadein 0.12s ease' }}>
-            <Btn variant="primary" size="sm" icon="edit" onClick={onEdit}>Edit</Btn>
-            <button onClick={onDelete} style={{ height: 32, padding: '0 12px', fontSize: 13, fontWeight: 600, background: 'rgba(201,64,64,0.7)', color: '#fff', border: '1px solid rgba(201,64,64,0.4)', borderRadius: 'var(--px-r)', cursor: 'pointer', fontFamily: 'var(--px-font)' }}>Delete</button>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, animation: 'px-fadein 0.12s ease' }}>
+            <Btn variant="primary" size="sm" icon="edit" onClick={() => onEdit()}>Edit</Btn>
+            {liveUrl && cs.published && (
+              <a href={liveUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                style={{ height: 32, padding: '0 12px', fontSize: 13, fontWeight: 600, background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 'var(--px-r)', cursor: 'pointer', fontFamily: 'var(--px-font)', display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
+                <Icon name="eye" size={13} color="#fff" /> View live
+              </a>
+            )}
           </div>
         )}
       </div>
-      <div style={{ padding: '14px 16px 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--px-text)', lineHeight: 1.35, flex: 1 }}>{cs.title}</h3>
-          {cs.nda_enabled && <Icon name="lock" size={14} color="var(--px-text-3)" style={{ flexShrink: 0, marginTop: 2 }} />}
+
+      {/* Info */}
+      <div style={{ padding: '12px 14px 10px' }}>
+        <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--px-text)', lineHeight: 1.35, margin: 0 }}>{cs.title}</h3>
+      </div>
+
+      {/* Action bar */}
+      <div style={{ padding: '0 10px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+        {/* Drag handle */}
+        <div {...(dragHandleProps || {})}
+          style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', borderRadius: 5, color: 'var(--px-text-3)', flexShrink: 0 }}
+          title="Drag to reorder">
+          <Icon name="drag" size={14} />
         </div>
-        <div style={{ display: 'flex', gap: 5 }}>
-          {!cs.published ? <Badge color="orange">Draft</Badge> : <Badge color="green">Published</Badge>}
-        </div>
+        {/* Edit */}
+        <button onClick={onEdit}
+          style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', borderRadius: 5, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
+          <Icon name="edit" size={12} /> Edit
+        </button>
+        {/* Visible toggle */}
+        <button onClick={handleToggle} disabled={toggling}
+          style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: cs.published ? 'var(--px-success)' : 'var(--px-text-3)', background: cs.published ? 'var(--px-success-subtle)' : 'var(--px-surface-2)', border: `1px solid ${cs.published ? 'var(--px-success)' : 'var(--px-border)'}`, borderRadius: 5, cursor: 'pointer', fontFamily: 'var(--px-font)', opacity: toggling ? 0.6 : 1 }}>
+          <Icon name={cs.published ? 'eye' : 'eyeOff'} size={12} /> {cs.published ? 'Visible' : 'Hidden'}
+        </button>
+        {/* Delete */}
+        <button onClick={onDelete}
+          style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FEF0EE', border: '1px solid #F5C2BB', borderRadius: 5, cursor: 'pointer', flexShrink: 0 }}
+          title="Delete">
+          <Icon name="trash" size={13} color="#C94040" />
+        </button>
       </div>
     </div>
   )
@@ -354,11 +395,44 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<CaseStudy | null>(null)
   const [addingCase, setAddingCase] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
     try { localStorage.setItem('px-dark', String(darkMode)) } catch {}
   }, [darkMode])
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setShowUserMenu(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/session', { method: 'DELETE' })
+    window.location.href = '/sign-in'
+  }
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination || result.source.index === result.destination.index) return
+    const next = Array.from(cases)
+    const [moved] = next.splice(result.source.index, 1)
+    next.splice(result.destination.index, 0, moved)
+    setCases(next)
+    // Persist new order
+    await Promise.all(next.map((cs, i) =>
+      fetch(`/api/case-studies/${cs.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ display_order: i }) })
+    ))
+  }
+
+  const handleToggleVisible = async (cs: CaseStudy) => {
+    const updated = { ...cs, published: !cs.published }
+    setCases(c => c.map(x => x.id === cs.id ? updated : x))
+    await fetch(`/api/case-studies/${cs.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ published: updated.published }) })
+  }
 
   const handleAddCase = async () => {
     if (profile?.plan === 'free' && cases.length >= freeLimit) { setShowUpgrade(true); return }
@@ -392,11 +466,30 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
         ) : <div style={{ fontSize: 12, color: 'var(--px-text-3)', fontStyle: 'italic' }}>Not published yet</div>}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
           <IconBtn name="barChart" size={34} iconSize={17} title="Admin" onClick={() => router.push('/admin')} />
-          <IconBtn name="palette" size={34} iconSize={17} title="Themes" />
           <IconBtn name={darkMode ? 'sun' : 'moon'} size={34} iconSize={17} onClick={() => setDarkMode(d => !d)} title={darkMode ? 'Light mode' : 'Dark mode'} />
           <div style={{ width: 1, height: 20, background: 'var(--px-border)', margin: '0 4px' }} />
           <Btn variant="secondary" size="sm" icon="eye" onClick={() => router.push('/preview')}>Preview</Btn>
           <Btn variant="primary" size="sm" icon="globe" onClick={() => setShowPublish(true)}>{profile?.slug ? 'Update' : 'Publish'}</Btn>
+          <div style={{ width: 1, height: 20, background: 'var(--px-border)', margin: '0 4px' }} />
+          {/* Profile / logout */}
+          <div ref={userMenuRef} style={{ position: 'relative' }}>
+            <button onClick={() => setShowUserMenu(m => !m)}
+              style={{ width: 34, height: 34, borderRadius: 999, overflow: 'hidden', cursor: 'pointer', border: showUserMenu ? '2px solid var(--px-accent)' : '2px solid transparent', padding: 0, background: 'none', transition: 'border-color 0.15s' }}>
+              <Avatar name={profile?.name || 'You'} src={profile?.avatar_url || undefined} size={30} />
+            </button>
+            {showUserMenu && (
+              <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', boxShadow: 'var(--px-shadow-md)', minWidth: 180, zIndex: 100, padding: 6 }}>
+                <div style={{ padding: '8px 12px 6px', borderBottom: '1px solid var(--px-border)', marginBottom: 4 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)' }}>{profile?.name || 'You'}</div>
+                  <div style={{ fontSize: 11, color: 'var(--px-text-3)', marginTop: 1 }}>{(profile as any)?.email || ''}</div>
+                </div>
+                <button onClick={handleLogout}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: '#C94040', background: 'none', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left' }}>
+                  <Icon name="logout" size={14} color="#C94040" /> Sign out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -420,9 +513,20 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                 </p>
               </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-              {(profile?.skills || []).map(s => <Tag key={s}>{s}</Tag>)}
-              <Tag onClick={() => setShowProfileEdit(true)}>+ {(profile?.skills || []).length === 0 ? 'Add skills' : 'Edit skills'}</Tag>
+            {/* Skills marquee */}
+            {(profile?.skills || []).length > 0 ? (
+              <div style={{ overflow: 'hidden', marginBottom: 12, maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+                <div style={{ display: 'flex', gap: 8, width: 'max-content', animation: 'px-marquee 18s linear infinite' }}>
+                  {[...(profile?.skills || []), ...(profile?.skills || [])].map((s, i) => <Tag key={i}>{s}</Tag>)}
+                </div>
+              </div>
+            ) : (
+              <div style={{ marginBottom: 12 }}>
+                <Tag onClick={() => setShowProfileEdit(true)}>+ Add skills</Tag>
+              </div>
+            )}
+            <div style={{ marginBottom: 4 }}>
+              <Tag onClick={() => setShowProfileEdit(true)}>Edit skills</Tag>
             </div>
             {/* Social + Resume links */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -465,13 +569,32 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                 <Btn variant="primary" icon="plus" onClick={handleAddCase} disabled={addingCase}>{addingCase ? 'Creating…' : 'Add case study'}</Btn>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
-                {cases.map((cs, i) => (
-                  <div key={cs.id} style={{ animation: `px-fadein var(--dur-base) var(--ease-out) ${i * 60}ms both` }}>
-                    <CaseStudyCard cs={cs} onEdit={() => router.push(`/case-study/${cs.id}`)} onDelete={() => setDeleteTarget(cs)} />
-                  </div>
-                ))}
-              </div>
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable droppableId="cases" direction="horizontal">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}
+                      style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+                      {cases.map((cs, i) => (
+                        <Draggable key={cs.id} draggableId={cs.id} index={i}>
+                          {(drag) => (
+                            <div ref={drag.innerRef} {...drag.draggableProps}>
+                              <CaseStudyCard
+                                cs={cs}
+                                dragHandleProps={drag.dragHandleProps || undefined}
+                                onEdit={() => router.push(`/case-study/${cs.id}`)}
+                                onDelete={() => setDeleteTarget(cs)}
+                                onToggleVisible={() => handleToggleVisible(cs)}
+                                liveUrl={slugUrl}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             )}
           </div>
 

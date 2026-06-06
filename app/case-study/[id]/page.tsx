@@ -16,8 +16,10 @@ import { TextBlock } from '@/components/editor/TextBlock'
 import { GeneratingText } from '@/components/editor/GeneratingText'
 import type { Block, BlockType, CaseStudy } from '@/types'
 
-// ── Always-dark palette ───────────────────────────────────────────────────────
-const D = { bg: '#0D0D0B', surface: '#161513', surface2: '#1E1D1A', border: '#2B2926', text: '#F0EEE9', text2: '#8A8780', text3: '#56534D' }
+const DARK  = { bg: '#0D0D0B', surface: '#161513', surface2: '#1E1D1A', border: '#2B2926', text: '#F0EEE9', text2: '#8A8780', text3: '#56534D' }
+const LIGHT = { bg: '#F8F7F4', surface: '#FFFFFF', surface2: '#F2F0EC', border: '#E4E2DC', text: '#1C1B18', text2: '#6C6960', text3: '#9A978E' }
+// D is set dynamically in the component based on lightMode state
+const D = DARK // default — overridden inside component
 
 const BLOCK_TYPES = [
   { id: 'image',   label: 'Image',         icon: 'image',    desc: 'Single image with caption' },
@@ -43,7 +45,8 @@ function makeBlock(type: BlockType): Block {
 }
 
 // ── Gallery Block ─────────────────────────────────────────────────────────────
-function GalleryBlock({ block, onChange }: { block: Block; onChange: (b: Block) => void }) {
+type Palette = typeof DARK
+function GalleryBlock({ block, onChange, D }: { block: Block; onChange: (b: Block) => void; D: Palette }) {
   const imgs = block.images || [{ url: '', caption: '' }, { url: '', caption: '' }]
   const canAdd = imgs.length < 4
 
@@ -89,7 +92,7 @@ function GalleryBlock({ block, onChange }: { block: Block; onChange: (b: Block) 
 }
 
 // ── Dynamic Block ─────────────────────────────────────────────────────────────
-function DynamicBlock({ block, onChange, onDelete, index, draggableProps, dragHandleProps, innerRef }: {
+function DynamicBlock({ block, onChange, onDelete, index, draggableProps, dragHandleProps, innerRef, D }: {
   block: Block
   onChange: (b: Block) => void
   onDelete: () => void
@@ -99,6 +102,7 @@ function DynamicBlock({ block, onChange, onDelete, index, draggableProps, dragHa
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dragHandleProps: any
   innerRef: (el: HTMLElement | null) => void
+  D: Palette
 }) {
   const [hover, setHover] = useState(false)
 
@@ -123,7 +127,7 @@ function DynamicBlock({ block, onChange, onDelete, index, draggableProps, dragHa
           caption={block.caption || ''} onCaption={v => onChange({ ...block, caption: v })}
           imageUrl={block.imageUrl} onImageUrl={url => onChange({ ...block, imageUrl: url })} />
       )}
-      {block.type === 'gallery' && <GalleryBlock block={block} onChange={onChange} />}
+      {block.type === 'gallery' && <GalleryBlock block={block} onChange={onChange} D={D} />}
       {block.type === 'figma' && (
         <FigmaBlock figmaUrl={block.figmaUrl} onFigmaUrl={url => onChange({ ...block, figmaUrl: url })}
           sectionLabel={block.sectionLabel} onSectionLabel={v => onChange({ ...block, sectionLabel: v })} />
@@ -145,6 +149,8 @@ function DynamicBlock({ block, onChange, onDelete, index, draggableProps, dragHa
 export default function EditorPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const [lightMode, setLightMode] = useState(false)
+  const P = lightMode ? LIGHT : DARK // active palette
 
   const [cs, setCs] = useState<CaseStudy | null>(null)
   const [title, setTitle] = useState('Untitled')
@@ -315,46 +321,51 @@ export default function EditorPage() {
   const isGenerating = thinking || !!streaming
 
   return (
-    <div className="px-screen" style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: D.bg, color: D.text, overflow: 'hidden' }}>
+    <div className="px-screen" style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: P.bg, color: P.text, overflow: 'hidden' }}>
       {/* Top bar */}
-      <div style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: `1px solid ${D.border}`, background: D.surface, flexShrink: 0, gap: 12 }}>
+      <div style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: `1px solid ${P.border}`, background: P.surface, flexShrink: 0, gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button onClick={() => { saveNow(); router.push('/dashboard') }} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: D.text2, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--px-font)', fontWeight: 500, padding: '4px 6px', borderRadius: 5 }}>
+          <button onClick={() => { saveNow(); router.push('/dashboard') }} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: P.text2, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--px-font)', fontWeight: 500, padding: '4px 6px', borderRadius: 5 }}>
             <Icon name="arrowLeft" size={14} /> Builder
           </button>
-          <div style={{ width: 1, height: 16, background: D.border }} />
+          <div style={{ width: 1, height: 16, background: P.border }} />
           {editTitle ? (
             <input value={title} onChange={e => { setTitle(e.target.value); markDirty() }} onBlur={() => setEditTitle(false)} autoFocus
-              style={{ fontSize: 14, fontWeight: 700, color: D.text, background: 'transparent', border: 'none', borderBottom: '1px solid #E53416', outline: 'none', fontFamily: 'var(--px-font)', letterSpacing: '-0.02em', width: 240, padding: '2px 0' }} />
+              style={{ fontSize: 14, fontWeight: 700, color: P.text, background: 'transparent', border: 'none', borderBottom: '1px solid #E53416', outline: 'none', fontFamily: 'var(--px-font)', letterSpacing: '-0.02em', width: 240, padding: '2px 0' }} />
           ) : (
-            <span onClick={() => setEditTitle(true)} title="Click to rename" style={{ fontSize: 14, fontWeight: 700, color: D.text, letterSpacing: '-0.02em', cursor: 'text', maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
+            <span onClick={() => setEditTitle(true)} title="Click to rename" style={{ fontSize: 14, fontWeight: 700, color: P.text, letterSpacing: '-0.02em', cursor: 'text', maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {/* Save indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: saved ? '#3DBE6A' : D.text3 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: saved ? '#3DBE6A' : P.text3 }}>
             <Icon name={saved ? 'checkCircle' : 'edit'} size={13} />
             {saved ? 'Saved' : 'Unsaved'}
           </div>
           {/* Credits */}
           {creditsLeft !== null && (
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, color: creditsLeft > 3 ? D.text3 : '#B86E0A', background: creditsLeft > 3 ? D.surface2 : '#FEF3E4', border: `1px solid ${creditsLeft > 3 ? D.border : '#B86E0A'}` }}>
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, color: creditsLeft > 3 ? P.text3 : '#B86E0A', background: creditsLeft > 3 ? P.surface2 : '#FEF3E4', border: `1px solid ${creditsLeft > 3 ? P.border : '#B86E0A'}` }}>
               {creditsLeft} credit{creditsLeft !== 1 ? 's' : ''}
             </span>
           )}
+          {/* Light/dark toggle */}
+          <button onClick={() => setLightMode(m => !m)} title={lightMode ? 'Switch to dark' : 'Switch to light'}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, height: 32, padding: '0 10px', fontSize: 12, fontWeight: 600, borderRadius: 7, background: P.surface2, color: P.text2, border: `1px solid ${P.border}`, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
+            <Icon name={lightMode ? 'moon' : 'sun'} size={13} /> {lightMode ? 'Dark' : 'Light'}
+          </button>
           {/* Publish toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: D.surface2, border: `1px solid ${D.border}`, borderRadius: 6 }}>
-            <span style={{ fontSize: 12, color: D.text2, fontWeight: 500 }}>{published ? 'Published' : 'Draft'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: P.surface2, border: `1px solid ${P.border}`, borderRadius: 6 }}>
+            <span style={{ fontSize: 12, color: P.text2, fontWeight: 500 }}>{published ? 'Published' : 'Draft'}</span>
             <Toggle value={published} onChange={v => { setPublished(v); markDirty() }} size="sm" />
           </div>
-          <div style={{ width: 1, height: 16, background: D.border }} />
+          <div style={{ width: 1, height: 16, background: P.border }} />
           {/* Generate narrative */}
           <button onClick={generateAll} disabled={!canGenerate || isGenerating}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 14px', fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em', borderRadius: 7, background: canGenerate && !isGenerating ? '#E53416' : '#2A2926', color: canGenerate && !isGenerating ? '#fff' : D.text3, border: 'none', cursor: canGenerate ? 'pointer' : 'not-allowed', fontFamily: 'var(--px-font)', position: 'relative', overflow: 'hidden' }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 14px', fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em', borderRadius: 7, background: canGenerate && !isGenerating ? '#E53416' : P.surface2, color: canGenerate && !isGenerating ? '#fff' : P.text3, border: `1px solid ${P.border}`, cursor: canGenerate ? 'pointer' : 'not-allowed', fontFamily: 'var(--px-font)', position: 'relative', overflow: 'hidden' }}>
             {thinking ? <Spinner size={12} /> : isGenerating ? <Spinner size={12} /> : <Icon name="sparkle" size={14} />}
             {thinking ? 'Thinking…' : isGenerating ? `Generating ${streaming}…` : 'Generate narrative'}
           </button>
-          <button onClick={saveNow} style={{ display: 'flex', alignItems: 'center', gap: 5, height: 32, padding: '0 12px', fontSize: 13, fontWeight: 600, borderRadius: 7, background: D.surface2, color: D.text2, border: `1px solid ${D.border}`, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
+          <button onClick={saveNow} style={{ display: 'flex', alignItems: 'center', gap: 5, height: 32, padding: '0 12px', fontSize: 13, fontWeight: 600, borderRadius: 7, background: P.surface2, color: P.text2, border: `1px solid ${P.border}`, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
             Save
           </button>
         </div>
@@ -362,17 +373,17 @@ export default function EditorPage() {
 
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Left panel — block types + metadata */}
-        <div style={{ width: 196, borderRight: `1px solid ${D.border}`, background: D.surface, display: 'flex', flexDirection: 'column', flexShrink: 0, overflowY: 'auto' }}>
-          <div style={{ padding: '14px 12px 8px', fontSize: 10, fontWeight: 700, color: D.text3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Block Types</div>
+        <div style={{ width: 196, borderRight: `1px solid ${P.border}`, background: P.surface, display: 'flex', flexDirection: 'column', flexShrink: 0, overflowY: 'auto' }}>
+          <div style={{ padding: '14px 12px 8px', fontSize: 10, fontWeight: 700, color: P.text3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Block Types</div>
           {BLOCK_TYPES.map(bt => (
             <button key={bt.id} onClick={() => setActiveBlockType(bt.id as BlockType)}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: activeBlockType === bt.id ? '#252420' : 'transparent', border: 'none', borderLeft: `2px solid ${activeBlockType === bt.id ? '#E53416' : 'transparent'}`, cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--px-font)', transition: 'all 0.12s' }}>
-              <div style={{ width: 30, height: 30, borderRadius: 7, background: activeBlockType === bt.id ? '#2A2926' : D.surface2, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon name={bt.icon as any} size={15} color={activeBlockType === bt.id ? '#E53416' : D.text2} />
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: activeBlockType === bt.id ? (lightMode ? '#F2F0EC' : '#252420') : 'transparent', border: 'none', borderLeft: `2px solid ${activeBlockType === bt.id ? '#E53416' : 'transparent'}`, cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--px-font)', transition: 'all 0.12s' }}>
+              <div style={{ width: 30, height: 30, borderRadius: 7, background: activeBlockType === bt.id ? (lightMode ? '#E4E2DC' : '#2A2926') : P.surface2, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name={bt.icon as any} size={15} color={activeBlockType === bt.id ? '#E53416' : P.text2} />
               </div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: activeBlockType === bt.id ? D.text : D.text2, letterSpacing: '-0.01em' }}>{bt.label}</div>
-                <div style={{ fontSize: 10, color: D.text3, lineHeight: 1.3 }}>{bt.desc}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: activeBlockType === bt.id ? P.text : P.text2, letterSpacing: '-0.01em' }}>{bt.label}</div>
+                <div style={{ fontSize: 10, color: P.text3, lineHeight: 1.3 }}>{bt.desc}</div>
               </div>
             </button>
           ))}
@@ -383,11 +394,11 @@ export default function EditorPage() {
             <Icon name="plus" size={14} /> Add block
           </button>
 
-          <div style={{ margin: '4px 12px', height: 1, background: D.border }} />
+          <div style={{ margin: '4px 12px', height: 1, background: P.border }} />
 
           {/* Project metadata */}
           <div style={{ padding: '10px 12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: D.text3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Project Info</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: P.text3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Project Info</div>
             {[
               { key: 'role', label: 'My Role', ph: 'Lead Designer' },
               { key: 'client', label: 'Client', ph: 'Optional' },
@@ -395,27 +406,27 @@ export default function EditorPage() {
               { key: 'platform', label: 'Platform', ph: 'Web, iOS…' },
             ].map(f => (
               <div key={f.key}>
-                <div style={{ fontSize: 10, color: D.text3, marginBottom: 3, fontWeight: 600, letterSpacing: '0.03em' }}>{f.label}</div>
+                <div style={{ fontSize: 10, color: P.text3, marginBottom: 3, fontWeight: 600, letterSpacing: '0.03em' }}>{f.label}</div>
                 <input value={(metadata as any)[f.key]} onChange={e => { setMetadata(m => ({ ...m, [f.key]: e.target.value })); markDirty() }} placeholder={f.ph}
-                  style={{ width: '100%', fontSize: 12, color: D.text, background: D.surface2, border: `1px solid ${D.border}`, borderRadius: 5, padding: '4px 8px', fontFamily: 'var(--px-font)', outline: 'none', transition: 'border-color 0.12s' }}
+                  style={{ width: '100%', fontSize: 12, color: P.text, background: P.surface2, border: `1px solid ${P.border}`, borderRadius: 5, padding: '4px 8px', fontFamily: 'var(--px-font)', outline: 'none', transition: 'border-color 0.12s' }}
                   onFocus={e => (e.target.style.borderColor = '#E53416')}
-                  onBlur={e => (e.target.style.borderColor = D.border)} />
+                  onBlur={e => (e.target.style.borderColor = P.border)} />
               </div>
             ))}
 
             {/* NDA toggle */}
-            <div style={{ marginTop: 4, padding: '10px', background: ndaEnabled ? 'rgba(229,52,22,0.05)' : D.surface2, borderRadius: 6, border: `1px solid ${ndaEnabled ? 'rgba(229,52,22,0.2)' : D.border}` }}>
+            <div style={{ marginTop: 4, padding: '10px', background: ndaEnabled ? 'rgba(229,52,22,0.05)' : P.surface2, borderRadius: 6, border: `1px solid ${ndaEnabled ? 'rgba(229,52,22,0.2)' : P.border}` }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: ndaEnabled ? 8 : 0 }}>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: D.text2, letterSpacing: '-0.01em' }}>NDA Protected</div>
-                  <div style={{ fontSize: 10, color: D.text3 }}>Require password</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: P.text2, letterSpacing: '-0.01em' }}>NDA Protected</div>
+                  <div style={{ fontSize: 10, color: P.text3 }}>Require password</div>
                 </div>
                 <Toggle value={ndaEnabled} onChange={handleNdaToggle} size="sm" />
               </div>
               {ndaEnabled && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <input value={ndaPassword} onChange={e => setNdaPassword(e.target.value)} placeholder="Min 6 characters" type="password"
-                    style={{ width: '100%', fontSize: 12, color: D.text, background: '#0D0D0B', border: `1px solid ${ndaPasswordError ? '#C94040' : D.border}`, borderRadius: 5, padding: '5px 8px', fontFamily: 'var(--px-font)', outline: 'none' }} />
+                    style={{ width: '100%', fontSize: 12, color: P.text, background: P.bg, border: `1px solid ${ndaPasswordError ? '#C94040' : P.border}`, borderRadius: 5, padding: '5px 8px', fontFamily: 'var(--px-font)', outline: 'none' }} />
                   {ndaPasswordError && <span style={{ fontSize: 10, color: '#C94040' }}>{ndaPasswordError}</span>}
                   <button onClick={handleNdaSave} style={{ height: 28, fontSize: 11, fontWeight: 600, color: '#fff', background: '#E53416', border: 'none', borderRadius: 5, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
                     Set password
@@ -427,14 +438,14 @@ export default function EditorPage() {
         </div>
 
         {/* Center canvas */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px 48px', background: D.bg }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px 48px', background: P.bg }}>
           <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
 
             {/* Cover section */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: D.text3 }}>Cover</span>
-                <div style={{ flex: 1, height: 1, background: D.border }} />
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: P.text3 }}>Cover</span>
+                <div style={{ flex: 1, height: 1, background: P.border }} />
               </div>
               <ImageSlot label="cover" ratio="16/9" enforceRatio
                 sectionLabel={coverLabel} onSectionLabel={v => { setCoverLabel(v); markDirty() }}
@@ -460,6 +471,7 @@ export default function EditorPage() {
                             draggableProps={provided.draggableProps}
                             dragHandleProps={provided.dragHandleProps}
                             innerRef={provided.innerRef}
+                            D={P}
                           />
                         )}
                       </Draggable>
@@ -470,7 +482,7 @@ export default function EditorPage() {
               </Droppable>
             </DragDropContext>
 
-            {/* Process narrative — shown after non-outcome blocks */}
+            {/* Process narrative */}
             {generated.process && (
               <GeneratingText text={generated.process} streaming={streaming === 'process'}
                 onRegenerate={() => generateSection('process')} disabled={isGenerating || !canGenerate} />
@@ -480,28 +492,28 @@ export default function EditorPage() {
             {generated.outcome && (
               <div style={{ marginTop: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: D.text3 }}>Outcome Narrative</span>
-                  <div style={{ flex: 1, height: 1, background: D.border }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: P.text3 }}>Outcome Narrative</span>
+                  <div style={{ flex: 1, height: 1, background: P.border }} />
                 </div>
                 <GeneratingText text={generated.outcome} streaming={streaming === 'outcome'}
                   onRegenerate={() => generateSection('outcome')} disabled={isGenerating || !canGenerate} />
               </div>
             )}
 
-            {/* Add block CTA at bottom */}
+            {/* Add block CTA */}
             <button onClick={addBlock}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, height: 44, fontSize: 13, fontWeight: 600, color: D.text3, background: 'transparent', border: `1.5px dashed ${D.border}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'var(--px-font)', transition: 'border-color 0.15s, color 0.15s' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, height: 44, fontSize: 13, fontWeight: 600, color: P.text3, background: 'transparent', border: `1.5px dashed ${P.border}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'var(--px-font)', transition: 'border-color 0.15s, color 0.15s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#E53416'; (e.currentTarget as HTMLButtonElement).style.color = '#E53416' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = D.border; (e.currentTarget as HTMLButtonElement).style.color = D.text3 }}>
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = P.border; (e.currentTarget as HTMLButtonElement).style.color = P.text3 }}>
               <Icon name="plus" size={15} /> Add {activeBlockType} block
             </button>
           </div>
         </div>
 
         {/* Right panel — Case Brief */}
-        <div style={{ width: 272, borderLeft: `1px solid ${D.border}`, background: D.surface, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-          <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${D.border}` }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: D.text, letterSpacing: '-0.01em' }}>Case Brief</span>
+        <div style={{ width: 272, borderLeft: `1px solid ${P.border}`, background: P.surface, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${P.border}` }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: P.text, letterSpacing: '-0.01em' }}>Case Brief</span>
             <Badge color="default" size="xs">AI Context</Badge>
           </div>
           <div style={{ flex: 1, padding: 16, display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto' }}>
@@ -511,32 +523,32 @@ export default function EditorPage() {
               { key: 'outcome', label: 'Outcome', value: outcome, onChange: setOutcome, required: false, placeholder: 'What changed? Metrics, team impact, learnings.', rows: 3 },
             ].map(f => (
               <div key={f.key}>
-                <label style={{ fontSize: 11, fontWeight: 700, color: D.text2, letterSpacing: '0.04em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: P.text2, letterSpacing: '0.04em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
                   {f.label} {f.required && <span style={{ color: '#E53416' }}>*</span>}
                 </label>
                 <textarea value={f.value} onChange={e => { f.onChange(e.target.value); markDirty() }} placeholder={f.placeholder} rows={f.rows}
-                  style={{ width: '100%', fontSize: 12, lineHeight: 1.6, color: D.text, background: D.surface2, border: `1px solid ${D.border}`, borderRadius: 6, padding: '8px 10px', resize: 'none', fontFamily: 'var(--px-font)', outline: 'none', transition: 'border 0.12s' }}
+                  style={{ width: '100%', fontSize: 12, lineHeight: 1.6, color: P.text, background: P.surface2, border: `1px solid ${P.border}`, borderRadius: 6, padding: '8px 10px', resize: 'none', fontFamily: 'var(--px-font)', outline: 'none', transition: 'border 0.12s' }}
                   onFocus={e => (e.target.style.borderColor = '#E53416')}
-                  onBlur={e => (e.target.style.borderColor = D.border)} />
+                  onBlur={e => (e.target.style.borderColor = P.border)} />
               </div>
             ))}
           </div>
 
           {/* Generate CTA */}
-          <div style={{ padding: '12px 14px', borderTop: `1px solid ${D.border}`, background: D.surface }}>
+          <div style={{ padding: '12px 14px', borderTop: `1px solid ${P.border}`, background: P.surface }}>
             {!canGenerate && (
-              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', padding: '8px 10px', background: D.surface2, borderRadius: 6, border: `1px dashed ${D.border}`, marginBottom: 8 }}>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', padding: '8px 10px', background: P.surface2, borderRadius: 6, border: `1px dashed ${P.border}`, marginBottom: 8 }}>
                 <span style={{ fontSize: 16, lineHeight: 1 }}>✦</span>
-                <p style={{ fontSize: 11, color: D.text2, lineHeight: 1.5, margin: 0 }}>
-                  Fill in <strong style={{ color: D.text }}>Problem</strong> and <strong style={{ color: D.text }}>What I did</strong> to unlock generation.
+                <p style={{ fontSize: 11, color: P.text2, lineHeight: 1.5, margin: 0 }}>
+                  Fill in <strong style={{ color: P.text }}>Problem</strong> and <strong style={{ color: P.text }}>What I did</strong> to unlock generation.
                 </p>
               </div>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {(['intro', 'process', 'outcome'] as const).map(section => (
                 <button key={section} onClick={() => generateSection(section)} disabled={!canGenerate || isGenerating}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 32, fontSize: 12, fontWeight: 600, borderRadius: 6, background: streaming === section ? '#E53416' : (canGenerate ? '#2A2926' : '#1A1917'), color: canGenerate ? (streaming === section ? '#fff' : D.text2) : D.text3, border: `1px solid ${streaming === section ? '#E53416' : D.border}`, cursor: canGenerate ? 'pointer' : 'not-allowed', fontFamily: 'var(--px-font)', transition: 'all 0.15s', position: 'relative', overflow: 'hidden', textTransform: 'capitalize' }}>
-                  {thinking && streaming === null ? <Spinner size={11} color={D.text2} /> : <Icon name="sparkle" size={12} />}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 32, fontSize: 12, fontWeight: 600, borderRadius: 6, background: streaming === section ? '#E53416' : P.surface2, color: canGenerate ? (streaming === section ? '#fff' : P.text2) : P.text3, border: `1px solid ${streaming === section ? '#E53416' : P.border}`, cursor: canGenerate ? 'pointer' : 'not-allowed', fontFamily: 'var(--px-font)', transition: 'all 0.15s', position: 'relative', overflow: 'hidden', textTransform: 'capitalize' }}>
+                  {thinking && streaming === null ? <Spinner size={11} color={P.text2} /> : <Icon name="sparkle" size={12} />}
                   {streaming === section ? `Generating…` : `${section} section`}
                 </button>
               ))}

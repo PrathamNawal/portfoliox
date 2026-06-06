@@ -22,6 +22,51 @@ const TOOL_COLORS: Record<string, string> = {
   Protopie: '#5C5CE6', Notion: '#1C1B18', Jira: '#0052CC', GitHub: '#24292F',
 }
 
+// Simple Icons slugs for logo CDN
+const TOOL_ICONS: Record<string, string> = {
+  'Figma': 'figma', 'FigJam': 'figma', 'Framer': 'framer', 'Sketch': 'sketch',
+  'Adobe XD': 'adobexd', 'Miro': 'miro', 'Maze': 'maze', 'Zeplin': 'zeplin',
+  'Principle': 'principle', 'Whimsical': 'whimsical', 'Spline': 'spline',
+  'Adobe Illustrator': 'adobeillustrator', 'Adobe Photoshop': 'adobephotoshop',
+  'Adobe After Effects': 'adobeaftereffects', 'Adobe Premiere': 'adobepremierepro',
+  'Protopie': 'protopie', 'Notion': 'notion', 'Jira': 'jira',
+  'Confluence': 'confluence', 'Slack': 'slack', 'Loom': 'loom',
+  'Linear': 'linear', 'GitHub': 'github', 'VS Code': 'visualstudiocode',
+  'Blender': 'blender', 'Cinema 4D': 'cinema4d', 'Dovetail': 'dovetail',
+}
+
+function ToolIcon({ name }: { name: string }) {
+  const [hover, setHover] = React.useState(false)
+  const [imgError, setImgError] = React.useState(false)
+  const slug = TOOL_ICONS[name]
+  const color = (TOOL_COLORS[name] || '888').replace('#', '')
+
+  return (
+    <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{ position: 'relative', width: 44, height: 44, borderRadius: 10, background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'default', transition: 'transform 0.15s', transform: hover ? 'translateY(-2px)' : 'none' }}>
+      {slug && !imgError ? (
+        <img
+          src={`https://cdn.simpleicons.org/${slug}/${color}`}
+          alt={name}
+          width={22}
+          height={22}
+          onError={() => setImgError(true)}
+          style={{ display: 'block' }}
+        />
+      ) : (
+        <div style={{ width: 22, height: 22, borderRadius: 4, background: TOOL_COLORS[name] || '#888', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{name[0]}</span>
+        </div>
+      )}
+      {hover && (
+        <div style={{ position: 'absolute', bottom: 'calc(100% + 6px)', left: '50%', transform: 'translateX(-50%)', background: '#1C1B18', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 8px', borderRadius: 5, whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 10 }}>
+          {name}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function ToolBadge({ name }: { name: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'var(--px-surface-2)', borderRadius: 6, fontSize: 12, fontWeight: 600, color: 'var(--px-text)', border: '1px solid var(--px-border)' }}>
@@ -118,9 +163,9 @@ export function ToolStackSection({ tools, onChange }: Props) {
             Add the tools you work with every day — up to 12.
           </p>
         ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            {tools.map(t => <ToolBadge key={t.id} name={t.tool_name} />)}
-            <button onClick={() => setModalOpen(true)} style={{ display: 'flex', alignItems: 'center', padding: '5px 10px', fontSize: 12, fontWeight: 500, borderRadius: 6, background: 'transparent', border: '1px dashed var(--px-border)', color: 'var(--px-text-3)', cursor: 'pointer', fontFamily: 'var(--px-font)' }}>Edit</button>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+            {tools.map(t => <ToolIcon key={t.id} name={t.tool_name} />)}
+            <button onClick={() => setModalOpen(true)} style={{ width: 44, height: 44, borderRadius: 10, background: 'transparent', border: '1px dashed var(--px-border)', color: 'var(--px-text-3)', cursor: 'pointer', fontFamily: 'var(--px-font)', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit tools">+</button>
           </div>
         )}
       </div>
