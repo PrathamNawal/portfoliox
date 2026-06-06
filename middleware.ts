@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// DIAGNOSTIC: middleware auth check disabled — let server layouts handle auth
-// This tells us if the issue is the middleware or the exchange itself
+const AUTH_REQUIRED = ['/dashboard', '/case-study', '/analytics', '/preview', '/admin']
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  const needsAuth = AUTH_REQUIRED.some((r) => pathname.startsWith(r))
+
+  if (needsAuth && !request.cookies.get('px_session')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/sign-in'
+    url.searchParams.set('next', pathname)
+    return NextResponse.redirect(url)
+  }
+
   return NextResponse.next()
 }
 

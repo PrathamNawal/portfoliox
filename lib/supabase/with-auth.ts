@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/firebase/session'
 import { createClient as serviceClient } from '@supabase/supabase-js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,8 +12,7 @@ function makeServiceClient(): SupabaseClient {
 }
 
 export async function requireAuthContext(): Promise<{ userId: string; supabase: SupabaseClient }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) throw new Error('UNAUTHORIZED')
-  return { userId: user.id, supabase: makeServiceClient() }
+  return { userId: user.uid, supabase: makeServiceClient() }
 }

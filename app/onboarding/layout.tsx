@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/firebase/session'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export default async function OnboardingLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  
+  const user = await getSessionUser()
   if (!user) redirect('/sign-in')
 
   const db = createServiceClient(
@@ -14,7 +14,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
   const { data: profile } = await db
     .from('profiles')
     .select('onboarding_complete')
-    .eq('id', user.id)
+    .eq('id', user.uid)
     .maybeSingle()
 
   if (profile?.onboarding_complete) redirect('/dashboard')

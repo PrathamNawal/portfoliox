@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
-import { createClient as serverClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/firebase/session'
 import { AdminClient } from './AdminClient'
 
 export default async function AdminPage() {
-  const supabase = await serverClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  
+  const user = await getSessionUser()
 
   const db = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,7 +44,7 @@ export default async function AdminPage() {
       initialUsers={users}
       freeLimit={parseInt(setting?.value || '6', 10)}
       stats={{ total: users.length, new7d: users.filter(u => u.joinedRaw >= since7d).length, new30d: users.filter(u => u.joinedRaw >= since30d).length, pro: users.filter(u => u.plan === 'pro').length }}
-      currentAdminId={user!.id}
+      currentAdminId={user!.uid}
     />
   )
 }
