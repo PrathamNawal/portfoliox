@@ -1,12 +1,9 @@
 import { redirect } from 'next/navigation'
-import { stackServerApp } from '@/lib/stack'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function HomePage() {
-  const user = await stackServerApp.getUser({ or: 'return-null' })
-
-  if (user) {
-    redirect('/dashboard')
-  }
-
-  redirect('/handler/sign-in')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) redirect('/dashboard')
+  redirect('/sign-in')
 }

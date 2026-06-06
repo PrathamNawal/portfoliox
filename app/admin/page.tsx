@@ -1,44 +1,32 @@
 import { createClient } from '@supabase/supabase-js'
-import { stackServerApp } from '@/lib/stack'
+import { createClient as serverClient } from '@/lib/supabase/server'
 import { AdminClient } from './AdminClient'
 
 export default async function AdminPage() {
-  const user = await stackServerApp.getUser({ or: 'redirect' })
+  const supabase = await serverClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  const supabase = createClient(
+  const db = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 
-  // Fetch all profiles with case study counts
-  const { data: profiles } = await supabase
+  const { data: profiles } = await db
     .from('profiles')
     .select('id, name, email, created_at, plan, role, slug')
     .order('created_at', { ascending: false })
 
-  const { data: caseCountRows } = await supabase
-    .from('case_studies')
-    .select('user_id')
+  const { data: caseCountRows } = await db.from('case_studies').select('user_id')
+  const { data: setting } = await db.from('app_settings').select('value').eq('key', 'free_tier_case_study_limit').single()
 
-  const { data: setting } = await supabase
-    .from('app_settings')
-    .select('value')
-    .eq('key', 'free_tier_case_study_limit')
-    .single()
-
-  // Calculate per-user case study counts
   const countMap: Record<string, number> = {}
   for (const row of caseCountRows || []) {
     countMap[row.user_id] = (countMap[row.user_id] || 0) + 1
   }
 
-  // 7-day and 30-day signup counts
   const now = Date.now()
   const since7d = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString()
   const since30d = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString()
-  const new7d = (profiles || []).filter(p => p.created_at >= since7d).length
-  const new30d = (profiles || []).filter(p => p.created_at >= since30d).length
-
   const users = (profiles || []).map(p => ({
     id: p.id,
     name: p.name,
@@ -55,8 +43,8 @@ export default async function AdminPage() {
     <AdminClient
       initialUsers={users}
       freeLimit={parseInt(setting?.value || '6', 10)}
-      stats={{ total: users.length, new7d, new30d, pro: users.filter(u => u.plan === 'pro').length }}
-      currentAdminId={user.id}
+      stats={{ total: users.length, new7d: users.filter(u => u.joinedRaw >= since7d).length, new30d: users.filter(u => u.joinedRaw >= since30d).length, pro: users.filter(u => u.plan === 'pro').length }}
+      currentAdminId={user!.id}
     />
   )
 }

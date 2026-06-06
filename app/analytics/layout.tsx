@@ -1,6 +1,9 @@
-import { stackServerApp } from '@/lib/stack'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function AnalyticsLayout({ children }: { children: React.ReactNode }) {
-  await stackServerApp.getUser({ or: 'redirect' })
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/sign-in')
   return <>{children}</>
 }

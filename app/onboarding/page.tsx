@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useUser } from '@stackframe/stack'
+import { createClient } from '@/lib/supabase/client'
 import { Btn } from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Input'
 import { Tag } from '@/components/ui/Badge'
@@ -67,7 +67,7 @@ const LABELS = ['Your profile', 'Your discipline', 'Your skills', 'Choose your l
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const user = useUser({ or: 'redirect' })
+  const supabase = createClient()
 
   const [step, setStep] = useState(0)
   const [dir, setDir] = useState<'fwd' | 'back'>('fwd')
@@ -77,7 +77,7 @@ export default function OnboardingPage() {
   const avatarInput = useRef<HTMLInputElement>(null)
 
   const [data, setData] = useState({
-    name: (user as any)?.displayName || '',
+    name: '',
     bio: '',
     discipline: '',
     skills: [] as string[],

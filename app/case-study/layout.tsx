@@ -1,7 +1,9 @@
-import { stackServerApp } from '@/lib/stack'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function CaseStudyLayout({ children }: { children: React.ReactNode }) {
-  // Just enforce auth — onboarding guard is on dashboard
-  await stackServerApp.getUser({ or: 'redirect' })
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/sign-in')
   return <>{children}</>
 }

@@ -1,27 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stackServerApp } from './lib/stack'
-
-const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN || 'portfoliox.me'
+import { createServerClient } from '@supabase/ssr'
 
 const AUTH_REQUIRED = ['/dashboard', '/case-study', '/analytics', '/preview', '/admin']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const host = request.headers.get('host') || ''
 
-  // ── Auth guard ─────────────────────────────────────────────────────
+  // Build a response we can attach refreshed cookies to
+  let response = NextResponse.next({ request })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+        },
+      },
+    },
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
   const needsAuth = AUTH_REQUIRED.some((r) => pathname.startsWith(r))
-  if (!needsAuth) return NextResponse.next()
-
-  const user = await stackServerApp.getUser({ or: 'return-null' })
-  if (!user) {
+  if (needsAuth && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/sign-in'
-    url.searchParams.set('after', pathname)
+    url.searchParams.set('next', pathname)
     return NextResponse.redirect(url)
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {

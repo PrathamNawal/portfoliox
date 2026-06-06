@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stackServerApp } from '@/lib/stack'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/server'
+import { createClient as serviceClient } from '@supabase/supabase-js'
 
 const ADMIN_EMAIL = process.env.ADMIN_SEED_EMAIL
 
-function serviceClient() {
-  return createClient(
+function db() {
+  return serviceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 }
 
 export async function POST(req: NextRequest) {
-  const user = await stackServerApp.getUser({ or: 'return-null' })
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
@@ -22,12 +23,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 })
   }
 
-  const supabase = serviceClient()
+  const email = user.email || null
+  const supa = db()
 
-  const { error } = await supabase.from('profiles').upsert({
+  const { error } = await supa.from('profiles').upsert({
     id: user.id,
     name: name.trim().slice(0, 60),
-    email: user.primaryEmail || null,
+    email,
     bio: (bio || '').slice(0, 200) || null,
     avatar_url: avatar_url || null,
     discipline: discipline || null,
@@ -39,26 +41,24 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Seed AI credits on first signup
-  await supabase.from('ai_credits').upsert({
+  await supa.from('ai_credits').upsert({
     user_id: user.id,
     credits_remaining: 10,
     updated_at: new Date().toISOString(),
   })
 
-  // Seed admin role if this is the configured admin email or has a pending invite
-  if (ADMIN_EMAIL && user.primaryEmail === ADMIN_EMAIL) {
-    await supabase.from('profiles').update({ role: 'admin' }).eq('id', user.id)
-  } else if (user.primaryEmail) {
-    const { data: invite } = await supabase
+  if (ADMIN_EMAIL && email === ADMIN_EMAIL) {
+    await supa.from('profiles').update({ role: 'admin' }).eq('id', user.id)
+  } else if (email) {
+    const { data: invite } = await supa
       .from('admin_invites')
       .select('id')
-      .eq('email', user.primaryEmail)
+      .eq('email', email)
       .eq('accepted', false)
       .maybeSingle()
     if (invite) {
-      await supabase.from('profiles').update({ role: 'admin' }).eq('id', user.id)
-      await supabase.from('admin_invites').update({ accepted: true }).eq('id', invite.id)
+      await supa.from('profiles').update({ role: 'admin' }).eq('id', user.id)
+      await supa.from('admin_invites').update({ accepted: true }).eq('id', invite.id)
     }
   }
 
