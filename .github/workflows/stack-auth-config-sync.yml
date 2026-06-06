@@ -1,0 +1,31 @@
+name: Hexclave Config Sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "stack.config.ts"
+      - ".github/workflows/stack-auth-config-sync.yml"
+
+jobs:
+  push-stack-config:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+      - name: Push Hexclave config
+        env:
+          STACK_PROJECT_ID: ${{ secrets.STACK_AUTH_PROJECT_ID }}
+          STACK_SECRET_SERVER_KEY: ${{ secrets.STACK_AUTH_SECRET_SERVER_KEY }}
+          STACK_AUTH_CONFIG_PATH: "stack.config.ts"
+          STACK_AUTH_SOURCE_REPO: ${{ github.repository }}
+          STACK_AUTH_SOURCE_WORKFLOW_PATH: ".github/workflows/stack-auth-config-sync.yml"
+        run: npx --yes @hexclave/cli@latest config push --config-file "$STACK_AUTH_CONFIG_PATH" --source github --source-repo "$STACK_AUTH_SOURCE_REPO" --source-path "$STACK_AUTH_CONFIG_PATH" --source-workflow-path "$STACK_AUTH_SOURCE_WORKFLOW_PATH"
