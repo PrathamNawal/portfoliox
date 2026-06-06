@@ -33,6 +33,11 @@ export function anonymousFingerprint(ip: string, ua: string): string {
     .digest('hex')
 }
 
+export function portfolioUrl(slug: string): string {
+  const base = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/\/$/, '')
+  return `${base}/p/${slug}`
+}
+
 export function truncate(str: string, max: number): string {
   if (str.length <= max) return str
   return str.slice(0, max - 1) + '…'

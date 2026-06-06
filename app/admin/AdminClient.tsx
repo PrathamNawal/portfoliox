@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { portfolioUrl } from '@/lib/utils'
 import { Btn } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { PXLogo } from '@/components/ui/Misc'
@@ -239,7 +240,7 @@ export function AdminClient({ initialUsers, freeLimit: initialLimit, stats, curr
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     {u.slug && (
-                      <a href={`https://${u.slug}.portfoliox.me`} target="_blank" rel="noreferrer"
+                      <a href={portfolioUrl(u.slug!)} target="_blank" rel="noreferrer"
                         style={{ display: 'flex', alignItems: 'center', padding: '4px 6px', borderRadius: 'var(--px-r)', border: '1px solid var(--px-border)', background: 'var(--px-surface-2)', color: 'var(--px-text-3)', textDecoration: 'none', transition: 'all 0.1s' }}
                         title="View portfolio">
                         <Icon name="externalLink" size={12} />

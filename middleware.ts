@@ -9,20 +9,6 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const host = request.headers.get('host') || ''
 
-  // ── Subdomain routing ──────────────────────────────────────────────
-  // {slug}.portfoliox.me → rewrite to /[slug]
-  const isSubdomain =
-    host.endsWith(`.${APP_DOMAIN}`) &&
-    !host.startsWith('www.') &&
-    host !== APP_DOMAIN
-
-  if (isSubdomain) {
-    const slug = host.replace(`.${APP_DOMAIN}`, '')
-    const url = request.nextUrl.clone()
-    url.pathname = `/${slug}${pathname === '/' ? '' : pathname}`
-    return NextResponse.rewrite(url)
-  }
-
   // ── Auth guard ─────────────────────────────────────────────────────
   const needsAuth = AUTH_REQUIRED.some((r) => pathname.startsWith(r))
   if (!needsAuth) return NextResponse.next()

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { portfolioUrl } from '@/lib/utils'
 import { Btn, IconBtn } from '@/components/ui/Button'
 import { Badge, Tag } from '@/components/ui/Badge'
 import { Avatar } from '@/components/ui/Avatar'
@@ -72,12 +73,12 @@ function PublishModal({ open, onClose, profile, onPublished }: {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: 'var(--px-success-subtle)', borderRadius: 'var(--px-r)', border: '1px solid var(--px-success)' }}>
             <Icon name="checkCircle" size={16} color="var(--px-success)" />
-            <span style={{ fontSize: 13, color: 'var(--px-success)', fontWeight: 600 }}>Live at {liveSlug}.portfoliox.me</span>
+            <span style={{ fontSize: 13, color: 'var(--px-success)', fontWeight: 600 }}>Live at /p/{liveSlug}</span>
           </div>
           <Btn variant="primary" size="lg" onClick={handlePublish} disabled={publishing} style={{ width: '100%', justifyContent: 'center' }}>
             {publishing ? 'Updating…' : 'Push latest changes'}
           </Btn>
-          <a href={`https://${liveSlug}.portfoliox.me`} target="_blank" rel="noreferrer"
+          <a href={portfolioUrl(liveSlug)} target="_blank" rel="noreferrer"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13, color: 'var(--px-text-3)', textDecoration: 'none' }}>
             <Icon name="externalLink" size={13} /> Open portfolio
           </a>
@@ -87,7 +88,7 @@ function PublishModal({ open, onClose, profile, onPublished }: {
           <p style={{ fontSize: 14, color: 'var(--px-text-2)', lineHeight: 1.5 }}>Choose your portfolio URL. This cannot be changed after publishing.</p>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r)', overflow: 'hidden', background: 'var(--px-surface)' }}>
-              <span style={{ padding: '0 10px', fontSize: 13, color: 'var(--px-text-3)', background: 'var(--px-surface-2)', borderRight: '1px solid var(--px-border)', height: 40, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>portfoliox.me/</span>
+              <span style={{ padding: '0 10px', fontSize: 13, color: 'var(--px-text-3)', background: 'var(--px-surface-2)', borderRight: '1px solid var(--px-border)', height: 40, display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>/p/</span>
               <input value={slug} onChange={e => setSlug(e.target.value.toLowerCase())} placeholder="yourname" maxLength={30}
                 style={{ flex: 1, height: 40, padding: '0 12px', fontSize: 14, border: 'none', outline: 'none', fontFamily: 'var(--px-font)', color: 'var(--px-text)', background: 'transparent' }} autoFocus />
               {checking && <span style={{ marginRight: 12 }}><Spinner size={14} color="var(--px-text-3)" /></span>}
@@ -374,7 +375,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
     setDeleteTarget(null)
   }
 
-  const slugUrl = profile?.slug ? `${profile.slug}.portfoliox.me` : null
+  const slugUrl = profile?.slug ? portfolioUrl(profile.slug) : null
 
   return (
     <div className="px-screen" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { portfolioUrl } from '@/lib/utils'
 import { Btn } from '@/components/ui/Button'
 import { PXLogo } from '@/components/ui/Misc'
 import { Icon } from '@/components/ui/Icon'
@@ -169,9 +170,9 @@ export function AnalyticsDashboard({ events, caseStudies, slug }: Props) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {slug && (
-            <a href={`https://${slug}.portfoliox.me`} target="_blank" rel="noreferrer"
+            <a href={portfolioUrl(slug)} target="_blank" rel="noreferrer"
               style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--px-text-3)', textDecoration: 'none', fontWeight: 500 }}>
-              <Icon name="externalLink" size={12} /> {slug}.portfoliox.me
+              <Icon name="externalLink" size={12} /> /p/{slug}
             </a>
           )}
           <Btn variant="secondary" size="sm" icon="arrowLeft" onClick={() => router.push('/dashboard')}>Builder</Btn>
@@ -214,11 +215,11 @@ export function AnalyticsDashboard({ events, caseStudies, slug }: Props) {
               </p>
               {slug ? (
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                  <button onClick={() => navigator.clipboard.writeText(`https://${slug}.portfoliox.me`)}
+                  <button onClick={() => navigator.clipboard.writeText(portfolioUrl(slug))}
                     style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 16px', fontSize: 13, fontWeight: 600, borderRadius: 'var(--px-r)', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', color: 'var(--px-text)', cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
                     <Icon name="copy" size={14} /> Copy portfolio link
                   </button>
-                  <a href={`https://${slug}.portfoliox.me`} target="_blank" rel="noreferrer"
+                  <a href={portfolioUrl(slug)} target="_blank" rel="noreferrer"
                     style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 16px', fontSize: 13, fontWeight: 600, borderRadius: 'var(--px-r)', background: 'var(--px-accent)', color: '#fff', textDecoration: 'none' }}>
                     <Icon name="externalLink" size={14} /> Open portfolio
                   </a>

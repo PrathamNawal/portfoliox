@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { portfolioUrl } from '@/lib/utils'
 import { CanvasLayout } from '@/components/published/CanvasLayout'
 import { SpotlightLayout } from '@/components/published/SpotlightLayout'
 import { Btn } from '@/components/ui/Button'
@@ -45,10 +46,10 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials }: Pro
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {profile.slug && (
-            <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>{profile.slug}.portfoliox.me</span>
+            <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>/p/{profile.slug}</span>
           )}
           <Btn variant="secondary" size="xs" icon="externalLink"
-            onClick={() => profile.slug && window.open(`https://${profile.slug}.portfoliox.me`, '_blank')}>
+            onClick={() => profile.slug && window.open(portfolioUrl(profile.slug), '_blank')}>
             Open live
           </Btn>
         </div>
