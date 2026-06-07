@@ -154,9 +154,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           <h2 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--px-text)', textAlign: 'center', marginBottom: 32 }}>Let&apos;s work together</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {profile.resume_url && (
-              <a href={profile.resume_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', textDecoration: 'none', transition: 'border-color 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--px-text-3)')}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--px-border)')}>
+              <a href={profile.resume_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', textDecoration: 'none', transition: 'border-color 0.15s' }} className="px-work-link">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <span style={{ fontSize: 22 }}>📄</span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--px-text)' }}>View Resume</span>
@@ -232,9 +230,7 @@ function CanvasCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; slu
   const bg = cs.cover_image_url ? `url(${cs.cover_image_url}) center/cover` : grad
 
   return (
-    <Link href={`/${slug}/case/${cs.id}`} style={{ display: 'block', background: 'var(--px-surface)', borderRadius: 'var(--px-r-lg)', border: '1px solid var(--px-border)', overflow: 'hidden', textDecoration: 'none', transition: 'box-shadow 0.18s, transform 0.18s' }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--px-shadow-lg)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)' }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = ''; (e.currentTarget as HTMLElement).style.transform = '' }}>
+    <Link href={`/${slug}/case/${cs.id}`} className="px-canvas-case-card" style={{ display: 'block', background: 'var(--px-surface)', borderRadius: 'var(--px-r-lg)', border: '1px solid var(--px-border)', overflow: 'hidden', textDecoration: 'none', transition: 'box-shadow 0.18s, transform 0.18s' }}>
       <div style={{ height: 180, background: bg, position: 'relative' }}>
         {cs.nda_enabled && (
           <div style={{ position: 'absolute', inset: 0, backdropFilter: 'blur(10px)', background: 'rgba(0,0,0,0.6)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
@@ -259,9 +255,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function SocialLink({ href, label }: { href: string; label: string }) {
   return (
-    <a href={href} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: 'var(--px-text-3)', textDecoration: 'none', fontWeight: 500, padding: '4px 8px', borderRadius: 5, transition: 'background 0.12s' }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'var(--px-surface-2)')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+    <a href={href} target="_blank" rel="noreferrer" className="px-social-link" style={{ fontSize: 12, color: 'var(--px-text-3)', textDecoration: 'none', fontWeight: 500, padding: '4px 8px', borderRadius: 5, transition: 'background 0.12s' }}>
       {label}
     </a>
   )

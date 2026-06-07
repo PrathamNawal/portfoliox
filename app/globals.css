@@ -185,6 +185,21 @@ a { text-decoration: none; color: inherit; }
 .ProseMirror p { margin: 0 0 8px; }
 .ProseMirror ul { padding-left: 20px; margin: 0 0 8px; }
 
+/* ── Published portfolio hover effects (CSS-only, no JS event handlers in RSC) ── */
+.px-canvas-case-card:hover {
+  box-shadow: var(--px-shadow-lg);
+  transform: translateY(-2px);
+}
+.px-spotlight-case-card:hover {
+  box-shadow: var(--px-shadow-lg);
+}
+.px-social-link:hover {
+  background: var(--px-surface-2);
+}
+.px-work-link:hover {
+  border-color: var(--px-text-3) !important;
+}
+
 /* ── Mobile responsive utilities ─────────────────────────────────── */
 @media (max-width: 640px) {
   /* Auth & onboarding left panel — hide on mobile */
