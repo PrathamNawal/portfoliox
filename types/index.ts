@@ -8,6 +8,28 @@ export type SectionLabel =
   | 'Intro' | 'Research' | 'Ideation' | 'Wireframes' | 'Process'
   | 'Prototype' | 'Testing' | 'Outcome' | 'Learnings'
 
+// ── New section-based case study structure ───────────────────────────────────
+export type CaseSectionType =
+  | 'overview' | 'challenge' | 'research' | 'process' | 'solution' | 'impact' | 'custom'
+
+export type CaseDiscipline = 'ux' | 'brand' | 'motion' | 'illustration' | 'custom'
+
+export interface CaseSection {
+  id: string
+  type: CaseSectionType
+  title: string
+  narrative: string        // rich text HTML
+  blocks: Block[]          // visual blocks within this section
+}
+
+export interface OverviewData {
+  summary: string
+  role: string
+  timeline: string
+  team: string
+  metrics: { label: string; value: string }[]
+}
+
 export interface Profile {
   id: string
   name: string
@@ -67,6 +89,10 @@ export interface CaseStudy {
   published: boolean
   display_order: number
   ai_generated: AIGenerated
+  // New section-based structure
+  sections: CaseSection[] | null
+  discipline: CaseDiscipline | null
+  overview_data: OverviewData | null
   created_at: string
   updated_at: string
 }

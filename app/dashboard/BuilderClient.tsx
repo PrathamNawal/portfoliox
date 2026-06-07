@@ -23,7 +23,7 @@ const CASE_GRADS = [
   'linear-gradient(135deg,#2A1018 0%,#5A1A2A 100%)',
 ]
 
-const DISCIPLINES: Record<string, string> = {
+const DISCIPLINE_LABELS: Record<string, string> = {
   ux: 'UX / Product Design', graphic: 'Graphic / Visual',
   motion: 'Motion Design', illustration: 'Illustration',
 }
@@ -372,6 +372,51 @@ function CaseStudyCard({
   )
 }
 
+// ── Discipline Picker Modal ───────────────────────────────────────────────────
+const CASE_DISCIPLINES = [
+  { id: 'ux',           label: 'UX / Product Design',  desc: 'Research-led, user-centred, process-heavy', emoji: '⬡' },
+  { id: 'brand',        label: 'Brand & Identity',       desc: 'Brief-driven, concept exploration, visual outcomes', emoji: '◈' },
+  { id: 'motion',       label: 'Motion Design',          desc: 'Concept, storyboard, production, final output', emoji: '◎' },
+  { id: 'illustration', label: 'Illustration',           desc: 'Brief, sketches, refinement, final application', emoji: '◇' },
+  { id: 'custom',       label: 'Start from scratch',     desc: 'Blank canvas — add any sections you need', emoji: '○' },
+]
+
+function DisciplinePickerModal({ open, onClose, onCreate }: {
+  open: boolean; onClose: () => void
+  onCreate: (discipline: string) => Promise<void>
+}) {
+  const [selected, setSelected] = useState('ux')
+  const [loading, setLoading] = useState(false)
+
+  const handleCreate = async () => {
+    setLoading(true)
+    await onCreate(selected)
+    setLoading(false)
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="What kind of case study is this?" width={500}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+        {CASE_DISCIPLINES.map(d => (
+          <button key={d.id} onClick={() => setSelected(d.id)}
+            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: selected === d.id ? 'var(--px-accent-subtle)' : 'var(--px-surface-2)', border: `1.5px solid ${selected === d.id ? 'var(--px-accent)' : 'var(--px-border)'}`, borderRadius: 'var(--px-r-lg)', cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--px-font)', transition: 'all 0.12s' }}>
+            <span style={{ fontSize: 22, flexShrink: 0 }}>{d.emoji}</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: selected === d.id ? 'var(--px-accent)' : 'var(--px-text)', letterSpacing: '-0.02em', marginBottom: 2 }}>{d.label}</div>
+              <div style={{ fontSize: 12, color: 'var(--px-text-3)' }}>{d.desc}</div>
+            </div>
+            {selected === d.id && <div style={{ marginLeft: 'auto', width: 18, height: 18, borderRadius: 999, background: 'var(--px-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="checkCircle" size={12} color="#fff" /></div>}
+          </button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <Btn variant="secondary" onClick={onClose}>Cancel</Btn>
+        <Btn variant="primary" onClick={handleCreate} disabled={loading}>{loading ? 'Creating…' : 'Start building →'}</Btn>
+      </div>
+    </Modal>
+  )
+}
+
 // ── Main Builder Client ───────────────────────────────────────────────────────
 interface Props {
   initialProfile: Profile | null
@@ -396,6 +441,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
   const [deleteTarget, setDeleteTarget] = useState<CaseStudy | null>(null)
   const [addingCase, setAddingCase] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showDisciplinePicker, setShowDisciplinePicker] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -434,10 +480,15 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
     await fetch(`/api/case-studies/${cs.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ published: updated.published }) })
   }
 
-  const handleAddCase = async () => {
+  const handleAddCase = () => {
     if (profile?.plan === 'free' && cases.length >= freeLimit) { setShowUpgrade(true); return }
+    setShowDisciplinePicker(true)
+  }
+
+  const handleCreateWithDiscipline = async (discipline: string) => {
     setAddingCase(true)
-    const res = await fetch('/api/case-studies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'Untitled' }) })
+    setShowDisciplinePicker(false)
+    const res = await fetch('/api/case-studies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'Untitled', discipline }) })
     if (res.ok) { const cs = await res.json(); router.push(`/case-study/${cs.id}`) }
     else { const d = await res.json(); if (d.upgrade) setShowUpgrade(true); setAddingCase(false) }
   }
@@ -504,7 +555,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                   <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)' }}>{profile?.name || 'Your Name'}</h1>
-                  {profile?.discipline && <Badge>{DISCIPLINES[profile.discipline]}</Badge>}
+                  {profile?.discipline && <Badge>{DISCIPLINE_LABELS[profile.discipline]}</Badge>}
                   <IconBtn name="edit" size={26} iconSize={13} title="Edit profile" onClick={() => setShowProfileEdit(true)} />
                 </div>
                 <p style={{ fontSize: 14, color: profile?.bio ? 'var(--px-text-2)' : 'var(--px-text-3)', lineHeight: 1.6, cursor: 'text', fontStyle: profile?.bio ? 'normal' : 'italic' }}
@@ -615,6 +666,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
       </div>
 
       {/* Modals */}
+      <DisciplinePickerModal open={showDisciplinePicker} onClose={() => setShowDisciplinePicker(false)} onCreate={handleCreateWithDiscipline} />
       <PublishModal open={showPublish} onClose={() => setShowPublish(false)} profile={profile} onPublished={slug => setProfile(p => p ? { ...p, slug } : p)} />
       <ProfileEditModal open={showProfileEdit} onClose={() => setShowProfileEdit(false)} profile={profile} onSaved={setProfile} />
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />

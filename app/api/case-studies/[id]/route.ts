@@ -29,7 +29,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
     const allowed = ['title','problem','what_i_did','outcome_notes','cover_image_url',
       'blocks','section_labels','metadata','nda_enabled','nda_password_hash',
-      'published','display_order','ai_generated']
+      'published','display_order','ai_generated',
+      'sections','overview_data','discipline']
     const update: Record<string, unknown> = {}
     for (const key of allowed) {
       if (key in body) update[key] = body[key]

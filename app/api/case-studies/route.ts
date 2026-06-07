@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
+import { makeSectionsForDiscipline, makeDefaultOverview } from '@/lib/case-study-templates'
+import type { CaseDiscipline } from '@/types'
 
 export async function GET() {
   try {
@@ -48,9 +50,19 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
+    const discipline: CaseDiscipline = body.discipline || 'ux'
+    const sections = makeSectionsForDiscipline(discipline)
+    const overview_data = makeDefaultOverview()
+
     const { data, error } = await supabase
       .from('case_studies')
-      .insert({ user_id: userId, title: body.title || 'Untitled' })
+      .insert({
+        user_id: userId,
+        title: body.title || 'Untitled',
+        discipline,
+        sections,
+        overview_data,
+      })
       .select()
       .single()
 
