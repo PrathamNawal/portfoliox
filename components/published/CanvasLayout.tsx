@@ -64,14 +64,16 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           <p style={{ fontSize: 17, color: 'var(--px-text-2)', lineHeight: 1.7, maxWidth: 640, marginBottom: 28 }}>{profile.bio}</p>
         )}
 
-        {/* Skills */}
+        {/* Skills — marquee */}
         {profile.skills?.length > 0 && (
           <div style={{ marginBottom: 36 }}>
             <SectionLabel>Skills</SectionLabel>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
-              {profile.skills.map(s => (
-                <span key={s} style={{ padding: '6px 14px', fontSize: 13, fontWeight: 500, borderRadius: 999, background: 'var(--px-surface)', border: '1px solid var(--px-border)', color: 'var(--px-text-2)' }}>{s}</span>
-              ))}
+            <div style={{ overflow: 'hidden', marginTop: 10, maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+              <div style={{ display: 'flex', gap: 8, width: 'max-content', animation: 'px-marquee 22s linear infinite' }}>
+                {[...profile.skills, ...profile.skills].map((s, i) => (
+                  <span key={i} style={{ padding: '6px 14px', fontSize: 13, fontWeight: 500, borderRadius: 999, background: 'var(--px-surface)', border: '1px solid var(--px-border)', color: 'var(--px-text-2)', whiteSpace: 'nowrap', flexShrink: 0 }}>{s}</span>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -80,7 +82,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         {caseStudies.length > 0 && (
           <div style={{ marginBottom: 48 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 20 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)' }}>Work</h2>
+              <h2 style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)' }}>Case Studies</h2>
               <span style={{ fontSize: 13, color: 'var(--px-text-3)' }}>{caseStudies.length} project{caseStudies.length !== 1 ? 's' : ''}</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
@@ -139,12 +141,14 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           </div>
         )}
 
-        {/* Tool Stack */}
+        {/* Tool Stack — marquee */}
         {tools.length > 0 && (
           <div style={{ marginBottom: 48 }}>
             <SectionLabel>Tool Stack</SectionLabel>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 16 }}>
-              {tools.map(t => <PublishedToolIcon key={t.id} name={t.tool_name} />)}
+            <div style={{ overflow: 'hidden', marginTop: 16, maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+              <div style={{ display: 'flex', gap: 10, width: 'max-content', animation: 'px-marquee 28s linear infinite' }}>
+                {[...tools, ...tools].map((t, i) => <PublishedToolIcon key={i} name={t.tool_name} />)}
+              </div>
             </div>
           </div>
         )}
