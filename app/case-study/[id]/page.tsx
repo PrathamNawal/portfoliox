@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useIsMobile } from '@/lib/hooks'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { Toggle, Spinner } from '@/components/ui/Misc'
 import { Icon } from '@/components/ui/Icon'
@@ -386,7 +387,18 @@ function AddSectionTab({ onAdd, palette }: { onAdd: (t: CaseSectionType) => void
 export default function EditorPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const [lightMode, setLightMode] = useState(false)
+  const isMobile = useIsMobile()
+  const [showStoryCheck, setShowStoryCheck] = useState(false)
+
+  // Sync with the global light/dark preference set on the dashboard
+  const [lightMode, setLightMode] = useState(() => {
+    if (typeof window === 'undefined') return true
+    return localStorage.getItem('px-dark') !== 'true'
+  })
+  const toggleLightMode = (next: boolean) => {
+    setLightMode(next)
+    try { localStorage.setItem('px-dark', String(!next)) } catch {}
+  }
   const palette = lightMode ? LIGHT : DARK
 
   const [title, setTitle] = useState('Untitled')
@@ -514,7 +526,7 @@ export default function EditorPage() {
               {creditsLeft} credits
             </span>
           )}
-          <button onClick={() => setLightMode(m => !m)}
+          <button onClick={() => toggleLightMode(!lightMode)}
             style={{ display: 'flex', alignItems: 'center', gap: 5, height: 30, padding: '0 10px', fontSize: 12, fontWeight: 600, borderRadius: 6, background: palette.surface2, color: palette.text2, border: `1px solid ${palette.border}`, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
             <Icon name={lightMode ? 'moon' : 'sun'} size={13} /> {lightMode ? 'Dark' : 'Light'}
           </button>
@@ -560,10 +572,10 @@ export default function EditorPage() {
       </div>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
 
         {/* Canvas */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '40px 48px 80px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '20px 16px 80px' : '40px 48px 80px' }}>
           <div style={{ maxWidth: 700, margin: '0 auto' }}>
             {/* Section header */}
             {activeSection && (
@@ -599,17 +611,36 @@ export default function EditorPage() {
           </div>
         </div>
 
-        {/* Story Check */}
-        <div style={{ width: 264, borderLeft: `1px solid ${palette.border}`, background: palette.surface, flexShrink: 0, overflow: 'hidden' }}>
-          <StoryCheckPanel sections={sections} activeIdx={activeIdx} onJump={goTo}
-            problem={problem} setProblem={v => { setProblem(v); markDirty() }}
-            whatIDid={whatIDid} setWhatIDid={v => { setWhatIDid(v); markDirty() }}
-            creditsLeft={creditsLeft} palette={palette} />
-        </div>
+        {/* Story Check — sidebar on desktop, bottom sheet on mobile */}
+        {!isMobile && (
+          <div style={{ width: 264, borderLeft: `1px solid ${palette.border}`, background: palette.surface, flexShrink: 0, overflow: 'hidden' }}>
+            <StoryCheckPanel sections={sections} activeIdx={activeIdx} onJump={goTo}
+              problem={problem} setProblem={v => { setProblem(v); markDirty() }}
+              whatIDid={whatIDid} setWhatIDid={v => { setWhatIDid(v); markDirty() }}
+              creditsLeft={creditsLeft} palette={palette} />
+          </div>
+        )}
+        {isMobile && showStoryCheck && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 40, display: 'flex', flexDirection: 'column' }}>
+            <div onClick={() => setShowStoryCheck(false)} style={{ flex: 1, background: 'rgba(0,0,0,0.4)' }} />
+            <div style={{ background: palette.surface, borderTop: `1px solid ${palette.border}`, height: '70%', overflow: 'hidden', borderRadius: '16px 16px 0 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: `1px solid ${palette.border}` }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: palette.text }}>Story Check</span>
+                <button onClick={() => setShowStoryCheck(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: palette.text3, padding: 4 }}>
+                  <Icon name="x" size={16} color={palette.text3} />
+                </button>
+              </div>
+              <StoryCheckPanel sections={sections} activeIdx={activeIdx} onJump={i => { goTo(i); setShowStoryCheck(false) }}
+                problem={problem} setProblem={v => { setProblem(v); markDirty() }}
+                whatIDid={whatIDid} setWhatIDid={v => { setWhatIDid(v); markDirty() }}
+                creditsLeft={creditsLeft} palette={palette} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Bottom navigation ── */}
-      <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', background: palette.surface, borderTop: `1px solid ${palette.border}`, flexShrink: 0 }}>
+      <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 12px' : '0 32px', background: palette.surface, borderTop: `1px solid ${palette.border}`, flexShrink: 0, gap: 8 }}>
         {activeIdx > 0 ? (
           <button onClick={() => goTo(activeIdx - 1)}
             style={{ display: 'flex', alignItems: 'center', gap: 7, height: 34, padding: '0 14px', fontSize: 13, fontWeight: 600, color: palette.text2, background: palette.surface2, border: `1px solid ${palette.border}`, borderRadius: 7, cursor: 'pointer', fontFamily: 'var(--px-font)', transition: 'all 0.15s' }}
@@ -619,9 +650,16 @@ export default function EditorPage() {
           </button>
         ) : <div />}
 
-        <span style={{ fontSize: 12, color: palette.text3, fontWeight: 500 }}>
-          {activeIdx + 1} / {sections.length}
-        </span>
+        {isMobile ? (
+          <button onClick={() => setShowStoryCheck(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 12px', fontSize: 12, fontWeight: 600, color: palette.text2, background: palette.surface2, border: `1px solid ${palette.border}`, borderRadius: 7, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
+            ✦ Story
+          </button>
+        ) : (
+          <span style={{ fontSize: 12, color: palette.text3, fontWeight: 500 }}>
+            {activeIdx + 1} / {sections.length}
+          </span>
+        )}
 
         {activeIdx < sections.length - 1 ? (
           <button onClick={() => goTo(activeIdx + 1)}

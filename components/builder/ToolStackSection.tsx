@@ -14,39 +14,58 @@ const ALL_TOOLS = [
   'Adobe After Effects','Adobe Premiere','Blender','Cinema 4D',
 ]
 
+// Brand colors for the fallback dot (when no icon slug)
 const TOOL_COLORS: Record<string, string> = {
   Figma: '#A259FF', FigJam: '#F24E1E', Framer: '#0099FF', Sketch: '#F7B500',
   'Adobe XD': '#FF61F6', Miro: '#FFD02F', Maze: '#FF5A5F', Dovetail: '#7B5EE0',
   Zeplin: '#FDBD39', Principle: '#4251FF', Whimsical: '#9B51E0',
-  'Adobe Illustrator': '#FF9A00', 'Adobe Photoshop': '#31A8FF', Spline: '#0066FF',
-  Protopie: '#5C5CE6', Notion: '#1C1B18', Jira: '#0052CC', GitHub: '#24292F',
+  'Adobe Illustrator': '#FF9A00', 'Adobe Photoshop': '#31A8FF', Spline: '#3D80FF',
+  Protopie: '#5C5CE6', Notion: '#9A978E', Jira: '#2684FF',
+  Confluence: '#2684FF', Slack: '#7C3085', Loom: '#625DF5',
+  Linear: '#A47EFF', GitHub: '#9A978E', 'VS Code': '#0078D4',
+  'Adobe After Effects': '#9999FF', 'Adobe Premiere': '#EA77FF',
+  Blender: '#E87D0D', 'Cinema 4D': '#0168B3',
+}
+
+// Colors used for the SVG icon itself — adjusted for visibility on both light + dark surfaces
+const TOOL_ICON_COLORS: Record<string, string> = {
+  Figma: 'A259FF', FigJam: 'F24E1E', Framer: '0099FF', Sketch: 'F7B500',
+  'Adobe XD': 'FF61F6', Miro: 'D4A800', Maze: 'FF5A5F', Dovetail: '7B5EE0',
+  Zeplin: 'FDBD39', Principle: '4251FF', Whimsical: '9B51E0',
+  'Adobe Illustrator': 'FF9A00', 'Adobe Photoshop': '31A8FF', Spline: '3D80FF',
+  Protopie: '5C5CE6', Notion: '9A978E', Jira: '2684FF',
+  Confluence: '2684FF', Slack: '7C3085', Loom: '625DF5',
+  Linear: 'A47EFF', GitHub: '9A978E', 'VS Code': '0078D4',
+  'Adobe After Effects': '9999FF', 'Adobe Premiere': 'EA77FF',
+  Blender: 'E87D0D', 'Cinema 4D': '0168B3',
 }
 
 // Simple Icons slugs for logo CDN
 const TOOL_ICONS: Record<string, string> = {
   'Figma': 'figma', 'FigJam': 'figma', 'Framer': 'framer', 'Sketch': 'sketch',
   'Adobe XD': 'adobexd', 'Miro': 'miro', 'Maze': 'maze', 'Zeplin': 'zeplin',
-  'Principle': 'principle', 'Whimsical': 'whimsical', 'Spline': 'spline',
+  'Whimsical': 'whimsical', 'Spline': 'spline',
   'Adobe Illustrator': 'adobeillustrator', 'Adobe Photoshop': 'adobephotoshop',
   'Adobe After Effects': 'adobeaftereffects', 'Adobe Premiere': 'adobepremierepro',
   'Protopie': 'protopie', 'Notion': 'notion', 'Jira': 'jira',
   'Confluence': 'confluence', 'Slack': 'slack', 'Loom': 'loom',
   'Linear': 'linear', 'GitHub': 'github', 'VS Code': 'visualstudiocode',
-  'Blender': 'blender', 'Cinema 4D': 'cinema4d', 'Dovetail': 'dovetail',
+  'Blender': 'blender', 'Cinema 4D': 'maxon', 'Dovetail': 'dovetail',
+  'Principle': 'principle',
 }
 
 function ToolIcon({ name }: { name: string }) {
   const [hover, setHover] = React.useState(false)
   const [imgError, setImgError] = React.useState(false)
   const slug = TOOL_ICONS[name]
-  const color = (TOOL_COLORS[name] || '888').replace('#', '')
+  const iconColor = TOOL_ICON_COLORS[name] || '888'
 
   return (
     <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{ position: 'relative', width: 44, height: 44, borderRadius: 10, background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'default', transition: 'transform 0.15s', transform: hover ? 'translateY(-2px)' : 'none' }}>
       {slug && !imgError ? (
         <img
-          src={`https://cdn.simpleicons.org/${slug}/${color}`}
+          src={`https://cdn.simpleicons.org/${slug}/${iconColor}`}
           alt={name}
           width={22}
           height={22}
@@ -79,8 +98,8 @@ function ToolBadge({ name }: { name: string }) {
 function ToolLogo({ name, size = 14 }: { name: string; size?: number }) {
   const [err, setErr] = React.useState(false)
   const slug = TOOL_ICONS[name]
-  const color = (TOOL_COLORS[name] || '888').replace('#', '')
-  if (slug && !err) return <img src={`https://cdn.simpleicons.org/${slug}/${color}`} alt="" width={size} height={size} onError={() => setErr(true)} style={{ display: 'block', flexShrink: 0 }} />
+  const iconColor = TOOL_ICON_COLORS[name] || '888'
+  if (slug && !err) return <img src={`https://cdn.simpleicons.org/${slug}/${iconColor}`} alt="" width={size} height={size} onError={() => setErr(true)} style={{ display: 'block', flexShrink: 0 }} />
   return <div style={{ width: size, height: size, borderRadius: 3, background: TOOL_COLORS[name] || '#888', flexShrink: 0 }} />
 }
 

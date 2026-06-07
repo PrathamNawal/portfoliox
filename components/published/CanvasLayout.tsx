@@ -3,8 +3,15 @@ import { AnalyticsTracker } from './AnalyticsTracker'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const TOOL_COLORS: Record<string, string> = {
-  Figma: '#A259FF', Framer: '#0099FF', Notion: '#1C1B18',
-  Miro: '#FFD02F', Maze: '#FF5A5F', FigJam: '#F24E1E',
+  Figma: '#A259FF', FigJam: '#F24E1E', Framer: '#0099FF', Sketch: '#F7B500',
+  'Adobe XD': '#FF61F6', Miro: '#FFD02F', Maze: '#FF5A5F', Dovetail: '#7B5EE0',
+  Zeplin: '#FDBD39', Principle: '#4251FF', Whimsical: '#9B51E0',
+  'Adobe Illustrator': '#FF9A00', 'Adobe Photoshop': '#31A8FF', Spline: '#3D80FF',
+  Protopie: '#5C5CE6', Notion: '#9A978E', Jira: '#2684FF',
+  Confluence: '#2684FF', Slack: '#7C3085', Loom: '#625DF5',
+  Linear: '#A47EFF', GitHub: '#9A978E', 'VS Code': '#0078D4',
+  'Adobe After Effects': '#9999FF', 'Adobe Premiere': '#EA77FF',
+  Blender: '#E87D0D', 'Cinema 4D': '#0168B3',
 }
 const GRAD = [
   'linear-gradient(135deg,#2A1B4A 0%,#5B3FA6 60%,#7B5EE0 100%)',
@@ -197,23 +204,37 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
 const TOOL_ICON_SLUGS: Record<string, string> = {
   'Figma': 'figma', 'FigJam': 'figma', 'Framer': 'framer', 'Sketch': 'sketch',
   'Adobe XD': 'adobexd', 'Miro': 'miro', 'Maze': 'maze', 'Zeplin': 'zeplin',
+  'Whimsical': 'whimsical', 'Spline': 'spline', 'Dovetail': 'dovetail',
   'Adobe Illustrator': 'adobeillustrator', 'Adobe Photoshop': 'adobephotoshop',
-  'Adobe After Effects': 'adobeaftereffects', 'Notion': 'notion', 'Jira': 'jira',
-  'Confluence': 'confluence', 'Slack': 'slack', 'Linear': 'linear', 'GitHub': 'github',
+  'Adobe After Effects': 'adobeaftereffects', 'Adobe Premiere': 'adobepremierepro',
+  'Notion': 'notion', 'Jira': 'jira', 'Confluence': 'confluence',
+  'Slack': 'slack', 'Linear': 'linear', 'GitHub': 'github',
   'VS Code': 'visualstudiocode', 'Blender': 'blender', 'Protopie': 'protopie',
-  'Loom': 'loom', 'Spline': 'spline', 'Whimsical': 'whimsical',
+  'Loom': 'loom', 'Cinema 4D': 'maxon', 'Principle': 'principle',
 }
 
 function PublishedToolIcon({ name }: { name: string }) {
   const slug = TOOL_ICON_SLUGS[name]
-  const color = (TOOL_COLORS[name] || '888').replace('#', '')
+  const fallbackColor = (TOOL_COLORS[name] || '#888').replace('#', '')
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 8 }}>
-      {slug
-        ? <img src={`https://cdn.simpleicons.org/${slug}/${color}`} alt={name} width={16} height={16} style={{ display: 'block' }} />
-        : <div style={{ width: 16, height: 16, borderRadius: 3, background: TOOL_COLORS[name] || '#888' }} />
-      }
+      {slug ? (
+        <img
+          src={`https://cdn.simpleicons.org/${slug}`}
+          alt={name}
+          width={16}
+          height={16}
+          style={{ display: 'block' }}
+          onError={(e) => {
+            const el = e.currentTarget as HTMLImageElement
+            el.style.display = 'none'
+            const dot = el.nextSibling as HTMLElement | null
+            if (dot) dot.style.display = 'block'
+          }}
+        />
+      ) : null}
+      <div style={{ width: 16, height: 16, borderRadius: 3, background: `#${fallbackColor}`, display: slug ? 'none' : 'block', flexShrink: 0 }} />
       <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text)' }}>{name}</span>
     </div>
   )
