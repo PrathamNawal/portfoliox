@@ -302,6 +302,15 @@ function UpgradeModal({ open, onClose }: { open: boolean; onClose: () => void })
 }
 
 // ── Case Study Card ───────────────────────────────────────────────────────────
+const DISCIPLINE_TINTS: Record<string, string> = {
+  ux:           'rgba(123,94,224,0.06)',
+  brand:        'rgba(184,110,10,0.06)',
+  motion:       'rgba(252,128,25,0.06)',
+  illustration: 'rgba(99,102,241,0.06)',
+  graphic:      'rgba(20,184,166,0.06)',
+  custom:       'rgba(154,151,142,0.06)',
+}
+
 function CaseStudyCard({
   cs, dragHandleProps, onEdit, onDelete, onToggleVisible, liveUrl,
 }: {
@@ -319,6 +328,8 @@ function CaseStudyCard({
   const discipline = cs.discipline || 'ux'
   const disciplineLabel = DISCIPLINE_LABELS[discipline] || discipline
   const disciplineColor = DISCIPLINE_COLORS[discipline] || DISCIPLINE_COLORS.custom
+  const tint = DISCIPLINE_TINTS[discipline] || DISCIPLINE_TINTS.custom
+  const summary = cs.overview_data?.summary || ''
 
   const handleToggle = async () => {
     setToggling(true)
@@ -328,16 +339,19 @@ function CaseStudyCard({
 
   return (
     <div style={{
-      background: 'var(--px-surface)',
+      background: `color-mix(in srgb, var(--px-surface) 94%, transparent)`,
       border: '1px solid var(--px-border)',
-      borderRadius: 'var(--px-r-xl)',
+      borderRadius: 20,
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'row',
-      height: 192,
+      height: 320,
       boxShadow: coverHover ? 'var(--px-shadow-md)' : 'var(--px-shadow-sm)',
-      transition: 'box-shadow 0.15s',
+      transition: 'box-shadow 0.18s',
+      position: 'relative',
     }}>
+      {/* Tinted background wash */}
+      <div style={{ position: 'absolute', inset: 0, background: tint, pointerEvents: 'none', zIndex: 0 }} />
 
       {/* Left — cover image */}
       <div
@@ -345,32 +359,35 @@ function CaseStudyCard({
         onMouseLeave={() => setCoverHover(false)}
         onClick={onEdit}
         style={{
-          width: '42%',
+          width: '44%',
           flexShrink: 0,
           background: bg,
           position: 'relative',
           cursor: 'pointer',
           overflow: 'hidden',
+          zIndex: 1,
         }}
       >
-        {/* Subtle gradient overlay so cover always readable */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.28) 100%)', transition: 'opacity 0.15s', opacity: coverHover ? 1 : 0.5 }} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(160deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.32) 100%)',
+          opacity: coverHover ? 1 : 0.6,
+          transition: 'opacity 0.18s',
+        }} />
 
-        {/* NDA badge */}
         {cs.nda_enabled && (
-          <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 999, padding: '4px 10px', backdropFilter: 'blur(4px)', zIndex: 2 }}>
+          <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 999, padding: '4px 10px', backdropFilter: 'blur(4px)', zIndex: 2 }}>
             <Icon name="lock" size={11} color="#fff" />
             <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>NDA</span>
           </div>
         )}
 
-        {/* Hover action overlay */}
         {coverHover && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, animation: 'px-fadein 0.12s ease', zIndex: 2 }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, animation: 'px-fadein 0.12s ease', zIndex: 2 }}>
             <Btn variant="primary" size="sm" icon="edit" onClick={() => onEdit()}>Edit</Btn>
             {liveUrl && cs.published && (
               <a href={liveUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                style={{ height: 30, padding: '0 12px', fontSize: 12, fontWeight: 600, background: 'rgba(255,255,255,0.18)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', borderRadius: 'var(--px-r)', cursor: 'pointer', fontFamily: 'var(--px-font)', display: 'flex', alignItems: 'center', gap: 5, textDecoration: 'none', backdropFilter: 'blur(4px)' }}>
+                style={{ height: 32, padding: '0 14px', fontSize: 12, fontWeight: 600, background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 'var(--px-r)', cursor: 'pointer', fontFamily: 'var(--px-font)', display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none', backdropFilter: 'blur(4px)' }}>
                 <Icon name="eye" size={12} color="#fff" /> View live
               </a>
             )}
@@ -379,16 +396,17 @@ function CaseStudyCard({
       </div>
 
       {/* Right — info + actions */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '18px 16px 12px', minWidth: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '28px 24px 20px', minWidth: 0, position: 'relative', zIndex: 1 }}>
 
         {/* Discipline tag */}
-        <div style={{ marginBottom: 10 }}>
+        <div style={{ marginBottom: 14 }}>
           <span style={{
             display: 'inline-flex', alignItems: 'center',
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
-            padding: '3px 9px', borderRadius: 999,
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.07em',
+            padding: '4px 11px', borderRadius: 999,
             background: disciplineColor.bg, color: disciplineColor.color,
             textTransform: 'uppercase',
+            border: `1px solid ${disciplineColor.color}30`,
           }}>
             {disciplineLabel}
           </span>
@@ -396,36 +414,49 @@ function CaseStudyCard({
 
         {/* Title */}
         <h3 style={{
-          fontSize: 15, fontWeight: 800, letterSpacing: '-0.025em',
-          color: 'var(--px-text)', lineHeight: 1.3, margin: 0,
+          fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em',
+          color: 'var(--px-text)', lineHeight: 1.2, margin: '0 0 10px',
           display: '-webkit-box', WebkitLineClamp: 3,
           WebkitBoxOrient: 'vertical', overflow: 'hidden',
-          flex: 1,
         }}>
           {cs.title}
         </h3>
 
+        {/* Summary — shown if available */}
+        {summary && (
+          <p style={{
+            fontSize: 13, color: 'var(--px-text-2)', lineHeight: 1.55,
+            margin: 0,
+            display: '-webkit-box', WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          }}>
+            {summary}
+          </p>
+        )}
+
+        <div style={{ flex: 1 }} />
+
         {/* Action bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {/* Drag handle */}
           <div {...(dragHandleProps || {})}
-            style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', borderRadius: 6, color: 'var(--px-text-3)', flexShrink: 0 }}
+            style={{ width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', borderRadius: 8, color: 'var(--px-text-3)', flexShrink: 0 }}
             title="Drag to reorder">
             <Icon name="drag" size={14} />
           </div>
 
           {/* Edit */}
-          <button onClick={onEdit} style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: 'var(--px-text-2)', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
-            <Icon name="edit" size={11} /> Edit
+          <button onClick={onEdit} style={{ flex: 1, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 8, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
+            <Icon name="edit" size={12} /> Edit
           </button>
 
           {/* Visible toggle */}
-          <button onClick={handleToggle} disabled={toggling} style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: cs.published ? 'var(--px-success)' : 'var(--px-text-3)', background: cs.published ? 'var(--px-success-subtle)' : 'var(--px-surface-2)', border: `1px solid ${cs.published ? 'var(--px-success)' : 'var(--px-border)'}`, borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', opacity: toggling ? 0.6 : 1 }}>
-            <Icon name={cs.published ? 'eye' : 'eyeOff'} size={11} /> {cs.published ? 'Visible' : 'Hidden'}
+          <button onClick={handleToggle} disabled={toggling} style={{ flex: 1, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: cs.published ? 'var(--px-success)' : 'var(--px-text-3)', background: cs.published ? 'var(--px-success-subtle)' : 'var(--px-surface)', border: `1px solid ${cs.published ? 'var(--px-success)' : 'var(--px-border)'}`, borderRadius: 8, cursor: 'pointer', fontFamily: 'var(--px-font)', opacity: toggling ? 0.6 : 1 }}>
+            <Icon name={cs.published ? 'eye' : 'eyeOff'} size={12} /> {cs.published ? 'Visible' : 'Hidden'}
           </button>
 
           {/* Delete */}
-          <button onClick={onDelete} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FEF0EE', border: '1px solid #F5C2BB', borderRadius: 6, cursor: 'pointer', flexShrink: 0 }} title="Delete">
+          <button onClick={onDelete} style={{ width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FEF0EE', border: '1px solid #F5C2BB', borderRadius: 8, cursor: 'pointer', flexShrink: 0 }} title="Delete">
             <Icon name="trash" size={12} color="#C94040" />
           </button>
         </div>
@@ -700,7 +731,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                 <Droppable droppableId="cases" direction="horizontal">
                   {(provided) => (
                     <div ref={provided.innerRef} {...provided.droppableProps}
-                      style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 14 }}>
+                      style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
                       {cases.map((cs, i) => (
                         <Draggable key={cs.id} draggableId={cs.id} index={i}>
                           {(drag) => (
