@@ -20,6 +20,7 @@ export interface CaseSection {
   title: string
   narrative: string        // rich text HTML
   blocks: Block[]          // visual blocks within this section
+  isSample?: boolean       // true when pre-filled with template content
 }
 
 export interface OverviewData {

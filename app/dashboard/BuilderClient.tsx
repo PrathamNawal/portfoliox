@@ -383,20 +383,21 @@ const CASE_DISCIPLINES = [
 
 function DisciplinePickerModal({ open, onClose, onCreate }: {
   open: boolean; onClose: () => void
-  onCreate: (discipline: string) => Promise<void>
+  onCreate: (discipline: string, withSample: boolean) => Promise<void>
 }) {
   const [selected, setSelected] = useState('ux')
+  const [withSample, setWithSample] = useState(true)
   const [loading, setLoading] = useState(false)
 
   const handleCreate = async () => {
     setLoading(true)
-    await onCreate(selected)
+    await onCreate(selected, withSample)
     setLoading(false)
   }
 
   return (
     <Modal open={open} onClose={onClose} title="What kind of case study is this?" width={500}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
         {CASE_DISCIPLINES.map(d => (
           <button key={d.id} onClick={() => setSelected(d.id)}
             style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: selected === d.id ? 'var(--px-accent-subtle)' : 'var(--px-surface-2)', border: `1.5px solid ${selected === d.id ? 'var(--px-accent)' : 'var(--px-border)'}`, borderRadius: 'var(--px-r-lg)', cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--px-font)', transition: 'all 0.12s' }}>
@@ -409,6 +410,19 @@ function DisciplinePickerModal({ open, onClose, onCreate }: {
           </button>
         ))}
       </div>
+
+      {/* Sample toggle */}
+      <button onClick={() => setWithSample(v => !v)}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '13px 16px', background: withSample ? 'var(--px-surface-2)' : 'transparent', border: `1.5px solid ${withSample ? 'var(--px-border-strong)' : 'var(--px-border)'}`, borderRadius: 'var(--px-r-lg)', cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--px-font)', marginBottom: 20, transition: 'all 0.12s' }}>
+        <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${withSample ? 'var(--px-accent)' : 'var(--px-border)'}`, background: withSample ? 'var(--px-accent)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.12s' }}>
+          {withSample && <Icon name="check" size={11} color="#fff" />}
+        </div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em', marginBottom: 1 }}>Start with a sample case study</div>
+          <div style={{ fontSize: 12, color: 'var(--px-text-3)' }}>See a completed example — replace with your own work</div>
+        </div>
+      </button>
+
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
         <Btn variant="secondary" onClick={onClose}>Cancel</Btn>
         <Btn variant="primary" onClick={handleCreate} disabled={loading}>{loading ? 'Creating…' : 'Start building →'}</Btn>
@@ -485,10 +499,10 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
     setShowDisciplinePicker(true)
   }
 
-  const handleCreateWithDiscipline = async (discipline: string) => {
+  const handleCreateWithDiscipline = async (discipline: string, withSample: boolean) => {
     setAddingCase(true)
     setShowDisciplinePicker(false)
-    const res = await fetch('/api/case-studies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'Untitled', discipline }) })
+    const res = await fetch('/api/case-studies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'Untitled', discipline, withSample }) })
     if (res.ok) { const cs = await res.json(); router.push(`/case-study/${cs.id}`) }
     else { const d = await res.json(); if (d.upgrade) setShowUpgrade(true); setAddingCase(false) }
   }

@@ -187,8 +187,18 @@ function SectionCanvas({ section, onUpdate, palette, generating, onGenerate, can
 
   return (
     <div>
+      {/* Sample banner — auto-dismisses on first edit */}
+      {section.isSample && (
+        <div style={{ marginBottom: 16, padding: '10px 14px', background: '#FFF8E6', borderRadius: 8, border: '1px solid #F5C842', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 14 }}>✏️</span>
+          <span style={{ fontSize: 13, color: '#7A5C00', lineHeight: 1.4, flex: 1 }}>
+            Sample content — this is an example. Start typing to replace it with your own work.
+          </span>
+        </div>
+      )}
+
       {/* Prompt — shown prominently when no content yet */}
-      {!section.narrative && !focused && (
+      {!section.narrative && !focused && !section.isSample && (
         <div style={{ marginBottom: 20, padding: '16px 20px', background: `${def.color}0D`, borderRadius: 10, border: `1px solid ${def.color}25` }}>
           <p style={{ fontSize: 15, color: def.color, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 0.85 }}>
             {def.prompt}
@@ -200,7 +210,7 @@ function SectionCanvas({ section, onUpdate, palette, generating, onGenerate, can
       <textarea
         ref={textareaRef}
         value={section.narrative}
-        onChange={e => onUpdate({ ...section, narrative: e.target.value })}
+        onChange={e => onUpdate({ ...section, isSample: false, narrative: e.target.value })}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? '' : 'Start writing…'}

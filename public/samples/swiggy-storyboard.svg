@@ -1,0 +1,142 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="sf"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.10"/></filter>
+  </defs>
+  <rect width="1200" height="675" fill="#1C1B18"/>
+
+  <text x="60" y="44" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="11" font-weight="600" fill="#6B7280" letter-spacing="0.10em">SWIGGY LOADING ANIMATION — STORYBOARD</text>
+  <text x="60" y="68" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="22" font-weight="700" fill="#F0EEE9" letter-spacing="-0.03em">6 keyframes · 2.8s total · Hold → Animate → Settle</text>
+
+  <!-- Frame 1: Hold (0–0.3s) -->
+  <rect x="60" y="96" width="168" height="224" rx="10" fill="#2A2825" stroke="#3A3734" stroke-width="1.5" filter="url(#sf)"/>
+  <text x="144" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#6B7280" letter-spacing="0.08em">FRAME 01</text>
+  <text x="144" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">0s → 0.3s</text>
+  <!-- Swiggy logo static -->
+  <rect x="100" y="148" width="88" height="88" rx="24" fill="#FC8019"/>
+  <text x="144" y="202" text-anchor="middle" font-family="Arial,sans-serif" font-size="32" font-weight="900" fill="white">S</text>
+  <text x="144" y="256" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Hold · Static · No motion</text>
+  <text x="144" y="272" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Prevents pop-in</text>
+  <text x="144" y="296" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">opacity: 1 → 1</text>
+  <text x="144" y="310" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">scale: 1.0 → 1.0</text>
+
+  <!-- Frame 2: Pulse begin (0.3–0.8s) -->
+  <rect x="248" y="96" width="168" height="224" rx="10" fill="#2A2825" stroke="#3A3734" stroke-width="1.5" filter="url(#sf)"/>
+  <text x="332" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#6B7280" letter-spacing="0.08em">FRAME 02</text>
+  <text x="332" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">0.3s → 0.8s</text>
+  <!-- Logo slightly smaller -->
+  <rect x="293" y="154" width="78" height="78" rx="22" fill="#FC8019" opacity="0.9"/>
+  <text x="332" y="201" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="900" fill="white">S</text>
+  <!-- Ripple ring starting -->
+  <circle cx="332" cy="193" r="48" stroke="#FC8019" stroke-width="2" fill="none" opacity="0.3"/>
+  <text x="332" y="256" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Pulse begins</text>
+  <text x="332" y="272" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Ripple ring expands</text>
+  <text x="332" y="296" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">scale: 1.0 → 0.92</text>
+  <text x="332" y="310" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">ease-out cubic</text>
+
+  <!-- Frame 3: Bounce peak (0.8–1.3s) -->
+  <rect x="436" y="96" width="168" height="224" rx="10" fill="#2A2825" stroke="#3A3734" stroke-width="1.5" filter="url(#sf)"/>
+  <text x="520" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#6B7280" letter-spacing="0.08em">FRAME 03</text>
+  <text x="520" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">0.8s → 1.3s</text>
+  <!-- Logo larger, bounced -->
+  <rect x="472" y="140" width="96" height="96" rx="26" fill="#FC8019"/>
+  <text x="520" y="197" text-anchor="middle" font-family="Arial,sans-serif" font-size="36" font-weight="900" fill="white">S</text>
+  <!-- Multiple ripple rings -->
+  <circle cx="520" cy="188" r="56" stroke="#FC8019" stroke-width="1.5" fill="none" opacity="0.2"/>
+  <circle cx="520" cy="188" r="68" stroke="#FC8019" stroke-width="1" fill="none" opacity="0.1"/>
+  <text x="520" y="256" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Bounce peak</text>
+  <text x="520" y="272" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Max scale · Rings expand</text>
+  <text x="520" y="296" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">scale: 0.92 → 1.08</text>
+  <text x="520" y="310" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">spring: stiffness 300</text>
+
+  <!-- Frame 4: Loading dots (1.3–2.0s) -->
+  <rect x="624" y="96" width="168" height="224" rx="10" fill="#2A2825" stroke="#3A3734" stroke-width="1.5" filter="url(#sf)"/>
+  <text x="708" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#6B7280" letter-spacing="0.08em">FRAME 04</text>
+  <text x="708" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">1.3s → 2.0s</text>
+  <!-- Logo normal + dots below -->
+  <rect x="668" y="152" width="80" height="80" rx="22" fill="#FC8019"/>
+  <text x="708" y="201" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="900" fill="white">S</text>
+  <!-- Loading dots staggered -->
+  <circle cx="688" cy="246" r="7" fill="#FC8019"/>
+  <circle cx="708" cy="242" r="7" fill="#FC8019" opacity="0.6"/>
+  <circle cx="728" cy="246" r="7" fill="#FC8019" opacity="0.3"/>
+  <text x="708" y="272" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Staggered bounce dots</text>
+  <text x="708" y="296" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">stagger: 120ms delay</text>
+  <text x="708" y="310" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">loop: infinite</text>
+
+  <!-- Frame 5: Near end (2.0–2.5s) -->
+  <rect x="812" y="96" width="168" height="224" rx="10" fill="#2A2825" stroke="#3A3734" stroke-width="1.5" filter="url(#sf)"/>
+  <text x="896" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#6B7280" letter-spacing="0.08em">FRAME 05</text>
+  <text x="896" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">2.0s → 2.5s</text>
+  <!-- Logo fading, dots fading -->
+  <rect x="856" y="152" width="80" height="80" rx="22" fill="#FC8019" opacity="0.7"/>
+  <text x="896" y="201" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="900" fill="white" opacity="0.7">S</text>
+  <circle cx="876" cy="246" r="7" fill="#FC8019" opacity="0.4"/>
+  <circle cx="896" cy="246" r="7" fill="#FC8019" opacity="0.2"/>
+  <circle cx="916" cy="246" r="7" fill="#FC8019" opacity="0.1"/>
+  <text x="896" y="272" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Settle begins</text>
+  <text x="896" y="288" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Dots fade · Logo dims</text>
+  <text x="896" y="296" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">opacity: 1 → 0</text>
+  <text x="896" y="310" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">ease-in 0.3s</text>
+
+  <!-- Frame 6: Home screen (2.5–2.8s) -->
+  <rect x="1000" y="96" width="168" height="224" rx="10" fill="#161513" stroke="#FC8019" stroke-width="1.5" filter="url(#sf)"/>
+  <text x="1084" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#FC8019" letter-spacing="0.08em">FRAME 06</text>
+  <text x="1084" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">2.5s → 2.8s</text>
+  <!-- Home screen appears -->
+  <rect x="1012" y="140" width="144" height="80" rx="8" fill="#FC8019" opacity="0.15"/>
+  <text x="1084" y="176" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="#FC8019">Home screen</text>
+  <text x="1084" y="192" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">transitions in</text>
+  <rect x="1012" y="228" width="60" height="8" rx="3" fill="#3A3734"/>
+  <rect x="1080" y="228" width="60" height="8" rx="3" fill="#3A3734"/>
+  <text x="1084" y="264" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Cross-dissolve in</text>
+  <text x="1084" y="280" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Abrupt cut prevented</text>
+  <text x="1084" y="296" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FC8019" font-weight="600">opacity: 0 → 1</text>
+  <text x="1084" y="310" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">ease-out 0.3s</text>
+
+  <!-- Timeline bar -->
+  <rect x="60" y="344" width="1080" height="44" rx="8" fill="#2A2825" stroke="#3A3734"/>
+  <!-- Timeline segments -->
+  <rect x="72" y="352" width="58" height="28" rx="4" fill="#3A3734"/>
+  <text x="101" y="371" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#FC8019">0 — 0.3s</text>
+  <rect x="138" y="352" width="100" height="28" rx="4" fill="#3A3734"/>
+  <text x="188" y="371" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#FC8019">0.3s — 0.8s</text>
+  <rect x="246" y="352" width="100" height="28" rx="4" fill="#FC8019" opacity="0.3"/>
+  <text x="296" y="371" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#FC8019">0.8s — 1.3s ← PEAK</text>
+  <rect x="354" y="352" width="140" height="28" rx="4" fill="#3A3734"/>
+  <text x="424" y="371" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#FC8019">1.3s — 2.0s · DOTS</text>
+  <rect x="502" y="352" width="100" height="28" rx="4" fill="#3A3734"/>
+  <text x="552" y="371" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="600" fill="#FC8019">2.0s — 2.5s</text>
+  <rect x="610" y="352" width="100" height="28" rx="4" fill="#FC8019" opacity="0.2"/>
+  <text x="660" y="371" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#FC8019">2.5 — 2.8s ← DONE</text>
+
+  <!-- Technical notes -->
+  <rect x="60" y="408" width="580" height="108" rx="10" fill="#2A2825" stroke="#3A3734"/>
+  <text x="80" y="430" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">TECHNICAL NOTES — ANDROID/iOS PARITY</text>
+  <text x="80" y="452" font-family="Arial,sans-serif" font-size="12" fill="#F0EEE9">• Built in Lottie — tested on Redmi Note 10 at 30fps (primary Indian device)</text>
+  <text x="80" y="472" font-family="Arial,sans-serif" font-size="12" fill="#F0EEE9">• All easing curves compatible with Lottie Android renderer (avoid step-easing)</text>
+  <text x="80" y="492" font-family="Arial,sans-serif" font-size="12" fill="#F0EEE9">• 2.8s duration · Designed to run slightly under avg load time — no visible loop</text>
+  <text x="80" y="512" font-family="Arial,sans-serif" font-size="12" fill="#F0EEE9">• File size: 18kb JSON · Hardware-accelerated transforms only</text>
+
+  <!-- Two versions note -->
+  <rect x="660" y="408" width="480" height="108" rx="10" fill="#2A2825" stroke="#3A3734"/>
+  <text x="680" y="430" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">TWO ANIMATION VERSIONS</text>
+  <rect x="680" y="440" width="200" height="64" rx="8" fill="#FC8019" opacity="0.15" stroke="#FC8019" stroke-width="1"/>
+  <text x="780" y="462" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#FC8019">Standard tier</text>
+  <text x="780" y="480" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Bouncy delivery bag</text>
+  <text x="780" y="497" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Playful · 18-30 cohort</text>
+  <rect x="900" y="440" width="200" height="64" rx="8" fill="#3A3734" stroke="#6B7280" stroke-width="1"/>
+  <text x="1000" y="462" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#F0EEE9">Swiggy One tier</text>
+  <text x="1000" y="480" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Minimal logo breath</text>
+  <text x="1000" y="497" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#6B7280">Confident · Premium</text>
+
+  <!-- Perception result -->
+  <rect x="60" y="536" width="1080" height="60" rx="10" fill="#FC8019" opacity="0.12" stroke="#FC8019" stroke-width="1"/>
+  <text x="120" y="558" font-family="Arial,sans-serif" font-size="22" font-weight="800" fill="#FC8019">−22%</text>
+  <text x="120" y="576" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">perceived wait time</text>
+  <text x="280" y="558" font-family="Arial,sans-serif" font-size="22" font-weight="800" fill="#F0EEE9">3.2s</text>
+  <text x="280" y="576" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">avg real load time</text>
+  <text x="430" y="562" font-family="Arial,sans-serif" font-size="13" fill="#F0EEE9">"No change in actual load time — animation alone reduced perceived wait by 22%.</text>
+  <text x="430" y="580" font-family="Arial,sans-serif" font-size="13" fill="#F0EEE9">Motion design is time design. You're controlling how long the gap <tspan font-weight="700">feels.</tspan>"</text>
+
+  <text x="60" y="658" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">Swiggy loading animation · Motion design · Storyboard + easing specification · 8 weeks · Lottie · iOS &amp; Android</text>
+</svg>

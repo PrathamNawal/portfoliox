@@ -1,0 +1,167 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="zg1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4C1D95"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="zspeed" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FCD34D"/>
+    </linearGradient>
+    <filter id="zf"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.15"/></filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background: Split — character studies left, campaign right -->
+  <rect width="560" height="675" fill="#F8F7F4"/>
+  <rect x="560" width="640" height="675" fill="url(#zg1)"/>
+
+  <!-- LEFT SIDE: Character Design Studies -->
+  <text x="40" y="36" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#9CA3AF" letter-spacing="0.10em">CHARACTER DESIGN — PROCESS</text>
+  <text x="40" y="56" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="18" font-weight="700" fill="#1C1B18" letter-spacing="-0.02em">12 studies → final delivery rider</text>
+
+  <!-- Study 01: Too rigid -->
+  <rect x="40" y="72" width="120" height="152" rx="10" fill="white" stroke="#E5E7EB" filter="url(#zf)"/>
+  <text x="100" y="92" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">STUDY 01</text>
+  <!-- Simple rider figure: upright, stiff -->
+  <circle cx="100" cy="120" r="16" fill="#D1D5DB"/>
+  <rect x="88" y="138" width="24" height="36" rx="4" fill="#D1D5DB"/>
+  <!-- Bike wheels -->
+  <circle cx="84" cy="186" r="10" stroke="#D1D5DB" stroke-width="3" fill="none"/>
+  <circle cx="116" cy="186" r="10" stroke="#D1D5DB" stroke-width="3" fill="none"/>
+  <rect x="84" y="174" width="32" height="12" rx="2" fill="#D1D5DB"/>
+  <text x="100" y="214" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#DC2626">Rejected</text>
+  <text x="100" y="226" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#9CA3AF">Too rigid</text>
+
+  <!-- Study 06: Better lean -->
+  <rect x="176" y="72" width="120" height="152" rx="10" fill="white" stroke="#E5E7EB" filter="url(#zf)"/>
+  <text x="236" y="92" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">STUDY 06</text>
+  <!-- Forward-leaning rider -->
+  <circle cx="250" cy="116" r="16" fill="#6B7280"/>
+  <!-- Body leaning forward -->
+  <path d="M234 134 L258 148 L266 162" stroke="#6B7280" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <!-- Arms extending -->
+  <path d="M246 142 L228 158" stroke="#6B7280" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <!-- Bike -->
+  <circle cx="218" cy="186" r="11" stroke="#6B7280" stroke-width="3" fill="none"/>
+  <circle cx="262" cy="182" r="11" stroke="#6B7280" stroke-width="3" fill="none"/>
+  <path d="M218 186 L240 172 L262 182" stroke="#6B7280" stroke-width="4" fill="none"/>
+  <!-- Bag on back -->
+  <rect x="260" y="134" width="18" height="22" rx="4" fill="#9CA3AF"/>
+  <text x="236" y="214" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#F59E0B">Closer</text>
+  <text x="236" y="226" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#9CA3AF">Mid-lean pose</text>
+
+  <!-- Study 12: Final -->
+  <rect x="312" y="72" width="148" height="152" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5" filter="url(#zf)"/>
+  <text x="386" y="92" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#7C3AED" letter-spacing="0.08em">STUDY 12 — FINAL</text>
+  <!-- Final hero rider: strong lean, one wheel up, glowing bag -->
+  <!-- Back wheel -->
+  <circle cx="342" cy="196" r="14" stroke="#7C3AED" stroke-width="3" fill="none"/>
+  <!-- Front wheel slightly up -->
+  <circle cx="416" cy="202" r="12" stroke="#7C3AED" stroke-width="3" fill="none"/>
+  <!-- Bike frame -->
+  <path d="M342 196 L370 172 L416 202" stroke="#7C3AED" stroke-width="4" fill="none"/>
+  <!-- Rider body — strong forward lean -->
+  <circle cx="394" cy="138" r="18" fill="#4C1D95"/>
+  <path d="M394 156 L374 170 L356 182 L342 192" stroke="#4C1D95" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Arms grip -->
+  <path d="M380 162 L408 178" stroke="#4C1D95" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <!-- Glowing bag (the hero detail) -->
+  <rect x="396" y="140" width="28" height="28" rx="6" fill="url(#zspeed)"/>
+  <text x="410" y="159" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="800" fill="white">z</text>
+  <!-- Speed lines -->
+  <path d="M340 180 L316 180" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M336 190 L308 190" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <path d="M338 200 L316 200" stroke="#7C3AED" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+  <text x="386" y="222" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#7C3AED">Approved ✓</text>
+  <text x="386" y="234" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#6B7280">Heroic · Fast · Warm</text>
+
+  <!-- Colour system small swatch -->
+  <rect x="40" y="248" width="440" height="52" rx="8" fill="white" stroke="#E5E7EB"/>
+  <text x="56" y="268" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.06em">COLOUR SYSTEM</text>
+  <rect x="56" y="278" width="36" height="14" rx="3" fill="#4C1D95"/>
+  <text x="74" y="290" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="white">Brand</text>
+  <rect x="100" y="278" width="36" height="14" rx="3" fill="#7C3AED"/>
+  <text x="118" y="290" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="white">Mid</text>
+  <rect x="144" y="278" width="36" height="14" rx="3" fill="#F59E0B"/>
+  <text x="162" y="290" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#1C1B18">Speed</text>
+  <rect x="188" y="278" width="36" height="14" rx="3" fill="#FCD34D"/>
+  <text x="206" y="290" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#1C1B18">Energy</text>
+  <rect x="232" y="278" width="36" height="14" rx="3" fill="#F8F7F4"/>
+  <text x="250" y="290" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#6B7280">White</text>
+
+  <!-- Format specs -->
+  <rect x="40" y="320" width="440" height="148" rx="10" fill="white" stroke="#E5E7EB"/>
+  <text x="56" y="340" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.06em">6 POSES × 4 BACKGROUNDS = 24 CAMPAIGN ASSETS</text>
+  <!-- Format grid 4×2 -->
+  <rect x="56" y="350" width="80" height="46" rx="6" fill="#4C1D95" opacity="0.8"/>
+  <text x="96" y="377" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="600" fill="white">OOH 16:9</text>
+  <rect x="148" y="350" width="52" height="46" rx="6" fill="#7C3AED" opacity="0.8"/>
+  <text x="174" y="377" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="600" fill="white">In-app</text>
+  <rect x="212" y="350" width="46" height="46" rx="6" fill="#4C1D95" opacity="0.6"/>
+  <text x="235" y="377" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="600" fill="white">1:1</text>
+  <rect x="270" y="350" width="36" height="46" rx="6" fill="#7C3AED" opacity="0.6"/>
+  <text x="288" y="370" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="600" fill="white">9:16</text>
+  <rect x="56" y="406" width="250" height="1" fill="#E5E7EB"/>
+  <text x="56" y="424" font-family="Arial,sans-serif" font-size="11" fill="#374151">Built on 12-column grid · Tiles across all formats</text>
+  <text x="56" y="442" font-family="Arial,sans-serif" font-size="11" fill="#374151">All 24 assets from 6 core poses + 4 backgrounds</text>
+  <text x="56" y="460" font-family="Arial,sans-serif" font-size="11" fill="#374151">Systematic illustration — no bespoke redraw per format</text>
+
+  <!-- RIGHT SIDE: Campaign Poster (Final Output) -->
+  <!-- Dark purple background already set -->
+  <text x="600" y="36" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="rgba(255,255,255,0.4)" letter-spacing="0.10em">FINAL CAMPAIGN POSTER — DELHI OOH</text>
+
+  <!-- Speed lines radiating from centre -->
+  <line x1="880" y1="340" x2="580" y2="280" stroke="#F59E0B" stroke-width="2" opacity="0.2"/>
+  <line x1="880" y1="340" x2="580" y2="340" stroke="#F59E0B" stroke-width="2" opacity="0.3"/>
+  <line x1="880" y1="340" x2="580" y2="400" stroke="#F59E0B" stroke-width="2" opacity="0.2"/>
+  <line x1="880" y1="340" x2="600" y2="240" stroke="#F59E0B" stroke-width="1.5" opacity="0.15"/>
+  <line x1="880" y1="340" x2="600" y2="440" stroke="#F59E0B" stroke-width="1.5" opacity="0.15"/>
+
+  <!-- Headline: 10 min -->
+  <text x="620" y="140" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="80" font-weight="900" fill="white" opacity="0.06" letter-spacing="-0.05em">10min</text>
+
+  <!-- Main illustration: Zepto rider hero -->
+  <!-- Back wheel -->
+  <circle cx="740" cy="440" r="68" stroke="#7C3AED" stroke-width="6" fill="rgba(124,58,237,0.12)"/>
+  <circle cx="740" cy="440" r="52" stroke="rgba(124,58,237,0.4)" stroke-width="2" fill="none"/>
+  <!-- Front wheel lifted -->
+  <circle cx="940" cy="460" r="58" stroke="#7C3AED" stroke-width="5" fill="rgba(124,58,237,0.1)"/>
+  <!-- Bike frame -->
+  <path d="M740 440 L820 360 L880 380 L940 460" stroke="#8B5CF6" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M820 360 L800 440 L740 440" stroke="#8B5CF6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Rider -->
+  <circle cx="900" cy="300" r="36" fill="#DDD6FE"/>
+  <!-- Body forward lean -->
+  <path d="M900 336 L860 370 L830 400 L800 420" stroke="#6D28D9" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <!-- Arms -->
+  <path d="M870 358 L910 380" stroke="#6D28D9" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <!-- Helmet -->
+  <path d="M876 276 C876 252 924 252 924 276 C934 280 934 308 900 312 C866 312 866 280 876 276Z" fill="#4C1D95"/>
+  <!-- Visor -->
+  <path d="M882 288 C882 284 918 284 918 288 L916 298 C916 300 884 300 884 298 Z" fill="#F59E0B"/>
+  <!-- Glowing Zepto bag (hero detail) -->
+  <rect x="920" y="288" width="60" height="60" rx="14" fill="url(#zspeed)"/>
+  <text x="950" y="320" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="22" font-weight="900" fill="white">z</text>
+  <!-- Bag glow -->
+  <rect x="920" y="288" width="60" height="60" rx="14" fill="url(#zspeed)" opacity="0.3" filter="url(#glow)"/>
+
+  <!-- Speed lines from wheels -->
+  <path d="M692 440 L620 430" stroke="#F59E0B" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <path d="M688 458 L608 460" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <path d="M694 476 L620 490" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Tagline -->
+  <text x="620" y="530" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="32" font-weight="900" fill="white" letter-spacing="-0.02em">Everything.</text>
+  <text x="620" y="570" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="32" font-weight="900" fill="#FCD34D" letter-spacing="-0.02em">In 10 minutes.</text>
+
+  <!-- Zepto logo area -->
+  <rect x="620" y="590" width="120" height="36" rx="8" fill="rgba(255,255,255,0.1)"/>
+  <text x="680" y="613" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="16" font-weight="800" fill="white">zepto</text>
+
+  <!-- Footer note -->
+  <text x="40" y="656" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Zepto campaign illustrations · 24 assets across 4 formats · 3 weeks solo · Character system — 6 poses × 4 backgrounds</text>
+</svg>

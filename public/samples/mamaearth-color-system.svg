@@ -1,0 +1,156 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="cs"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.07"/></filter>
+  </defs>
+  <rect width="1200" height="675" fill="#F7F3EF"/>
+
+  <text x="60" y="44" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="11" font-weight="600" fill="#9CA3AF" letter-spacing="0.10em">MAMAEARTH BRAND REFRESH — COLOUR SYSTEM</text>
+  <text x="60" y="68" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="22" font-weight="700" fill="#2C1810" letter-spacing="-0.03em">12-colour palette derived from ingredient families</text>
+
+  <!-- NEUTRALS ROW -->
+  <text x="60" y="104" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">FOUNDATION — WARM NEUTRALS</text>
+
+  <!-- Swatch: Off White -->
+  <rect x="60" y="112" width="96" height="88" rx="10" fill="#F7F3EF" stroke="#E8DDD5" stroke-width="1.5" filter="url(#cs)"/>
+  <text x="108" y="179" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#6B5B4E">Off White</text>
+  <text x="108" y="193" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#9CA3AF">#F7F3EF</text>
+
+  <!-- Swatch: Warm Parchment -->
+  <rect x="168" y="112" width="96" height="88" rx="10" fill="#EDE5DA" filter="url(#cs)"/>
+  <text x="216" y="179" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#6B5B4E">Parchment</text>
+  <text x="216" y="193" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#7A6155">#EDE5DA</text>
+
+  <!-- Swatch: Warm Sand -->
+  <rect x="276" y="112" width="96" height="88" rx="10" fill="#D4C5B2" filter="url(#cs)"/>
+  <text x="324" y="179" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#5B4033">Warm Sand</text>
+  <text x="324" y="193" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#6B5B4E">#D4C5B2</text>
+
+  <!-- Swatch: Earth -->
+  <rect x="384" y="112" width="96" height="88" rx="10" fill="#8B6B5A" filter="url(#cs)"/>
+  <text x="432" y="179" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="white">Earth Mid</text>
+  <text x="432" y="193" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="rgba(255,255,255,0.7)">#8B6B5A</text>
+
+  <!-- Swatch: Deep Earth -->
+  <rect x="492" y="112" width="96" height="88" rx="10" fill="#2C1810" filter="url(#cs)"/>
+  <text x="540" y="179" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="white">Deep Earth</text>
+  <text x="540" y="193" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="rgba(255,255,255,0.6)">#2C1810</text>
+
+  <!-- INGREDIENT FAMILIES -->
+  <text x="60" y="230" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">INGREDIENT FAMILIES — ACCENT COLOURS</text>
+
+  <!-- Plant Extracts: Greens -->
+  <rect x="60" y="238" width="240" height="108" rx="10" fill="white" stroke="#E5E7EB" filter="url(#cs)"/>
+  <text x="80" y="260" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">PLANT EXTRACTS</text>
+  <rect x="80" y="268" width="52" height="52" rx="8" fill="#4A7C59"/>
+  <rect x="144" y="268" width="52" height="52" rx="8" fill="#6CA575"/>
+  <rect x="208" y="268" width="52" height="52" rx="8" fill="#A8D5B2"/>
+  <text x="80" y="336" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">Deep Forest #4A7C59</text>
+  <text x="144" y="336" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">Herb #6CA575</text>
+
+  <!-- Oils: Ambers -->
+  <rect x="320" y="238" width="240" height="108" rx="10" fill="white" stroke="#E5E7EB" filter="url(#cs)"/>
+  <text x="340" y="260" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">NATURAL OILS</text>
+  <rect x="340" y="268" width="52" height="52" rx="8" fill="#B8780A"/>
+  <rect x="404" y="268" width="52" height="52" rx="8" fill="#D4A030"/>
+  <rect x="468" y="268" width="52" height="52" rx="8" fill="#F0CC7A"/>
+  <text x="340" y="336" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">Amber Deep #B8780A</text>
+  <text x="404" y="336" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">Golden #D4A030</text>
+
+  <!-- Vitamins: Coral -->
+  <rect x="580" y="238" width="240" height="108" rx="10" fill="white" stroke="#E5E7EB" filter="url(#cs)"/>
+  <text x="600" y="260" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">VITAMIN C / BRIGHTENING</text>
+  <rect x="600" y="268" width="52" height="52" rx="8" fill="#C94B2A"/>
+  <rect x="664" y="268" width="52" height="52" rx="8" fill="#E07550"/>
+  <rect x="728" y="268" width="52" height="52" rx="8" fill="#F5A585"/>
+  <text x="600" y="336" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">Coral Deep #C94B2A</text>
+  <text x="664" y="336" font-family="Arial,sans-serif" font-size="9" fill="#6B7280">Coral Mid #E07550</text>
+
+  <!-- TYPOGRAPHY SPECIMEN -->
+  <rect x="860" y="96" width="320" height="360" rx="12" fill="white" stroke="#E5E7EB" filter="url(#cs)"/>
+  <text x="880" y="120" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#9CA3AF" letter-spacing="0.08em">TYPOGRAPHY SYSTEM</text>
+
+  <text x="880" y="150" font-family="Georgia,serif" font-size="11" fill="#9CA3AF">BRAND WORDMARK</text>
+  <text x="880" y="178" font-family="Georgia,serif" font-size="32" font-weight="700" fill="#2C1810" letter-spacing="-0.02em">mamaearth</text>
+
+  <rect x="880" y="192" width="260" height="1" fill="#E5E7EB"/>
+  <text x="880" y="212" font-family="Arial,sans-serif" font-size="10" fill="#9CA3AF" letter-spacing="0.06em">CATEGORY LABEL — MEDIUM 10pt</text>
+  <text x="880" y="228" font-family="Arial,sans-serif" font-size="14" font-weight="500" fill="#6B5B4E" letter-spacing="0.12em">HAIR CARE</text>
+
+  <rect x="880" y="238" width="260" height="1" fill="#E5E7EB"/>
+  <text x="880" y="258" font-family="Arial,sans-serif" font-size="10" fill="#9CA3AF" letter-spacing="0.06em">KEY INGREDIENT — BOLD 16pt</text>
+  <text x="880" y="280" font-family="Georgia,serif" font-size="20" font-weight="700" fill="#4A7C59">Onion &amp; Bhringraj</text>
+
+  <rect x="880" y="292" width="260" height="1" fill="#E5E7EB"/>
+  <text x="880" y="312" font-family="Arial,sans-serif" font-size="10" fill="#9CA3AF" letter-spacing="0.06em">PRODUCT NAME — REGULAR 13pt</text>
+  <text x="880" y="330" font-family="Arial,sans-serif" font-size="14" fill="#2C1810">Hair Fall Control Shampoo</text>
+
+  <rect x="880" y="342" width="260" height="1" fill="#E5E7EB"/>
+  <text x="880" y="362" font-family="Arial,sans-serif" font-size="10" fill="#9CA3AF" letter-spacing="0.06em">CLAIM — MAX 8 WORDS</text>
+  <rect x="880" y="370" width="200" height="28" rx="4" fill="#4A7C59"/>
+  <text x="980" y="388" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="white">Reduces Hair Fall by 96%</text>
+
+  <rect x="880" y="410" width="260" height="1" fill="#E5E7EB"/>
+  <text x="880" y="428" font-family="Arial,sans-serif" font-size="10" fill="#9CA3AF" letter-spacing="0.06em">SIZE / VOLUME</text>
+  <text x="880" y="444" font-family="Arial,sans-serif" font-size="13" fill="#8B6B5A">300 ml · MRP ₹349</text>
+
+  <!-- Packaging mockup mini-preview -->
+  <rect x="60" y="376" width="780" height="264" rx="12" fill="#EDE5DA" filter="url(#cs)"/>
+  <text x="80" y="400" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#6B5B4E" letter-spacing="0.08em">SYSTEM APPLIED — PACKAGING PREVIEW</text>
+
+  <!-- 4 product cards side by side -->
+  <!-- Product 1: Hair -->
+  <rect x="80" y="412" width="156" height="212" rx="12" fill="#4A7C59"/>
+  <rect x="96" y="428" width="124" height="80" rx="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="158" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="rgba(255,255,255,0.7)" letter-spacing="0.1em">HAIR CARE</text>
+  <text x="158" y="492" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Onion</text>
+  <text x="158" y="506" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Shampoo</text>
+  <text x="158" y="524" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">300 ml</text>
+  <rect x="96" y="532" width="124" height="72" rx="6" fill="rgba(255,255,255,0.1)"/>
+  <text x="158" y="560" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.6)">Reduces Hair Fall</text>
+  <text x="158" y="572" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.6)">by 96%</text>
+  <text x="158" y="592" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="white">mamaearth</text>
+
+  <!-- Product 2: Vitamin C -->
+  <rect x="252" y="412" width="156" height="212" rx="12" fill="#C94B2A"/>
+  <rect x="268" y="428" width="124" height="80" rx="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="330" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="rgba(255,255,255,0.7)" letter-spacing="0.1em">SKIN CARE</text>
+  <text x="330" y="492" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Vitamin C</text>
+  <text x="330" y="506" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Face Wash</text>
+  <text x="330" y="524" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">100 ml</text>
+  <rect x="268" y="532" width="124" height="72" rx="6" fill="rgba(255,255,255,0.1)"/>
+  <text x="330" y="572" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.6)">Brightening + Glow</text>
+  <text x="330" y="592" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="white">mamaearth</text>
+
+  <!-- Product 3: Neem -->
+  <rect x="424" y="412" width="156" height="212" rx="12" fill="#6CA575"/>
+  <rect x="440" y="428" width="124" height="80" rx="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="502" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="rgba(255,255,255,0.7)" letter-spacing="0.1em">SKIN CARE</text>
+  <text x="502" y="492" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Neem</text>
+  <text x="502" y="506" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Face Pack</text>
+  <text x="502" y="524" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">100 g</text>
+  <rect x="440" y="532" width="124" height="72" rx="6" fill="rgba(255,255,255,0.1)"/>
+  <text x="502" y="572" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.6)">Purifying + Anti-acne</text>
+  <text x="502" y="592" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="white">mamaearth</text>
+
+  <!-- Product 4: Argan -->
+  <rect x="596" y="412" width="156" height="212" rx="12" fill="#B8780A"/>
+  <rect x="612" y="428" width="124" height="80" rx="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="674" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="rgba(255,255,255,0.7)" letter-spacing="0.1em">HAIR CARE</text>
+  <text x="674" y="492" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Argan</text>
+  <text x="674" y="506" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="700" fill="white">Hair Oil</text>
+  <text x="674" y="524" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">150 ml</text>
+  <rect x="612" y="532" width="124" height="72" rx="6" fill="rgba(255,255,255,0.1)"/>
+  <text x="674" y="572" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.6)">Deep Nourishment</text>
+  <text x="674" y="592" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="white">mamaearth</text>
+
+  <!-- Logic label -->
+  <text x="774" y="480" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#2C1810">Colour logic</text>
+  <text x="774" y="498" font-family="Arial,sans-serif" font-size="11" fill="#6B5B4E">Green = plant extracts</text>
+  <text x="774" y="514" font-family="Arial,sans-serif" font-size="11" fill="#6B5B4E">Red/coral = Vitamin C</text>
+  <text x="774" y="530" font-family="Arial,sans-serif" font-size="11" fill="#6B5B4E">Amber = oils &amp; butters</text>
+  <text x="774" y="546" font-family="Arial,sans-serif" font-size="11" fill="#6B5B4E">Dark = base / neutrals</text>
+  <rect x="774" y="556" width="180" height="28" rx="6" fill="#2C1810"/>
+  <text x="864" y="574" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="white">Logic visible to any consumer</text>
+
+  <text x="60" y="658" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Mamaearth brand refresh · Colour architecture · 12 ingredient-derived colours · Works across 60+ SKUs and 3 packaging vendors</text>
+</svg>

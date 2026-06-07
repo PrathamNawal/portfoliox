@@ -1,0 +1,131 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="c"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.08"/></filter>
+  </defs>
+  <rect width="1200" height="675" fill="#F0EFEB"/>
+
+  <text x="60" y="44" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="11" font-weight="600" fill="#9CA3AF" letter-spacing="0.10em">RESEARCH &amp; DISCOVERY — ZOMATO CHECKOUT</text>
+  <text x="60" y="68" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="22" font-weight="700" fill="#1C1B18" letter-spacing="-0.03em">Affinity map — 14 user interviews across Delhi, Mumbai, Bengaluru</text>
+
+  <!-- CLUSTER 1: Surprise costs (dominant theme) -->
+  <rect x="60" y="96" width="320" height="260" rx="12" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.5" filter="url(#c)"/>
+  <text x="80" y="120" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#DC2626" letter-spacing="0.06em">SURPRISE COSTS  ·  11/14 sessions</text>
+  <!-- Sticky notes -->
+  <rect x="80" y="130" width="130" height="52" rx="6" fill="#FCA5A5" opacity="0.6"/>
+  <text x="95" y="149" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">"I didn't know it</text>
+  <text x="95" y="163" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">would be ₹50 extra"</text>
+  <text x="95" y="175" font-family="Arial,sans-serif" font-size="9" fill="#B91C1C">P2, Mumbai</text>
+
+  <rect x="224" y="130" width="130" height="52" rx="6" fill="#FCA5A5" opacity="0.6"/>
+  <text x="239" y="149" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">"Delivery fee shows</text>
+  <text x="239" y="163" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">too late"</text>
+  <text x="239" y="175" font-family="Arial,sans-serif" font-size="9" fill="#B91C1C">P7, Delhi</text>
+
+  <rect x="80" y="196" width="130" height="52" rx="6" fill="#FECDD3" opacity="0.7"/>
+  <text x="95" y="215" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">"Platform fee? That's</text>
+  <text x="95" y="229" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">new, why?"</text>
+  <text x="95" y="241" font-family="Arial,sans-serif" font-size="9" fill="#B91C1C">P11, Bengaluru</text>
+
+  <rect x="224" y="196" width="130" height="52" rx="6" fill="#FECDD3" opacity="0.7"/>
+  <text x="239" y="215" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">"Total was higher than</text>
+  <text x="239" y="229" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">expected"</text>
+  <text x="239" y="241" font-family="Arial,sans-serif" font-size="9" fill="#B91C1C">P3, Delhi</text>
+
+  <rect x="80" y="262" width="130" height="52" rx="6" fill="#FEE2E2" opacity="0.8"/>
+  <text x="95" y="281" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">"I just wanted to see</text>
+  <text x="95" y="295" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">the final amount"</text>
+  <text x="95" y="307" font-family="Arial,sans-serif" font-size="9" fill="#B91C1C">P9, Mumbai</text>
+
+  <rect x="224" y="262" width="130" height="52" rx="6" fill="#FEE2E2" opacity="0.8"/>
+  <text x="239" y="281" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">"Too many steps to</text>
+  <text x="239" y="295" font-family="Arial,sans-serif" font-size="10" fill="#7F1D1D">see the actual total"</text>
+  <text x="239" y="307" font-family="Arial,sans-serif" font-size="9" fill="#B91C1C">P13, Bengaluru</text>
+
+  <!-- CLUSTER 2: Hidden delivery time -->
+  <rect x="400" y="96" width="320" height="260" rx="12" fill="#FFF7ED" stroke="#FCD34D" stroke-width="1.5" filter="url(#c)"/>
+  <text x="420" y="120" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#D97706" letter-spacing="0.06em">HIDDEN ETA  ·  8/14 sessions</text>
+
+  <rect x="420" y="130" width="130" height="52" rx="6" fill="#FDE68A" opacity="0.8"/>
+  <text x="435" y="149" font-family="Arial,sans-serif" font-size="10" fill="#78350F">"Can't see delivery</text>
+  <text x="435" y="163" font-family="Arial,sans-serif" font-size="10" fill="#78350F">time until too late"</text>
+  <text x="435" y="175" font-family="Arial,sans-serif" font-size="9" fill="#92400E">P1, Delhi</text>
+
+  <rect x="564" y="130" width="130" height="52" rx="6" fill="#FDE68A" opacity="0.8"/>
+  <text x="579" y="149" font-family="Arial,sans-serif" font-size="10" fill="#78350F">"I want to know 30</text>
+  <text x="579" y="163" font-family="Arial,sans-serif" font-size="10" fill="#78350F">min before I pay"</text>
+  <text x="579" y="175" font-family="Arial,sans-serif" font-size="9" fill="#92400E">P5, Bengaluru</text>
+
+  <rect x="420" y="196" width="130" height="52" rx="6" fill="#FEF3C7" opacity="0.9"/>
+  <text x="435" y="215" font-family="Arial,sans-serif" font-size="10" fill="#78350F">"Restaurant prep time</text>
+  <text x="435" y="229" font-family="Arial,sans-serif" font-size="10" fill="#78350F">shown too late"</text>
+  <text x="435" y="241" font-family="Arial,sans-serif" font-size="9" fill="#92400E">P8, Mumbai</text>
+
+  <rect x="564" y="196" width="130" height="52" rx="6" fill="#FEF3C7" opacity="0.9"/>
+  <text x="579" y="215" font-family="Arial,sans-serif" font-size="10" fill="#78350F">"I need ETA before</text>
+  <text x="579" y="229" font-family="Arial,sans-serif" font-size="10" fill="#78350F">entering payment"</text>
+  <text x="579" y="241" font-family="Arial,sans-serif" font-size="9" fill="#92400E">P12, Delhi</text>
+
+  <rect x="420" y="262" width="130" height="52" rx="6" fill="#FFFBEB"/>
+  <text x="435" y="281" font-family="Arial,sans-serif" font-size="10" fill="#78350F">"Thought order was</text>
+  <text x="435" y="295" font-family="Arial,sans-serif" font-size="10" fill="#78350F">placed already"</text>
+  <text x="435" y="307" font-family="Arial,sans-serif" font-size="9" fill="#92400E">P6, Bengaluru</text>
+
+  <!-- CLUSTER 3: Mental model -->
+  <rect x="740" y="96" width="400" height="260" rx="12" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5" filter="url(#c)"/>
+  <text x="760" y="120" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#16A34A" letter-spacing="0.06em">KEY INSIGHT  ·  REFRAMES THE PROBLEM</text>
+
+  <rect x="760" y="132" width="360" height="100" rx="8" fill="white" stroke="#86EFAC"/>
+  <text x="780" y="155" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#111827">Users aren't abandoning because checkout</text>
+  <text x="780" y="173" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#111827">has too many steps.</text>
+  <text x="780" y="196" font-family="Arial,sans-serif" font-size="13" fill="#374151">They're abandoning because information</text>
+  <text x="780" y="214" font-family="Arial,sans-serif" font-size="13" fill="#374151">needed to <tspan font-weight="700" fill="#16A34A">commit</tspan> was withheld until</text>
+  <text x="780" y="232" font-family="Arial,sans-serif" font-size="13" fill="#374151"><tspan font-weight="700" fill="#E23744">commitment was expected.</tspan></text>
+
+  <text x="760" y="258" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">Design frame shift:</text>
+  <rect x="760" y="266" width="360" height="32" rx="6" fill="#F0FDF4" stroke="#86EFAC"/>
+  <text x="780" y="286" font-family="Arial,sans-serif" font-size="12" fill="#374151">❌ Reduce friction  →  ✅ <tspan font-weight="700">Build trust earlier</tspan></text>
+
+  <!-- Stats bar -->
+  <rect x="60" y="376" width="1080" height="80" rx="12" fill="white" stroke="#E5E7EB" filter="url(#c)"/>
+  <text x="100" y="405" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="800" fill="#E23744">68%</text>
+  <text x="100" y="422" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">drop-off step 4</text>
+  <rect x="170" y="390" width="1" height="52" fill="#E5E7EB"/>
+  <text x="220" y="405" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="800" fill="#374151">14</text>
+  <text x="220" y="422" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">user interviews</text>
+  <rect x="290" y="390" width="1" height="52" fill="#E5E7EB"/>
+  <text x="360" y="405" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="800" fill="#374151">3</text>
+  <text x="360" y="422" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">cities</text>
+  <rect x="430" y="390" width="1" height="52" fill="#E5E7EB"/>
+  <text x="510" y="405" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="800" fill="#374151">2.3M</text>
+  <text x="510" y="422" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">sessions analysed</text>
+  <rect x="590" y="390" width="1" height="52" fill="#E5E7EB"/>
+  <text x="670" y="405" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="800" fill="#374151">8s</text>
+  <text x="670" y="422" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">avg before exit at step 4</text>
+  <rect x="750" y="390" width="1" height="52" fill="#E5E7EB"/>
+  <text x="840" y="405" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="800" fill="#374151">4 wks</text>
+  <text x="840" y="422" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#6B7280">discovery sprint</text>
+
+  <!-- Funnel visualization -->
+  <rect x="60" y="476" width="1080" height="164" rx="12" fill="white" stroke="#E5E7EB" filter="url(#c)"/>
+  <text x="80" y="500" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#9CA3AF" letter-spacing="0.06em">CHECKOUT FUNNEL — 2.3M SESSIONS</text>
+  <!-- Funnel bars -->
+  <rect x="80" y="512" width="180" height="36" rx="4" fill="#E23744"/>
+  <text x="170" y="535" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="white">Step 1 — 100%</text>
+  <rect x="80" y="556" width="162" height="36" rx="4" fill="#E55063"/>
+  <text x="161" y="579" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="white">Step 2 — 90%</text>
+  <rect x="80" y="600" width="144" height="36" rx="4" fill="#E97383"/>
+  <text x="152" y="623" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="white">Step 3 — 80%</text>
+  <!-- Big drop at step 4 -->
+  <rect x="380" y="512" width="180" height="36" rx="4" fill="#111827"/>
+  <text x="470" y="535" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="white">Step 4 — 32% ⚠</text>
+  <text x="380" y="508" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#DC2626">68% DROP HERE</text>
+  <rect x="380" y="556" width="100" height="36" rx="4" fill="#374151"/>
+  <text x="430" y="579" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="white">Step 5 — 28%</text>
+  <rect x="380" y="600" width="64" height="36" rx="4" fill="#6B7280"/>
+  <text x="412" y="623" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="white">Step 6 — 18%</text>
+  <rect x="700" y="512" width="48" height="36" rx="4" fill="#9CA3AF"/>
+  <text x="724" y="535" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="white">Placed</text>
+  <text x="724" y="551" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#374151">13%</text>
+
+  <text x="60" y="656" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Zomato checkout redesign · User research synthesis · 14 interviews + 2.3M session analysis · Week 4 of 14</text>
+</svg>

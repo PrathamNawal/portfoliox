@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
 import { makeSectionsForDiscipline, makeDefaultOverview } from '@/lib/case-study-templates'
+import { DISCIPLINE_SAMPLES } from '@/lib/case-study-samples'
 import type { CaseDiscipline } from '@/types'
 
 export async function GET() {
@@ -51,17 +52,31 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json()
     const discipline: CaseDiscipline = body.discipline || 'ux'
-    const sections = makeSectionsForDiscipline(discipline)
-    const overview_data = makeDefaultOverview()
+    const withSample: boolean = body.withSample === true
+
+    let sections, overview_data, title, cover_image_url
+    if (withSample && discipline !== 'custom') {
+      const sample = DISCIPLINE_SAMPLES[discipline]
+      sections = sample.sections
+      overview_data = sample.overviewData
+      cover_image_url = sample.coverUrl || null
+      title = sample.overviewData.summary.split('—')[0].trim().slice(0, 80)
+    } else {
+      sections = makeSectionsForDiscipline(discipline)
+      overview_data = makeDefaultOverview()
+      cover_image_url = null
+      title = body.title || 'Untitled'
+    }
 
     const { data, error } = await supabase
       .from('case_studies')
       .insert({
         user_id: userId,
-        title: body.title || 'Untitled',
+        title,
         discipline,
         sections,
         overview_data,
+        cover_image_url,
       })
       .select()
       .single()

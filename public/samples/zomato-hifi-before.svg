@@ -1,0 +1,113 @@
+<svg width="800" height="920" viewBox="0 0 800 920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="sh">
+      <feDropShadow dx="0" dy="8" stdDeviation="20" flood-color="#000" flood-opacity="0.18"/>
+    </filter>
+    <linearGradient id="zred" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E23744"/>
+      <stop offset="100%" stop-color="#C12030"/>
+    </linearGradient>
+    <clipPath id="screen-before">
+      <rect x="100" y="10" width="600" height="870" rx="44"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="920" fill="#1C1B18"/>
+
+  <!-- Label top -->
+  <text x="400" y="30" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-size="11" font-weight="600" fill="#6B7280" letter-spacing="0.10em">BEFORE — OLD 7-STEP CHECKOUT (HI-FI)</text>
+
+  <!-- Phone body -->
+  <rect x="96" y="54" width="608" height="840" rx="52" fill="#111" filter="url(#sh)"/>
+  <rect x="100" y="58" width="600" height="832" rx="48" fill="#111"/>
+
+  <!-- Screen area -->
+  <g clip-path="url(#screen-before)">
+    <rect x="100" y="58" width="600" height="832" fill="#FAFAFA"/>
+
+    <!-- Status bar -->
+    <rect x="100" y="58" width="600" height="44" fill="#FAFAFA"/>
+    <text x="124" y="85" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#111">9:41</text>
+    <text x="650" y="86" font-family="Arial,sans-serif" font-size="11" fill="#111">▪▪▪▪</text>
+
+    <!-- Nav bar with Zomato red -->
+    <rect x="100" y="102" width="600" height="56" fill="url(#zred)"/>
+    <path d="M134 130 L124 122 L134 114" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="400" y="135" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="white">Checkout</text>
+
+    <!-- Step indicator - 4 of 7 -->
+    <rect x="116" y="166" width="568" height="4" rx="2" fill="#F3F4F6"/>
+    <rect x="116" y="166" width="325" height="4" rx="2" fill="#E23744"/>
+    <!-- Step dots -->
+    <circle cx="116" cy="168" r="6" fill="#E23744"/>
+    <circle cx="198" cy="168" r="6" fill="#E23744"/>
+    <circle cx="280" cy="168" r="6" fill="#E23744"/>
+    <circle cx="362" cy="168" r="6" fill="#E23744"/>
+    <circle cx="444" cy="168" r="6" fill="#E5E7EB"/>
+    <circle cx="526" cy="168" r="6" fill="#E5E7EB"/>
+    <circle cx="608" cy="168" r="6" fill="#E5E7EB"/>
+    <text x="400" y="188" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#9CA3AF">Step 4 of 7 — Payment</text>
+
+    <!-- WARNING: Surprise fee shown here for first time -->
+    <rect x="116" y="200" width="568" height="72" rx="10" fill="#FFFBEB"/>
+    <rect x="116" y="200" width="4" height="72" fill="#F59E0B"/>
+    <text x="134" y="224" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#92400E">Delivery fee + taxes shown for first time</text>
+    <text x="134" y="242" font-family="Arial,sans-serif" font-size="12" fill="#78350F">Subtotal ₹340 + Delivery ₹49 + Platform fee ₹5 + GST ₹17</text>
+    <text x="134" y="260" font-family="Arial,sans-serif" font-size="14" font-weight="800" fill="#92400E">Total: ₹411</text>
+
+    <!-- Payment options -->
+    <text x="116" y="298" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#374151" letter-spacing="0.06em">CHOOSE PAYMENT</text>
+
+    <!-- UPI -->
+    <rect x="116" y="308" width="568" height="68" rx="10" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+    <rect x="132" y="322" width="36" height="36" rx="8" fill="#F0FDF4"/>
+    <text x="150" y="345" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="700" fill="#16A34A">UPI</text>
+    <text x="184" y="335" font-family="Arial,sans-serif" font-size="14" font-weight="600" fill="#111827">UPI / PhonePe</text>
+    <text x="184" y="353" font-family="Arial,sans-serif" font-size="12" fill="#9CA3AF">Instant payment via UPI app</text>
+    <circle cx="648" cy="342" r="10" fill="#E5E7EB"/>
+
+    <!-- Credit Card -->
+    <rect x="116" y="388" width="568" height="68" rx="10" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+    <rect x="132" y="402" width="36" height="36" rx="8" fill="#EFF6FF"/>
+    <text x="150" y="425" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#2563EB">CARD</text>
+    <text x="184" y="415" font-family="Arial,sans-serif" font-size="14" font-weight="600" fill="#111827">Credit / Debit Card</text>
+    <text x="184" y="433" font-family="Arial,sans-serif" font-size="12" fill="#9CA3AF">Visa, Mastercard, RuPay</text>
+    <circle cx="648" cy="422" r="10" fill="#E5E7EB"/>
+
+    <!-- Wallet -->
+    <rect x="116" y="468" width="568" height="68" rx="10" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+    <rect x="132" y="482" width="36" height="36" rx="8" fill="#FFF7ED"/>
+    <text x="150" y="505" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#EA580C">PAY</text>
+    <text x="184" y="495" font-family="Arial,sans-serif" font-size="14" font-weight="600" fill="#111827">Paytm Wallet</text>
+    <text x="184" y="513" font-family="Arial,sans-serif" font-size="12" fill="#9CA3AF">Balance: ₹220</text>
+    <circle cx="648" cy="502" r="10" fill="#E5E7EB"/>
+
+    <!-- COD -->
+    <rect x="116" y="548" width="568" height="68" rx="10" fill="white" stroke="#E5E7EB" stroke-width="1.5"/>
+    <rect x="132" y="562" width="36" height="36" rx="8" fill="#F9FAFB"/>
+    <text x="150" y="585" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#6B7280">COD</text>
+    <text x="184" y="575" font-family="Arial,sans-serif" font-size="14" font-weight="600" fill="#111827">Cash on Delivery</text>
+    <text x="184" y="593" font-family="Arial,sans-serif" font-size="12" fill="#9CA3AF">Pay when order arrives</text>
+    <circle cx="648" cy="582" r="10" fill="#E5E7EB"/>
+
+    <!-- 3 more steps remain note -->
+    <rect x="116" y="630" width="568" height="36" rx="8" fill="#F3F4F6"/>
+    <text x="400" y="653" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#6B7280">3 more steps after this — confirmation, review, place order</text>
+
+    <!-- CTA -->
+    <rect x="116" y="694" width="568" height="52" rx="10" fill="url(#zred)"/>
+    <text x="400" y="726" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="white">Continue →</text>
+
+    <!-- Bottom safe area -->
+    <rect x="100" y="750" width="600" height="140" fill="#FAFAFA"/>
+    <rect x="320" y="812" width="160" height="5" rx="3" fill="#D1D5DB"/>
+  </g>
+
+  <!-- Phone notch -->
+  <rect x="310" y="58" width="180" height="36" rx="0" fill="#111"/>
+  <rect x="335" y="68" width="130" height="18" rx="9" fill="#0D0D0B"/>
+
+  <!-- Caption below -->
+  <text x="400" y="904" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#6B7280">Before: 7-step checkout — fee surprise at step 4 caused 68% abandonment</text>
+</svg>
