@@ -70,7 +70,6 @@ function TestimonialModal({ open, onClose, initial, onSaved }: {
   return (
     <Modal open={open} onClose={onClose} title={initial ? 'Edit testimonial' : 'Add testimonial'} width={480}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* Photo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ position: 'relative' }}>
             <Avatar name={name || 'Person'} src={photoUrl || null} size={52} editable onClick={() => fileRef.current?.click()} />
@@ -96,6 +95,80 @@ function TestimonialModal({ open, onClose, initial, onSaved }: {
   )
 }
 
+// ── Single testimonial card (marquee item) ─────────────────────────────────────
+function TestimonialCard({ t, onEdit, onDelete }: {
+  t: Testimonial
+  onEdit: () => void
+  onDelete: () => void
+}) {
+  const [hover, setHover] = useState(false)
+
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        position: 'relative',
+        width: 360,
+        flexShrink: 0,
+        background: 'var(--px-surface)',
+        borderRadius: 28,
+        padding: '28px 28px 24px',
+        border: '1px solid var(--px-border)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 0,
+        cursor: 'default',
+        transition: 'box-shadow 0.18s',
+        boxShadow: hover ? 'var(--px-shadow-md)' : 'none',
+      }}
+    >
+      {/* Quote */}
+      <p style={{
+        fontSize: 15,
+        lineHeight: 1.65,
+        color: 'var(--px-text)',
+        margin: 0,
+        flex: 1,
+        letterSpacing: '-0.01em',
+      }}>
+        <span style={{ fontSize: 22, color: 'var(--px-accent)', fontFamily: 'Georgia, serif', lineHeight: 0, verticalAlign: '-6px', marginRight: 2 }}>"</span>
+        {t.quote}
+        <span style={{ fontSize: 22, color: 'var(--px-accent)', fontFamily: 'Georgia, serif', lineHeight: 0, verticalAlign: '-6px', marginLeft: 2 }}>"</span>
+      </p>
+
+      {/* Spacer */}
+      <div style={{ height: 28 }} />
+
+      {/* Author */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Avatar name={t.name} src={t.photo_url} size={40} />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {t.name}
+          </div>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--px-text-3)', letterSpacing: '0.07em', textTransform: 'uppercase', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {t.title_and_company}
+          </div>
+        </div>
+      </div>
+
+      {/* Edit/delete — hover overlay top-right */}
+      {hover && (
+        <div style={{
+          position: 'absolute', top: 12, right: 12,
+          display: 'flex', gap: 4,
+          animation: 'px-fadein 0.12s ease',
+        }}>
+          <IconBtn name="edit" size={26} iconSize={13} title="Edit" onClick={() => onEdit()} />
+          <IconBtn name="trash" size={26} iconSize={13} title="Delete" color="#C94040" onClick={() => onDelete()} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Main section ───────────────────────────────────────────────────────────────
 interface Props {
   testimonials: Testimonial[]
   onChange: (ts: Testimonial[]) => void
@@ -105,6 +178,7 @@ export function TestimonialsSection({ testimonials, onChange }: Props) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Testimonial | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [paused, setPaused] = useState(false)
 
   const handleSaved = (t: Testimonial) => {
     if (editTarget) onChange(testimonials.map(x => x.id === t.id ? t : x))
@@ -118,37 +192,77 @@ export function TestimonialsSection({ testimonials, onChange }: Props) {
     setDeleteId(null)
   }
 
+  // Duplicate cards for seamless loop — need at least 2 sets
+  const looped = testimonials.length > 0
+    ? [...testimonials, ...testimonials, ...testimonials]
+    : []
+
+  // Speed: 40s per full pass (adjust based on count)
+  const duration = Math.max(20, testimonials.length * 8)
+
   return (
     <div style={{ marginBottom: 24 }}>
-      <SectionHead title="Testimonials" count={testimonials.length}
-        action={<Btn variant="ghost" size="sm" icon="plus" onClick={() => { setEditTarget(null); setModalOpen(true) }}>Add</Btn>} />
+      <SectionHead
+        title="Testimonials"
+        count={testimonials.length}
+        action={<Btn variant="ghost" size="sm" icon="plus" onClick={() => { setEditTarget(null); setModalOpen(true) }}>Add</Btn>}
+      />
 
       {testimonials.length === 0 ? (
-        <div style={{ background: 'var(--px-surface)', border: '1px dashed var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '20px 24px', fontSize: 13, color: 'var(--px-text-3)', cursor: 'pointer' }}
-          onClick={() => { setEditTarget(null); setModalOpen(true) }}>
-          Add a quote from a collaborator or manager.
+        <div
+          style={{ background: 'var(--px-surface)', border: '1px dashed var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '20px 24px', fontSize: 13, color: 'var(--px-text-3)', cursor: 'pointer' }}
+          onClick={() => { setEditTarget(null); setModalOpen(true) }}
+        >
+          Add a quote from a collaborator or manager. They'll scroll across your portfolio.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {testimonials.map(t => (
-            <div key={t.id} style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-              <Avatar name={t.name} src={t.photo_url} size={40} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 14, color: 'var(--px-text)', lineHeight: 1.6, marginBottom: 8, fontStyle: 'italic' }}>&quot;{t.quote}&quot;</p>
-                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)' }}>{t.name} · {t.title_and_company}</span>
-              </div>
-              <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                <IconBtn name="edit" size={28} iconSize={14} title="Edit" onClick={() => { setEditTarget(t); setModalOpen(true) }} />
-                <IconBtn name="trash" size={28} iconSize={14} title="Delete" color="#C94040" onClick={() => setDeleteId(t.id)} />
-              </div>
+        <div>
+          {/* Marquee viewport */}
+          <div
+            style={{
+              overflow: 'hidden',
+              // Fade edges
+              maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+              borderRadius: 8,
+            }}
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+          >
+            {/* Scrolling track */}
+            <div style={{
+              display: 'flex',
+              gap: 16,
+              width: 'max-content',
+              animation: `px-marquee ${duration}s linear infinite`,
+              animationPlayState: paused ? 'paused' : 'running',
+              paddingBottom: 4, // prevent shadow clipping
+            }}>
+              {looped.map((t, i) => (
+                <TestimonialCard
+                  key={`${t.id}-${i}`}
+                  t={t}
+                  onEdit={() => { setEditTarget(t); setModalOpen(true) }}
+                  onDelete={() => setDeleteId(t.id)}
+                />
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* Hover hint */}
+          <p style={{ fontSize: 11, color: 'var(--px-text-3)', marginTop: 10, textAlign: 'center' }}>
+            Hover to pause · {testimonials.length} {testimonials.length === 1 ? 'testimonial' : 'testimonials'}
+          </p>
         </div>
       )}
 
-      <TestimonialModal open={modalOpen} onClose={() => { setModalOpen(false); setEditTarget(null) }} initial={editTarget} onSaved={handleSaved} />
+      <TestimonialModal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setEditTarget(null) }}
+        initial={editTarget}
+        onSaved={handleSaved}
+      />
 
-      {/* Delete confirm */}
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title="Delete testimonial" width={380}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={{ fontSize: 14, color: 'var(--px-text-2)', lineHeight: 1.5 }}>Delete this testimonial? This cannot be undone.</p>
