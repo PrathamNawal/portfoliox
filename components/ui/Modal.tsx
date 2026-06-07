@@ -41,11 +41,13 @@ export function Modal({ open, onClose, children, width = 480, title, noPad }: Mo
         style={{
           width,
           maxWidth: 'calc(100vw - 32px)',
+          maxHeight: 'calc(100dvh - 32px)',
+          overflowY: 'auto',
           background: 'var(--px-surface)',
           borderRadius: 'var(--px-r-xl)',
           boxShadow: 'var(--px-shadow-xl)',
           border: '1px solid var(--px-border)',
-          overflow: 'hidden',
+          overflow: 'hidden auto',
         }}
       >
         {title && (

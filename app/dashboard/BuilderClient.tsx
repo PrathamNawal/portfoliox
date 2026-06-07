@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import { useIsMobile } from '@/lib/hooks'
 import { useRouter } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { portfolioUrl } from '@/lib/utils'
@@ -312,7 +313,7 @@ const DISCIPLINE_TINTS: Record<string, string> = {
 }
 
 function CaseStudyCard({
-  cs, dragHandleProps, onEdit, onDelete, onToggleVisible, liveUrl,
+  cs, dragHandleProps, onEdit, onDelete, onToggleVisible, liveUrl, isMobile,
 }: {
   cs: CaseStudy
   dragHandleProps?: object
@@ -320,6 +321,7 @@ function CaseStudyCard({
   onDelete: () => void
   onToggleVisible: () => void
   liveUrl: string | null
+  isMobile: boolean
 }) {
   const [coverHover, setCoverHover] = useState(false)
   const [toggling, setToggling] = useState(false)
@@ -344,8 +346,8 @@ function CaseStudyCard({
       borderRadius: 20,
       overflow: 'hidden',
       display: 'flex',
-      flexDirection: 'row',
-      height: 320,
+      flexDirection: isMobile ? 'column' : 'row',
+      height: isMobile ? 'auto' : 320,
       boxShadow: coverHover ? 'var(--px-shadow-md)' : 'var(--px-shadow-sm)',
       transition: 'box-shadow 0.18s',
       position: 'relative',
@@ -353,13 +355,14 @@ function CaseStudyCard({
       {/* Tinted background wash */}
       <div style={{ position: 'absolute', inset: 0, background: tint, pointerEvents: 'none', zIndex: 0 }} />
 
-      {/* Left — cover image */}
+      {/* Cover image (left on desktop, top on mobile) */}
       <div
         onMouseEnter={() => setCoverHover(true)}
         onMouseLeave={() => setCoverHover(false)}
         onClick={onEdit}
         style={{
-          width: '44%',
+          width: isMobile ? '100%' : '44%',
+          height: isMobile ? 180 : 'auto',
           flexShrink: 0,
           background: bg,
           position: 'relative',
@@ -536,6 +539,7 @@ interface Props {
 
 export function BuilderClient({ initialProfile, initialCaseStudies, initialTestimonials, initialExperience, initialTools, freeLimit }: Props) {
   const router = useRouter()
+  const isMobile = useIsMobile()
   const [profile, setProfile] = useState<Profile | null>(initialProfile)
   const [cases, setCases] = useState<CaseStudy[]>(initialCaseStudies)
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials)
@@ -612,21 +616,21 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
   return (
     <div className="px-screen" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* Top nav */}
-      <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', borderBottom: '1px solid var(--px-border)', background: 'var(--px-surface)', flexShrink: 0, gap: 12 }}>
+      <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: '1px solid var(--px-border)', background: 'var(--px-surface)', flexShrink: 0, gap: 8 }}>
         <PXLogo size={24} />
-        {slugUrl ? (
+        {!isMobile && (slugUrl ? (
           <button onClick={() => { navigator.clipboard.writeText(slugUrl) }} title="Copy URL"
             style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 12px', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', borderRadius: 999, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
             <Icon name="globe" size={12} color="var(--px-success)" />
             <span style={{ fontSize: 12, color: 'var(--px-text-3)', fontWeight: 500 }}>{slugUrl}</span>
             <Icon name="copy" size={12} color="var(--px-text-3)" />
           </button>
-        ) : <div style={{ fontSize: 12, color: 'var(--px-text-3)', fontStyle: 'italic' }}>Not published yet</div>}
+        ) : <div style={{ fontSize: 12, color: 'var(--px-text-3)', fontStyle: 'italic' }}>Not published yet</div>)}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
-          <IconBtn name="barChart" size={34} iconSize={17} title="Admin" onClick={() => router.push('/admin')} />
-          <IconBtn name={darkMode ? 'sun' : 'moon'} size={34} iconSize={17} onClick={() => setDarkMode(d => !d)} title={darkMode ? 'Light mode' : 'Dark mode'} />
-          <div style={{ width: 1, height: 20, background: 'var(--px-border)', margin: '0 4px' }} />
-          <Btn variant="secondary" size="sm" icon="eye" onClick={() => router.push('/preview')}>Preview</Btn>
+          {!isMobile && <IconBtn name="barChart" size={34} iconSize={17} title="Admin" onClick={() => router.push('/admin')} />}
+          {!isMobile && <IconBtn name={darkMode ? 'sun' : 'moon'} size={34} iconSize={17} onClick={() => setDarkMode(d => !d)} title={darkMode ? 'Light mode' : 'Dark mode'} />}
+          {!isMobile && <div style={{ width: 1, height: 20, background: 'var(--px-border)', margin: '0 4px' }} />}
+          {!isMobile && <Btn variant="secondary" size="sm" icon="eye" onClick={() => router.push('/preview')}>Preview</Btn>}
           <Btn variant="primary" size="sm" icon="globe" onClick={() => setShowPublish(true)}>{profile?.slug ? 'Update' : 'Publish'}</Btn>
           <div style={{ width: 1, height: 20, background: 'var(--px-border)', margin: '0 4px' }} />
           {/* Profile / logout */}
@@ -641,6 +645,23 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                   <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)' }}>{profile?.name || 'You'}</div>
                   <div style={{ fontSize: 11, color: 'var(--px-text-3)', marginTop: 1 }}>{(profile as any)?.email || ''}</div>
                 </div>
+                {isMobile && (
+                  <>
+                    <button onClick={() => { setShowUserMenu(false); router.push('/admin') }}
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: 'var(--px-text)', background: 'none', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left' }}>
+                      <Icon name="barChart" size={14} /> Admin
+                    </button>
+                    <button onClick={() => { setShowUserMenu(false); router.push('/preview') }}
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: 'var(--px-text)', background: 'none', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left' }}>
+                      <Icon name="eye" size={14} /> Preview
+                    </button>
+                    <button onClick={() => { setShowUserMenu(false); setDarkMode(d => !d) }}
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: 'var(--px-text)', background: 'none', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left' }}>
+                      <Icon name={darkMode ? 'sun' : 'moon'} size={14} /> {darkMode ? 'Light mode' : 'Dark mode'}
+                    </button>
+                    <div style={{ height: 1, background: 'var(--px-border)', margin: '4px 0' }} />
+                  </>
+                )}
                 <button onClick={handleLogout}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: '#C94040', background: 'none', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left' }}>
                   <Icon name="logout" size={14} color="#C94040" /> Sign out
@@ -652,11 +673,11 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '32px 0 64px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '20px 0 48px' : '32px 0 64px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: isMobile ? '0 12px' : '0 24px' }}>
 
           {/* Profile hero */}
-          <div style={{ background: 'var(--px-surface)', borderRadius: 'var(--px-r-xl)', border: '1px solid var(--px-border)', padding: '32px 32px 28px', marginBottom: 16 }}>
+          <div style={{ background: 'var(--px-surface)', borderRadius: 'var(--px-r-xl)', border: '1px solid var(--px-border)', padding: isMobile ? '20px 16px 16px' : '32px 32px 28px', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 20 }}>
               <Avatar name={profile?.name || 'You'} src={profile?.avatar_url} size={72} editable onClick={() => setShowProfileEdit(true)} />
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -743,6 +764,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                                 onDelete={() => setDeleteTarget(cs)}
                                 onToggleVisible={() => handleToggleVisible(cs)}
                                 liveUrl={slugUrl}
+                                isMobile={isMobile}
                               />
                             </div>
                           )}
@@ -762,7 +784,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
           <WorkExperienceSection experience={experience} onChange={setExperience} />
 
           {/* Footer CTA */}
-          <div style={{ background: 'var(--px-text)', borderRadius: 'var(--px-r-xl)', padding: '36px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+          <div style={{ background: 'var(--px-text)', borderRadius: 'var(--px-r-xl)', padding: isMobile ? '24px 20px' : '36px 32px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', gap: isMobile ? 16 : 24 }}>
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-bg)', marginBottom: 6 }}>Ready to share?</h2>
               <p style={{ fontSize: 14, color: 'rgba(240,238,233,0.5)', lineHeight: 1.5 }}>{slugUrl ? `Live at ${slugUrl}` : 'Publish your portfolio to get a link.'}</p>

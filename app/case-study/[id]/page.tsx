@@ -492,7 +492,7 @@ export default function EditorPage() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: palette.bg, color: palette.text, fontFamily: 'var(--px-font)', overflow: 'hidden' }}>
 
       {/* ── Top bar ── */}
-      <div style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: `1px solid ${palette.border}`, background: palette.surface, flexShrink: 0, gap: 12, zIndex: 10 }}>
+      <div style={{ height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', borderBottom: `1px solid ${palette.border}`, background: palette.surface, flexShrink: 0, gap: 12, zIndex: 10, overflowX: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <button onClick={() => { saveNow(); router.push('/dashboard') }}
             style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: palette.text2, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--px-font)', fontWeight: 500, padding: '4px 6px', borderRadius: 5, flexShrink: 0 }}>

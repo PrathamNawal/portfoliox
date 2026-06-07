@@ -31,18 +31,18 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
       <AnalyticsTracker userId={profile.id} eventType="page_view" />
 
       {/* Sticky header */}
-      <header style={{ background: 'var(--px-surface)', borderBottom: '1px solid var(--px-border)', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56, position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <header className="px-canvas-header" style={{ background: 'var(--px-surface)', borderBottom: '1px solid var(--px-border)', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56, position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
           {profile.avatar_url
-            ? <img src={profile.avatar_url} alt={profile.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+            ? <img src={profile.avatar_url} alt={profile.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
             : <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#E53416', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{profile.name[0]}</span></div>
           }
-          <div>
-            <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--px-text)' }}>{profile.name}</span>
-            {profile.discipline && <span style={{ fontSize: 12, color: 'var(--px-text-3)', marginLeft: 8 }}>{DISCIPLINE[profile.discipline] || ''}</span>}
+          <div style={{ minWidth: 0 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--px-text)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.name}</span>
+            {profile.discipline && <span style={{ fontSize: 12, color: 'var(--px-text-3)', marginLeft: 0 }}>{DISCIPLINE[profile.discipline] || ''}</span>}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div className="px-canvas-header-links" style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
           {social.linkedin && <SocialLink href={`https://linkedin.com/in/${social.linkedin}`} label="LinkedIn" />}
           {social.dribbble && <SocialLink href={`https://dribbble.com/${social.dribbble}`} label="Dribbble" />}
           {social.website && <SocialLink href={social.website} label="Website" />}
@@ -51,7 +51,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         </div>
       </header>
 
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 40px 80px' }}>
+      <main className="px-canvas-main" style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 40px 80px' }}>
         {/* Bio */}
         {profile.bio && (
           <p style={{ fontSize: 17, color: 'var(--px-text-2)', lineHeight: 1.7, maxWidth: 640, marginBottom: 28 }}>{profile.bio}</p>
@@ -157,7 +157,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
                 <span style={{ fontSize: 20, color: 'var(--px-text-3)' }}>↗</span>
               </a>
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="px-cta-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               {(social as Record<string,string>).linkedin && (
                 <a href={`https://linkedin.com/in/${(social as Record<string,string>).linkedin}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', textDecoration: 'none', transition: 'border-color 0.15s' }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--px-text-3)')}

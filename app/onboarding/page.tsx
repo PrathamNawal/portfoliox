@@ -133,7 +133,7 @@ export default function OnboardingPage() {
 
   // Left decorative panel
   const leftPanel = (
-    <div style={{ width: 360, flexShrink: 0, background: '#0D0D0B', display: 'flex', flexDirection: 'column', padding: 40, position: 'relative', overflow: 'hidden' }}>
+    <div className="px-auth-panel" style={{ width: 360, flexShrink: 0, background: '#0D0D0B', display: 'flex', flexDirection: 'column', padding: 40, position: 'relative', overflow: 'hidden' }}>
       <PXLogo light wordmark size={26} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: '#F0EEE9', lineHeight: 1.15, marginBottom: 16 }}>
@@ -169,7 +169,7 @@ export default function OnboardingPage() {
       {leftPanel}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--px-bg)', overflowY: 'auto' }}>
         {/* Progress */}
-        <div style={{ padding: '24px 48px 0', flexShrink: 0 }}>
+        <div className="px-onboarding-content" style={{ padding: '24px 48px 0', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-3)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               {LABELS[step]}
@@ -180,7 +180,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Step content */}
-        <div key={step} className={dir === 'fwd' ? 'px-step-fwd' : 'px-step-back'} style={{ flex: 1, padding: '40px 48px', display: 'flex', flexDirection: 'column' }}>
+        <div key={step} className={`px-onboarding-content ${dir === 'fwd' ? 'px-step-fwd' : 'px-step-back'}`} style={{ flex: 1, padding: '40px 48px', display: 'flex', flexDirection: 'column' }}>
 
           {/* Step 0: Profile */}
           {step === 0 && (
@@ -260,7 +260,7 @@ export default function OnboardingPage() {
             <div style={{ maxWidth: 580 }}>
               <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 8 }}>How should it look?</h1>
               <p style={{ fontSize: 14, color: 'var(--px-text-2)', marginBottom: 32 }}>Pick a layout — you can always switch later.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="px-onboarding-layouts" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 {[
                   { id: 'canvas',    label: 'Canvas',    desc: 'Card grid — structured and dense',      Preview: CanvasPreview },
                   { id: 'spotlight', label: 'Spotlight', desc: 'Centered editorial — personal and airy', Preview: SpotlightPreview },
@@ -287,7 +287,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Footer nav */}
-        <div style={{ padding: '0 48px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <div className="px-onboarding-footer" style={{ padding: '0 48px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           {step > 0 ? (
             <button onClick={back} style={{ fontSize: 13, color: 'var(--px-text-3)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--px-font)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 5 }}>
               <Icon name="arrowLeft" size={14} /> Back

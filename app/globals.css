@@ -184,3 +184,53 @@ a { text-decoration: none; color: inherit; }
 }
 .ProseMirror p { margin: 0 0 8px; }
 .ProseMirror ul { padding-left: 20px; margin: 0 0 8px; }
+
+/* ── Mobile responsive utilities ─────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Auth & onboarding left panel — hide on mobile */
+  .px-auth-panel { display: none !important; }
+
+  /* Onboarding content padding */
+  .px-onboarding-content { padding-left: 20px !important; padding-right: 20px !important; }
+  .px-onboarding-footer  { padding-left: 20px !important; padding-right: 20px !important; }
+
+  /* Onboarding step 3 layout picker: 2-col → 1-col */
+  .px-onboarding-layouts { grid-template-columns: 1fr !important; }
+
+  /* Dashboard nav: hide non-essential items */
+  .px-nav-hide-mobile { display: none !important; }
+
+  /* Dashboard case study card: row → column */
+  .px-case-card {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .px-case-card-cover {
+    width: 100% !important;
+    min-height: 180px !important;
+    height: 180px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Dashboard profile hero padding */
+  .px-profile-hero { padding: 20px 16px 16px !important; }
+
+  /* Dashboard footer CTA */
+  .px-footer-cta {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  /* Published layouts: reduce outer padding */
+  .px-canvas-main  { padding: 24px 16px 60px !important; }
+  .px-canvas-header { padding: 0 16px !important; }
+  .px-canvas-header-links { display: none !important; }
+
+  /* Published: "Let's work together" grid → single column */
+  .px-cta-grid { grid-template-columns: 1fr !important; }
+
+  /* Published Spotlight: case card row → column */
+  .px-spotlight-card { grid-template-columns: 1fr !important; }
+  .px-spotlight-card-cover { min-height: 160px !important; }
+}

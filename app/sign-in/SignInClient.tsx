@@ -8,7 +8,7 @@ import { Icon } from '@/components/ui/Icon'
 
 function LeftPanel() {
   return (
-    <div style={{ width: 360, flexShrink: 0, background: '#0D0D0B', display: 'flex', flexDirection: 'column', padding: 40, position: 'relative', overflow: 'hidden' }}>
+    <div className="px-auth-panel" style={{ width: 360, flexShrink: 0, background: '#0D0D0B', display: 'flex', flexDirection: 'column', padding: 40, position: 'relative', overflow: 'hidden' }}>
       <PXLogo light wordmark size={26} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: '#F0EEE9', lineHeight: 1.15, marginBottom: 16 }}>
@@ -71,7 +71,7 @@ export function SignInClient() {
   return (
     <div className="px-screen" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <LeftPanel />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--px-bg)', padding: '40px 48px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--px-bg)', padding: 'clamp(24px, 5vw, 48px) clamp(20px, 6vw, 48px)' }}>
         <div style={{ width: '100%', maxWidth: 360 }}>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--px-text)', marginBottom: 6 }}>Welcome back</h1>
           <p style={{ fontSize: 14, color: 'var(--px-text-2)', marginBottom: 32 }}>Sign in or create your account.</p>

@@ -118,10 +118,10 @@ function SpotlightCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; 
   const bg = cs.cover_image_url ? `url(${cs.cover_image_url}) center/cover` : grad
 
   return (
-    <Link href={`/${slug}/case/${cs.id}`} style={{ display: 'grid', gridTemplateColumns: '220px 1fr', background: 'var(--px-surface)', borderRadius: 'var(--px-r-xl)', border: '1px solid var(--px-border)', overflow: 'hidden', textDecoration: 'none', transition: 'box-shadow 0.18s' }}
+    <Link href={`/${slug}/case/${cs.id}`} className="px-spotlight-card" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', background: 'var(--px-surface)', borderRadius: 'var(--px-r-xl)', border: '1px solid var(--px-border)', overflow: 'hidden', textDecoration: 'none', transition: 'box-shadow 0.18s' }}
       onMouseEnter={e => (e.currentTarget as HTMLElement).style.boxShadow = 'var(--px-shadow-lg)'}
       onMouseLeave={e => (e.currentTarget as HTMLElement).style.boxShadow = ''}>
-      <div style={{ background: bg, position: 'relative', minHeight: 160 }}>
+      <div className="px-spotlight-card-cover" style={{ background: bg, position: 'relative', minHeight: 160 }}>
         {cs.nda_enabled && (
           <div style={{ position: 'absolute', inset: 0, backdropFilter: 'blur(10px)', background: 'rgba(0,0,0,0.65)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><rect x="4" y="9.5" width="12" height="8.5" rx="2"/><path d="M7.5 9.5V7a2.5 2.5 0 0 1 5 0v2.5"/></svg>
