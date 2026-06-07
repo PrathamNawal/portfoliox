@@ -24,8 +24,18 @@ const CASE_GRADS = [
 ]
 
 const DISCIPLINE_LABELS: Record<string, string> = {
-  ux: 'UX / Product Design', graphic: 'Graphic / Visual',
-  motion: 'Motion Design', illustration: 'Illustration',
+  ux: 'UX / Product', graphic: 'Graphic / Visual',
+  brand: 'Brand & Identity', motion: 'Motion Design',
+  illustration: 'Illustration', custom: 'Custom',
+}
+
+const DISCIPLINE_COLORS: Record<string, { bg: string; color: string }> = {
+  ux:           { bg: 'rgba(123,94,224,0.12)', color: '#7B5EE0' },
+  brand:        { bg: 'rgba(184,110,10,0.12)', color: '#B86E0A' },
+  motion:       { bg: 'rgba(252,128,25,0.12)', color: '#FC8019' },
+  illustration: { bg: 'rgba(99,102,241,0.12)', color: '#6366F1' },
+  graphic:      { bg: 'rgba(20,184,166,0.12)', color: '#14B8A6' },
+  custom:       { bg: 'rgba(154,151,142,0.12)', color: '#9A978E' },
 }
 
 const ALL_SKILLS = [
@@ -302,10 +312,13 @@ function CaseStudyCard({
   onToggleVisible: () => void
   liveUrl: string | null
 }) {
-  const [hover, setHover] = useState(false)
+  const [coverHover, setCoverHover] = useState(false)
   const [toggling, setToggling] = useState(false)
   const grad = CASE_GRADS[cs.id.charCodeAt(0) % CASE_GRADS.length]
   const bg = cs.cover_image_url ? `url(${cs.cover_image_url}) center/cover` : grad
+  const discipline = cs.discipline || 'ux'
+  const disciplineLabel = DISCIPLINE_LABELS[discipline] || discipline
+  const disciplineColor = DISCIPLINE_COLORS[discipline] || DISCIPLINE_COLORS.custom
 
   const handleToggle = async () => {
     setToggling(true)
@@ -314,59 +327,108 @@ function CaseStudyCard({
   }
 
   return (
-    <div style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', overflow: 'hidden', transition: 'box-shadow 0.15s', boxShadow: hover ? 'var(--px-shadow-md)' : 'var(--px-shadow-sm)' }}>
-      {/* Cover */}
-      <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-        style={{ height: 150, background: bg, position: 'relative', cursor: 'pointer' }}
-        onClick={onEdit}>
+    <div style={{
+      background: 'var(--px-surface)',
+      border: '1px solid var(--px-border)',
+      borderRadius: 'var(--px-r-xl)',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'row',
+      height: 192,
+      boxShadow: coverHover ? 'var(--px-shadow-md)' : 'var(--px-shadow-sm)',
+      transition: 'box-shadow 0.15s',
+    }}>
+
+      {/* Left — cover image */}
+      <div
+        onMouseEnter={() => setCoverHover(true)}
+        onMouseLeave={() => setCoverHover(false)}
+        onClick={onEdit}
+        style={{
+          width: '42%',
+          flexShrink: 0,
+          background: bg,
+          position: 'relative',
+          cursor: 'pointer',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Subtle gradient overlay so cover always readable */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.28) 100%)', transition: 'opacity 0.15s', opacity: coverHover ? 1 : 0.5 }} />
+
+        {/* NDA badge */}
         {cs.nda_enabled && (
-          <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 999, padding: '4px 10px', backdropFilter: 'blur(4px)' }}>
-            <Icon name="lock" size={12} color="#fff" />
-            <span style={{ fontSize: 11, color: '#fff', fontWeight: 600 }}>NDA</span>
+          <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 999, padding: '4px 10px', backdropFilter: 'blur(4px)', zIndex: 2 }}>
+            <Icon name="lock" size={11} color="#fff" />
+            <span style={{ fontSize: 10, color: '#fff', fontWeight: 600 }}>NDA</span>
           </div>
         )}
-        {hover && (
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, animation: 'px-fadein 0.12s ease' }}>
+
+        {/* Hover action overlay */}
+        {coverHover && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, animation: 'px-fadein 0.12s ease', zIndex: 2 }}>
             <Btn variant="primary" size="sm" icon="edit" onClick={() => onEdit()}>Edit</Btn>
             {liveUrl && cs.published && (
               <a href={liveUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                style={{ height: 32, padding: '0 12px', fontSize: 13, fontWeight: 600, background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 'var(--px-r)', cursor: 'pointer', fontFamily: 'var(--px-font)', display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-                <Icon name="eye" size={13} color="#fff" /> View live
+                style={{ height: 30, padding: '0 12px', fontSize: 12, fontWeight: 600, background: 'rgba(255,255,255,0.18)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', borderRadius: 'var(--px-r)', cursor: 'pointer', fontFamily: 'var(--px-font)', display: 'flex', alignItems: 'center', gap: 5, textDecoration: 'none', backdropFilter: 'blur(4px)' }}>
+                <Icon name="eye" size={12} color="#fff" /> View live
               </a>
             )}
           </div>
         )}
       </div>
 
-      {/* Info */}
-      <div style={{ padding: '12px 14px 10px' }}>
-        <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--px-text)', lineHeight: 1.35, margin: 0 }}>{cs.title}</h3>
-      </div>
+      {/* Right — info + actions */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '18px 16px 12px', minWidth: 0 }}>
 
-      {/* Action bar */}
-      <div style={{ padding: '0 10px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
-        {/* Drag handle */}
-        <div {...(dragHandleProps || {})}
-          style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', borderRadius: 5, color: 'var(--px-text-3)', flexShrink: 0 }}
-          title="Drag to reorder">
-          <Icon name="drag" size={14} />
+        {/* Discipline tag */}
+        <div style={{ marginBottom: 10 }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center',
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+            padding: '3px 9px', borderRadius: 999,
+            background: disciplineColor.bg, color: disciplineColor.color,
+            textTransform: 'uppercase',
+          }}>
+            {disciplineLabel}
+          </span>
         </div>
-        {/* Edit */}
-        <button onClick={onEdit}
-          style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', borderRadius: 5, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
-          <Icon name="edit" size={12} /> Edit
-        </button>
-        {/* Visible toggle */}
-        <button onClick={handleToggle} disabled={toggling}
-          style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: cs.published ? 'var(--px-success)' : 'var(--px-text-3)', background: cs.published ? 'var(--px-success-subtle)' : 'var(--px-surface-2)', border: `1px solid ${cs.published ? 'var(--px-success)' : 'var(--px-border)'}`, borderRadius: 5, cursor: 'pointer', fontFamily: 'var(--px-font)', opacity: toggling ? 0.6 : 1 }}>
-          <Icon name={cs.published ? 'eye' : 'eyeOff'} size={12} /> {cs.published ? 'Visible' : 'Hidden'}
-        </button>
-        {/* Delete */}
-        <button onClick={onDelete}
-          style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FEF0EE', border: '1px solid #F5C2BB', borderRadius: 5, cursor: 'pointer', flexShrink: 0 }}
-          title="Delete">
-          <Icon name="trash" size={13} color="#C94040" />
-        </button>
+
+        {/* Title */}
+        <h3 style={{
+          fontSize: 15, fontWeight: 800, letterSpacing: '-0.025em',
+          color: 'var(--px-text)', lineHeight: 1.3, margin: 0,
+          display: '-webkit-box', WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          flex: 1,
+        }}>
+          {cs.title}
+        </h3>
+
+        {/* Action bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 12 }}>
+          {/* Drag handle */}
+          <div {...(dragHandleProps || {})}
+            style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', borderRadius: 6, color: 'var(--px-text-3)', flexShrink: 0 }}
+            title="Drag to reorder">
+            <Icon name="drag" size={14} />
+          </div>
+
+          {/* Edit */}
+          <button onClick={onEdit} style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: 'var(--px-text-2)', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
+            <Icon name="edit" size={11} /> Edit
+          </button>
+
+          {/* Visible toggle */}
+          <button onClick={handleToggle} disabled={toggling} style={{ flex: 1, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: cs.published ? 'var(--px-success)' : 'var(--px-text-3)', background: cs.published ? 'var(--px-success-subtle)' : 'var(--px-surface-2)', border: `1px solid ${cs.published ? 'var(--px-success)' : 'var(--px-border)'}`, borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', opacity: toggling ? 0.6 : 1 }}>
+            <Icon name={cs.published ? 'eye' : 'eyeOff'} size={11} /> {cs.published ? 'Visible' : 'Hidden'}
+          </button>
+
+          {/* Delete */}
+          <button onClick={onDelete} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FEF0EE', border: '1px solid #F5C2BB', borderRadius: 6, cursor: 'pointer', flexShrink: 0 }} title="Delete">
+            <Icon name="trash" size={12} color="#C94040" />
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -638,7 +700,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                 <Droppable droppableId="cases" direction="horizontal">
                   {(provided) => (
                     <div ref={provided.innerRef} {...provided.droppableProps}
-                      style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+                      style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 14 }}>
                       {cases.map((cs, i) => (
                         <Draggable key={cs.id} draggableId={cs.id} index={i}>
                           {(drag) => (
