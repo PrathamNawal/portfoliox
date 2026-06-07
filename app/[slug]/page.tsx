@@ -4,11 +4,21 @@ import { CanvasLayout } from '@/components/published/CanvasLayout'
 import { SpotlightLayout } from '@/components/published/SpotlightLayout'
 import type { Metadata } from 'next'
 
-// Plain anon client — no cookie/auth handling needed for public portfolio pages
+// Never cache portfolio pages — data changes in real time (RLS, publish toggles)
+export const revalidate = 0
+
+// Plain anon client — passes cache:'no-store' so Next.js Data Cache never
+// holds stale empty arrays from before RLS policies were in place
 function createPublicClient() {
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      global: {
+        fetch: (url: RequestInfo | URL, options: RequestInit = {}) =>
+          fetch(url, { ...options, cache: 'no-store' }),
+      },
+    }
   )
 }
 
