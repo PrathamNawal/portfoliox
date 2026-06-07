@@ -215,26 +215,13 @@ const TOOL_ICON_SLUGS: Record<string, string> = {
 
 function PublishedToolIcon({ name }: { name: string }) {
   const slug = TOOL_ICON_SLUGS[name]
-  const fallbackColor = (TOOL_COLORS[name] || '#888').replace('#', '')
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 8 }}>
-      {slug ? (
-        <img
-          src={`https://cdn.simpleicons.org/${slug}`}
-          alt={name}
-          width={16}
-          height={16}
-          style={{ display: 'block' }}
-          onError={(e) => {
-            const el = e.currentTarget as HTMLImageElement
-            el.style.display = 'none'
-            const dot = el.nextSibling as HTMLElement | null
-            if (dot) dot.style.display = 'block'
-          }}
-        />
-      ) : null}
-      <div style={{ width: 16, height: 16, borderRadius: 3, background: `#${fallbackColor}`, display: slug ? 'none' : 'block', flexShrink: 0 }} />
+      {slug
+        ? <img src={`https://cdn.simpleicons.org/${slug}`} alt={name} width={16} height={16} style={{ display: 'block' }} />
+        : <div style={{ width: 16, height: 16, borderRadius: 3, background: TOOL_COLORS[name] || '#888', flexShrink: 0 }} />
+      }
       <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text)' }}>{name}</span>
     </div>
   )
