@@ -1,4 +1,3 @@
-import React from 'react'
 import Link from 'next/link'
 import { AnalyticsTracker } from './AnalyticsTracker'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
@@ -28,7 +27,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
   const social = profile.social_links || {}
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--px-bg)' }}>
+    <div style={{ minHeight: '100vh', background: '#F8F7F4' }}>
       <AnalyticsTracker userId={profile.id} eventType="page_view" />
 
       {/* Sticky header */}
@@ -110,20 +109,22 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         {/* Work experience */}
         {experience.length > 0 && (
           <div style={{ marginBottom: 48 }}>
-            <SectionLabel>Experience</SectionLabel>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', overflow: 'hidden', marginTop: 16 }}>
-              {experience.map((exp, i) => (
-                <div key={exp.id} style={{ padding: '16px 20px', borderBottom: i < experience.length - 1 ? '1px solid var(--px-border)' : 'none', display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 'var(--px-r)', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--px-text-3)' }}>{exp.company[0]}</span>
+            <SectionLabel>Work Experience</SectionLabel>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+              {experience.map(exp => (
+                <div key={exp.id} style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '20px 24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: exp.description ? 8 : 0 }}>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.02em', marginBottom: 2 }}>{exp.role}</div>
+                      <div style={{ fontSize: 13, color: 'var(--px-text-2)' }}>{exp.company}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      {exp.discipline_tag && <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'var(--px-surface-2)', color: 'var(--px-text-3)', border: '1px solid var(--px-border)' }}>{exp.discipline_tag}</span>}
+                      <span style={{ fontSize: 12, color: 'var(--px-text-3)', whiteSpace: 'nowrap' }}>{exp.start_month} – {exp.is_current ? 'Present' : exp.end_month}</span>
+                    </div>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>{exp.role}</div>
-                    <div style={{ fontSize: 12, color: 'var(--px-text-2)' }}>{exp.company} · {exp.start_month} – {exp.is_current ? 'Present' : exp.end_month}</div>
-                    {exp.description && <p style={{ fontSize: 13, color: 'var(--px-text-3)', marginTop: 4, lineHeight: 1.5 }}>{exp.description}</p>}
-                  </div>
-                  {exp.discipline_tag && (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'var(--px-surface-2)', color: 'var(--px-text-3)', border: '1px solid var(--px-border)', whiteSpace: 'nowrap' }}>{exp.discipline_tag}</span>
+                  {exp.description && (
+                    <div style={{ fontSize: 13, color: 'var(--px-text-3)', lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: exp.description }} />
                   )}
                 </div>
               ))}
@@ -131,29 +132,89 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           </div>
         )}
 
-        {/* Tools + Contact */}
-        <div style={{ display: 'grid', gridTemplateColumns: tools.length > 0 ? '1fr 1fr' : '1fr', gap: 16 }}>
-          {tools.length > 0 && (
-            <div style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '20px 24px' }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em', marginBottom: 12 }}>Tool Stack</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {tools.map(t => (
-                  <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'var(--px-surface-2)', borderRadius: 6, fontSize: 12, fontWeight: 600, color: 'var(--px-text)' }}>
-                    <div style={{ width: 10, height: 10, borderRadius: 2, background: TOOL_COLORS[t.tool_name] || '#888', flexShrink: 0 }} />{t.tool_name}
-                  </div>
-                ))}
-              </div>
+        {/* Tool Stack */}
+        {tools.length > 0 && (
+          <div style={{ marginBottom: 48 }}>
+            <SectionLabel>Tool Stack</SectionLabel>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 16 }}>
+              {tools.map(t => <PublishedToolIcon key={t.id} name={t.tool_name} />)}
             </div>
-          )}
-          <div style={{ background: 'var(--px-text)', borderRadius: 'var(--px-r-lg)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--px-bg)', letterSpacing: '-0.03em', marginBottom: 6 }}>Open to work</h3>
-              <p style={{ fontSize: 13, color: 'rgba(240,238,233,0.5)', lineHeight: 1.5 }}>Full-time and freelance opportunities.</p>
+          </div>
+        )}
+
+        {/* Let's work together */}
+        <div style={{ borderTop: '1px solid var(--px-border)', paddingTop: 48, marginTop: 8 }}>
+          <h2 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--px-text)', textAlign: 'center', marginBottom: 32 }}>Let&apos;s work together</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {profile.resume_url && (
+              <a href={profile.resume_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', textDecoration: 'none', transition: 'border-color 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--px-text-3)')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--px-border)')}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <span style={{ fontSize: 22 }}>📄</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--px-text)' }}>View Resume</span>
+                </div>
+                <span style={{ fontSize: 20, color: 'var(--px-text-3)' }}>↗</span>
+              </a>
+            )}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {(social as Record<string,string>).linkedin && (
+                <a href={`https://linkedin.com/in/${(social as Record<string,string>).linkedin}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', textDecoration: 'none', transition: 'border-color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--px-text-3)')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--px-border)')}>
+                  <span style={{ fontSize: 22 }}>💼</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--px-text)' }}>LinkedIn</span>
+                </a>
+              )}
+              {(social as Record<string,string>).dribbble && (
+                <a href={`https://dribbble.com/${(social as Record<string,string>).dribbble}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', textDecoration: 'none', transition: 'border-color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--px-text-3)')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--px-border)')}>
+                  <span style={{ fontSize: 22 }}>🎯</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--px-text)' }}>Dribbble</span>
+                </a>
+              )}
+              {(social as Record<string,string>).website && (
+                <a href={(social as Record<string,string>).website} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', textDecoration: 'none', transition: 'border-color 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--px-text-3)')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--px-border)')}>
+                  <span style={{ fontSize: 22 }}>🔗</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--px-text)' }}>Website</span>
+                </a>
+              )}
+              <a href={`mailto:${(profile as any).email || ''}`} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px', background: '#E53416', border: '1px solid #E53416', borderRadius: 'var(--px-r-lg)', textDecoration: 'none' }}>
+                <span style={{ fontSize: 22 }}>✉️</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Get in touch</span>
+              </a>
             </div>
-            <a href="mailto:?subject=Hello" style={{ marginTop: 16, alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 14px', fontSize: 13, fontWeight: 600, borderRadius: 'var(--px-r)', background: '#E53416', color: '#fff', textDecoration: 'none' }}>Get in touch</a>
           </div>
         </div>
       </main>
+    </div>
+  )
+}
+
+const TOOL_ICON_SLUGS: Record<string, string> = {
+  'Figma': 'figma', 'FigJam': 'figma', 'Framer': 'framer', 'Sketch': 'sketch',
+  'Adobe XD': 'adobexd', 'Miro': 'miro', 'Maze': 'maze', 'Zeplin': 'zeplin',
+  'Adobe Illustrator': 'adobeillustrator', 'Adobe Photoshop': 'adobephotoshop',
+  'Adobe After Effects': 'adobeaftereffects', 'Notion': 'notion', 'Jira': 'jira',
+  'Confluence': 'confluence', 'Slack': 'slack', 'Linear': 'linear', 'GitHub': 'github',
+  'VS Code': 'visualstudiocode', 'Blender': 'blender', 'Protopie': 'protopie',
+  'Loom': 'loom', 'Spline': 'spline', 'Whimsical': 'whimsical',
+}
+
+function PublishedToolIcon({ name }: { name: string }) {
+  const slug = TOOL_ICON_SLUGS[name]
+  const color = (TOOL_COLORS[name] || '888').replace('#', '')
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 8 }}>
+      {slug
+        ? <img src={`https://cdn.simpleicons.org/${slug}/${color}`} alt={name} width={16} height={16} style={{ display: 'block' }} />
+        : <div style={{ width: 16, height: 16, borderRadius: 3, background: TOOL_COLORS[name] || '#888' }} />
+      }
+      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text)' }}>{name}</span>
     </div>
   )
 }

@@ -76,6 +76,25 @@ function ToolBadge({ name }: { name: string }) {
   )
 }
 
+function ToolLogo({ name, size = 14 }: { name: string; size?: number }) {
+  const [err, setErr] = React.useState(false)
+  const slug = TOOL_ICONS[name]
+  const color = (TOOL_COLORS[name] || '888').replace('#', '')
+  if (slug && !err) return <img src={`https://cdn.simpleicons.org/${slug}/${color}`} alt="" width={size} height={size} onError={() => setErr(true)} style={{ display: 'block', flexShrink: 0 }} />
+  return <div style={{ width: size, height: size, borderRadius: 3, background: TOOL_COLORS[name] || '#888', flexShrink: 0 }} />
+}
+
+function PickerChip({ name, selected, disabled, onToggle, showX }: { name: string; selected: boolean; disabled?: boolean; onToggle: () => void; showX?: boolean }) {
+  return (
+    <button onClick={onToggle}
+      style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', fontSize: 12, fontWeight: 500, borderRadius: 6, background: selected ? 'var(--px-accent-subtle)' : 'var(--px-surface-2)', border: `1px solid ${selected ? 'var(--px-accent)' : 'var(--px-border)'}`, color: selected ? 'var(--px-accent)' : disabled ? 'var(--px-text-3)' : 'var(--px-text)', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, fontFamily: 'var(--px-font)', transition: 'all 0.12s' }}>
+      <ToolLogo name={name} size={13} />
+      {name}
+      {showX && <span style={{ fontSize: 10, color: 'var(--px-text-3)', marginLeft: 2 }}>×</span>}
+    </button>
+  )
+}
+
 function ToolPickerModal({ open, onClose, selected, onSave }: {
   open: boolean; onClose: () => void
   selected: string[]; onSave: (tools: string[]) => void
@@ -110,26 +129,15 @@ function ToolPickerModal({ open, onClose, selected, onSave }: {
         {local.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, padding: '12px 14px', background: 'var(--px-surface-2)', borderRadius: 'var(--px-r)', border: '1px solid var(--px-border)' }}>
             {local.map(t => (
-              <button key={t} onClick={() => toggle(t)}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, borderRadius: 5, background: 'var(--px-surface)', border: '1px solid var(--px-border)', color: 'var(--px-text)', cursor: 'pointer', fontFamily: 'var(--px-font)' }}>
-                <div style={{ width: 8, height: 8, borderRadius: 2, background: TOOL_COLORS[t] || '#888' }} />
-                {t}
-                <span style={{ fontSize: 10, color: 'var(--px-text-3)', marginLeft: 2 }}>×</span>
-              </button>
+              <PickerChip key={t} name={t} selected onToggle={() => toggle(t)} showX />
             ))}
           </div>
         )}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, maxHeight: 200, overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, maxHeight: 220, overflowY: 'auto' }}>
           {filtered.map(t => {
             const sel = local.includes(t)
             const disabled = !sel && local.length >= 12
-            return (
-              <button key={t} onClick={() => !disabled && toggle(t)}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', fontSize: 12, fontWeight: 500, borderRadius: 5, background: sel ? 'var(--px-accent-subtle)' : 'var(--px-surface-2)', border: `1px solid ${sel ? 'var(--px-accent)' : 'var(--px-border)'}`, color: sel ? 'var(--px-accent)' : disabled ? 'var(--px-text-3)' : 'var(--px-text)', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, fontFamily: 'var(--px-font)', transition: 'all 0.12s' }}>
-                <div style={{ width: 8, height: 8, borderRadius: 2, background: TOOL_COLORS[t] || '#888' }} />
-                {t}
-              </button>
-            )
+            return <PickerChip key={t} name={t} selected={sel} disabled={disabled} onToggle={() => !disabled && toggle(t)} />
           })}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', paddingTop: 4, borderTop: '1px solid var(--px-border)' }}>

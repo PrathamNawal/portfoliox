@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, type ReactNode } from 'react'
 import { Btn, IconBtn } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
@@ -25,10 +25,12 @@ function RichTextEditor({ value, onChange, placeholder }: { value: string; onCha
     if (ref.current) onChange(ref.current.innerHTML)
   }
 
-  const toolBtn = (label: string, cmd: string, val?: string) => (
+  const toolBtn = (content: ReactNode, cmd: string, val?: string) => (
     <button type="button" onMouseDown={e => { e.preventDefault(); exec(cmd, val) }}
-      style={{ height: 26, padding: '0 8px', fontSize: 12, fontWeight: 700, background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', borderRadius: 4, cursor: 'pointer', color: 'var(--px-text)', fontFamily: 'var(--px-font)' }}>
-      {label}
+      style={{ width: 30, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid transparent', borderRadius: 5, cursor: 'pointer', color: 'var(--px-text)', fontFamily: 'var(--px-font)', transition: 'background 0.1s' }}
+      onMouseEnter={e => (e.currentTarget.style.background = 'var(--px-border)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+      {content}
     </button>
   )
 
@@ -37,11 +39,14 @@ function RichTextEditor({ value, onChange, placeholder }: { value: string; onCha
       <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--px-text)', letterSpacing: '-0.01em', display: 'block', marginBottom: 6 }}>Description</label>
       <div style={{ border: '1px solid var(--px-border)', borderRadius: 'var(--px-r)', overflow: 'hidden', background: 'var(--px-surface)' }}>
         {/* Toolbar */}
-        <div style={{ display: 'flex', gap: 4, padding: '6px 8px', borderBottom: '1px solid var(--px-border)', background: 'var(--px-surface-2)' }}>
-          {toolBtn('B', 'bold')}
-          {toolBtn('I', 'italic')}
-          {toolBtn('U', 'underline')}
-          {toolBtn('• List', 'insertUnorderedList')}
+        <div style={{ display: 'flex', gap: 2, padding: '4px 6px', borderBottom: '1px solid var(--px-border)', background: 'var(--px-surface-2)' }}>
+          {toolBtn(<span style={{ fontSize: 13, fontWeight: 900, letterSpacing: '-0.04em' }}>B</span>, 'bold')}
+          {toolBtn(<span style={{ fontSize: 13, fontWeight: 600, fontStyle: 'italic', letterSpacing: '-0.02em' }}>I</span>, 'italic')}
+          {toolBtn(<span style={{ fontSize: 12, fontWeight: 600, textDecoration: 'line-through' }}>S</span>, 'strikeThrough')}
+          {toolBtn(
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="2.5" width="9" height="1.5" rx="0.75" fill="currentColor"/><rect x="5" y="7.25" width="9" height="1.5" rx="0.75" fill="currentColor"/><rect x="5" y="12" width="9" height="1.5" rx="0.75" fill="currentColor"/><circle cx="2" cy="3.25" r="1.25" fill="currentColor"/><circle cx="2" cy="8" r="1.25" fill="currentColor"/><circle cx="2" cy="12.75" r="1.25" fill="currentColor"/></svg>,
+            'insertUnorderedList'
+          )}
         </div>
         {/* Editable area */}
         <div
