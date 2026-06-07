@@ -1,8 +1,16 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { CanvasLayout } from '@/components/published/CanvasLayout'
 import { SpotlightLayout } from '@/components/published/SpotlightLayout'
 import type { Metadata } from 'next'
+
+// Plain anon client — no cookie/auth handling needed for public portfolio pages
+function createPublicClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
+}
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -21,7 +29,7 @@ function assertNoDbError(error: { code?: string; message?: string } | null, cont
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('name, bio')
@@ -41,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublishedPortfolio({ params }: Props) {
   const { slug } = await params
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
