@@ -11,6 +11,7 @@ import { FigmaBlock } from '@/components/editor/FigmaBlock'
 import { CompareBlock } from '@/components/editor/CompareBlock'
 import { TextBlock } from '@/components/editor/TextBlock'
 import { SECTION_DEFS, SECTION_TITLE_EXAMPLES, makeSection } from '@/lib/case-study-templates'
+import { DISCIPLINE_SAMPLES } from '@/lib/case-study-samples'
 import type { Block, BlockType, CaseStudy, CaseSection, OverviewData, CaseSectionType } from '@/types'
 
 // ── Palettes ──────────────────────────────────────────────────────────────────
@@ -238,13 +239,23 @@ const VISUAL_BTNS = [
   { type: 'text',    label: 'Text block',      icon: 'text' },
 ] as const
 
-function SectionCanvas({ section, onUpdate, palette, generating, onGenerate, canGenerate }: {
+function SectionCanvas({ section, onUpdate, palette, generating, onGenerate, canGenerate, discipline }: {
   section: CaseSection; onUpdate: (s: CaseSection) => void; palette: P
-  generating: boolean; onGenerate: () => void; canGenerate: boolean
+  generating: boolean; onGenerate: () => void; canGenerate: boolean; discipline: string
 }) {
   const def = SECTION_DEFS[section.type]
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [focused, setFocused] = useState(false)
+  const [showExample, setShowExample] = useState(false)
+
+  // Pull the matching sample narrative for this section type + discipline
+  const exampleNarrative = React.useMemo(() => {
+    if (section.type === 'overview' || section.type === 'custom') return null
+    const sample = DISCIPLINE_SAMPLES[discipline as keyof typeof DISCIPLINE_SAMPLES]
+    if (!sample) return null
+    const matchingSection = sample.sections.find(s => s.type === section.type)
+    return matchingSection?.narrative || null
+  }, [discipline, section.type])
 
   // Auto-resize
   useEffect(() => {
@@ -283,6 +294,34 @@ function SectionCanvas({ section, onUpdate, palette, generating, onGenerate, can
           <p style={{ fontSize: 15, color: def.color, lineHeight: 1.7, margin: 0, fontStyle: 'italic', opacity: 0.85 }}>
             {def.prompt}
           </p>
+        </div>
+      )}
+
+      {/* Collapsed "See an example" — reference without forcing */}
+      {exampleNarrative && !section.isSample && (
+        <div style={{ marginBottom: 20 }}>
+          <button
+            onClick={() => setShowExample(v => !v)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: palette.text3, background: 'none', border: `1px dashed ${palette.border}`, borderRadius: 6, padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--px-font)', transition: 'all 0.15s' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = def.color; (e.currentTarget as HTMLButtonElement).style.borderColor = def.color }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = palette.text3; (e.currentTarget as HTMLButtonElement).style.borderColor = palette.border }}
+          >
+            {showExample ? '↑ Hide example' : '↓ See a strong example'}
+          </button>
+
+          {showExample && (
+            <div style={{ marginTop: 10, padding: '16px 18px', background: `${def.color}08`, borderRadius: 10, border: `1px solid ${def.color}20`, position: 'relative' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: def.color }}>
+                  Example — {discipline === 'ux' ? 'Zomato checkout' : discipline === 'brand' ? 'Mamaearth rebrand' : discipline === 'motion' ? 'Swiggy loading' : 'Zepto campaign'}
+                </span>
+                <span style={{ fontSize: 10, color: palette.text3 }}>· Read only — for reference</span>
+              </div>
+              <p style={{ fontSize: 13, color: palette.text2, lineHeight: 1.75, margin: 0, whiteSpace: 'pre-wrap', fontStyle: 'italic' }}>
+                {exampleNarrative.length > 600 ? exampleNarrative.slice(0, 600) + '…' : exampleNarrative}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -504,6 +543,7 @@ export default function EditorPage() {
   const [sections, setSections] = useState<CaseSection[]>([])
   const [overviewData, setOverviewData] = useState<OverviewData>({ summary: '', role: '', timeline: '', team: '', metrics: [{ label: '', value: '' }, { label: '', value: '' }, { label: '', value: '' }] })
   const [coverUrl, setCoverUrl] = useState<string | undefined>()
+  const [discipline, setDiscipline] = useState<string>('ux')
 
   const [activeIdx, setActiveIdx] = useState(0)
   const [problem, setProblem] = useState('')
@@ -538,6 +578,7 @@ export default function EditorPage() {
       setPublished(data.published)
       setNdaEnabled(data.nda_enabled)
       setCoverUrl(data.cover_image_url || undefined)
+      if (data.discipline) setDiscipline(data.discipline)
       setProblem(data.problem || '')
       setWhatIDid(data.what_i_did || '')
       if (data.sections?.length) setSections(data.sections)
@@ -696,7 +737,8 @@ export default function EditorPage() {
               <SectionCanvas section={activeSection} onUpdate={updateSection} palette={palette}
                 generating={generatingSectionId === activeSection.id}
                 onGenerate={() => generateForSection(activeSection)}
-                canGenerate={canGenerate} />
+                canGenerate={canGenerate}
+                discipline={discipline} />
             ) : (
               <div style={{ textAlign: 'center', paddingTop: 80, color: palette.text3 }}>
                 <p style={{ fontSize: 15 }}>No sections yet. Add a section above to begin.</p>
