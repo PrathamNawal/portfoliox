@@ -320,6 +320,34 @@ a { text-decoration: none; color: inherit; }
 .px-prose { line-height: var(--px-leading-relaxed); }
 .px-prose strong { color: var(--px-text); font-weight: 700; }
 
+/* ── Auth transition overlay ─────────────────────────────────────── */
+@keyframes px-sonar {
+  0%   { transform: scale(0.9);  opacity: 0.65; }
+  100% { transform: scale(3.2);  opacity: 0; }
+}
+@keyframes px-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes px-logo-settle {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes px-status-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.px-auth-overlay {
+  animation: px-overlay-in 0.28s var(--px-ease-out) both;
+}
+.px-auth-logo {
+  animation: px-logo-settle 0.45s var(--px-ease-spring) 0.1s both;
+}
+.px-auth-status {
+  animation: px-status-in 0.35s var(--px-ease-out) 0.25s both;
+}
+
 /* ── Landing page motion ─────────────────────────────────────────── */
 @keyframes px-glow {
   0%, 100% {

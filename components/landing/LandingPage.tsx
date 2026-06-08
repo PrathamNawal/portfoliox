@@ -1,7 +1,9 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { getFirebaseAuth, getGoogleProvider } from '@/lib/firebase/client'
 
 // ── Motion Priority 1: AI streaming demo text ─────────────────────────────────
 const STREAM_CHUNKS = [
@@ -147,6 +149,169 @@ function PortfolioMockup() {
   )
 }
 
+// ── Auth transition overlay ───────────────────────────────────────────────────
+type AuthStep = 'idle' | 'opening' | 'completing' | 'error'
+
+const STATUS_MESSAGES: Record<Exclude<AuthStep, 'idle'>, string> = {
+  opening:    'Opening Google sign-in…',
+  completing: 'Setting up your workspace…',
+  error:      'Something went wrong',
+}
+
+function AuthOverlay({
+  step,
+  error,
+  onRetry,
+  onDismiss,
+}: {
+  step: Exclude<AuthStep, 'idle'>
+  error: string | null
+  onRetry: () => void
+  onDismiss: () => void
+}) {
+  // Cycle "opening" sub-messages every 2s to feel alive
+  const [subMsg, setSubMsg] = useState(0)
+  const openingMsgs = [
+    'Opening Google sign-in…',
+    'Choose your Google account…',
+    'Waiting for you…',
+  ]
+  useEffect(() => {
+    if (step !== 'opening') return
+    const iv = setInterval(() => setSubMsg(m => (m + 1) % openingMsgs.length), 2000)
+    return () => clearInterval(iv)
+  }, [step])
+
+  const displayText = step === 'error'
+    ? (error || 'Something went wrong')
+    : step === 'opening'
+      ? openingMsgs[subMsg]
+      : STATUS_MESSAGES[step]
+
+  return (
+    <div
+      className="px-auth-overlay"
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: '#0D0D0B',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        gap: 0,
+      }}
+    >
+      {/* Ambient radial glow */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: 'radial-gradient(ellipse 50% 45% at 50% 50%, rgba(229,52,22,0.13) 0%, transparent 70%)',
+      }} />
+
+      {/* Logo + sonar rings */}
+      <div className="px-auth-logo" style={{ position: 'relative', width: 80, height: 80, marginBottom: 36 }}>
+        {/* Sonar rings */}
+        {step !== 'error' && [0, 750, 1500].map((delay, i) => (
+          <div key={i} style={{
+            position: 'absolute',
+            top: '50%', left: '50%',
+            width: 56, height: 56,
+            borderRadius: '50%',
+            border: '1.5px solid rgba(229,52,22,0.5)',
+            marginTop: -28, marginLeft: -28,
+            animation: `px-sonar 2.25s ease-out ${delay}ms infinite`,
+          }} />
+        ))}
+
+        {/* Error state: static dimmed ring */}
+        {step === 'error' && (
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
+            width: 64, height: 64, borderRadius: '50%',
+            border: '1.5px solid rgba(255,255,255,0.08)',
+            marginTop: -32, marginLeft: -32,
+          }} />
+        )}
+
+        {/* Logo mark */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          width: 48, height: 48, borderRadius: 13,
+          background: step === 'error'
+            ? 'rgba(255,255,255,0.06)'
+            : 'linear-gradient(135deg,#E53416 0%,#FF6B4A 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          marginTop: -24, marginLeft: -24,
+          boxShadow: step === 'error' ? 'none' : '0 0 40px rgba(229,52,22,0.35)',
+          transition: 'background 0.4s, box-shadow 0.4s',
+        }}>
+          <span style={{ fontSize: 22, lineHeight: 1, filter: step === 'error' ? 'opacity(0.3)' : 'none' }}>✦</span>
+        </div>
+      </div>
+
+      {/* Status text */}
+      <div key={displayText} className="px-auth-status" style={{ textAlign: 'center' }}>
+        <p style={{
+          fontSize: 16,
+          fontWeight: 500,
+          color: step === 'error' ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)',
+          fontFamily: 'var(--px-font)',
+          margin: '0 0 6px',
+          letterSpacing: '-0.01em',
+        }}>
+          {displayText}
+        </p>
+        {step === 'opening' && (
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', fontFamily: 'var(--px-font)', margin: 0 }}>
+            A Google popup has opened — choose your account there
+          </p>
+        )}
+      </div>
+
+      {/* Error actions */}
+      {step === 'error' && (
+        <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
+          <button
+            onClick={onRetry}
+            style={{
+              height: 40, padding: '0 20px', borderRadius: 8,
+              background: 'var(--px-accent)', color: '#fff',
+              border: 'none', fontSize: 13, fontWeight: 700,
+              fontFamily: 'var(--px-font)', cursor: 'pointer',
+            }}
+          >
+            Try again
+          </button>
+          <button
+            onClick={onDismiss}
+            style={{
+              height: 40, padding: '0 20px', borderRadius: 8,
+              background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)',
+              border: '1px solid rgba(255,255,255,0.1)', fontSize: 13, fontWeight: 600,
+              fontFamily: 'var(--px-font)', cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {/* Dismiss hint when opening (popup blocked) */}
+      {step === 'opening' && (
+        <button
+          onClick={onDismiss}
+          style={{
+            position: 'absolute', bottom: 32,
+            background: 'none', border: 'none',
+            fontSize: 12, color: 'rgba(255,255,255,0.18)',
+            fontFamily: 'var(--px-font)', cursor: 'pointer',
+            padding: '6px 12px',
+          }}
+        >
+          Cancel
+        </button>
+      )}
+    </div>
+  )
+}
+
 // ── AI Stream demo (Motion Priority 1) ───────────────────────────────────────
 function AIStreamDemo() {
   const [displayed, setDisplayed] = useState('')
@@ -237,7 +402,7 @@ function AIStreamDemo() {
 }
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
-function Nav() {
+function Nav({ onAuth }: { onAuth: () => void }) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 50,
@@ -274,27 +439,29 @@ function Nav() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Link href="/sign-in" style={{
+        <button onClick={onAuth} style={{
           fontSize: 13, fontWeight: 500, color: 'var(--px-text-2)',
-          textDecoration: 'none', padding: '6px 12px',
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontFamily: 'var(--px-font)', padding: '6px 12px',
         }}>
           Sign in
-        </Link>
-        <Link href="/sign-in" style={{
+        </button>
+        <button onClick={onAuth} style={{
           display: 'inline-flex', alignItems: 'center', height: 34,
           padding: '0 16px', borderRadius: 8, fontSize: 13, fontWeight: 700,
           background: 'var(--px-text)', color: 'var(--px-bg)',
-          textDecoration: 'none', letterSpacing: '-0.01em',
+          border: 'none', cursor: 'pointer',
+          fontFamily: 'var(--px-font)', letterSpacing: '-0.01em',
         }}>
-          Build my portfolio →
-        </Link>
+          Get started →
+        </button>
       </div>
     </nav>
   )
 }
 
 // ── Hero (Motion P2 + P3) ─────────────────────────────────────────────────────
-function HeroSection() {
+function HeroSection({ onAuth }: { onAuth: () => void }) {
   const [visible, setVisible] = useState(false)
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80)
@@ -367,20 +534,21 @@ function HeroSection() {
         </p>
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-          <Link
-            href="/sign-in"
+          <button
+            onClick={onAuth}
             className="px-cta-glow"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               height: 48, padding: '0 28px',
               borderRadius: 10, fontSize: 15, fontWeight: 700,
               background: 'var(--px-accent)', color: '#fff',
-              textDecoration: 'none', letterSpacing: '-0.01em',
+              border: 'none', cursor: 'pointer',
+              fontFamily: 'var(--px-font)', letterSpacing: '-0.01em',
             }}
           >
             Build my portfolio
             <span style={{ fontSize: 18, lineHeight: 1 }}>→</span>
-          </Link>
+          </button>
           <a
             href="#how-it-works"
             style={{
@@ -1030,7 +1198,7 @@ function TestimonialsSection() {
 
 
 // ── Final CTA (Motion Priority 4: pulse glow) ─────────────────────────────────
-function FinalCTA() {
+function FinalCTA({ onAuth }: { onAuth: () => void }) {
   return (
     <section style={{
       padding: 'clamp(72px,10vh,120px) clamp(16px,4vw,48px)',
@@ -1077,30 +1245,24 @@ function FinalCTA() {
           Published in under an hour. No setup required.
         </p>
 
-        <Link
-          href="/sign-in"
+        <button
+          onClick={onAuth}
           className="px-cta-glow"
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 10,
-            height: 56,
-            padding: '0 36px',
-            borderRadius: 12,
-            fontSize: 16,
-            fontWeight: 700,
-            background: 'var(--px-accent)',
-            color: '#fff',
-            textDecoration: 'none',
-            letterSpacing: '-0.01em',
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            height: 56, padding: '0 36px', borderRadius: 12,
+            fontSize: 16, fontWeight: 700,
+            background: 'var(--px-accent)', color: '#fff',
+            border: 'none', cursor: 'pointer',
+            fontFamily: 'var(--px-font)', letterSpacing: '-0.01em',
           }}
         >
           Build my portfolio
           <span style={{ fontSize: 20 }}>→</span>
-        </Link>
+        </button>
 
         <div style={{ marginTop: 20, fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
-          Sign in with Google · Ready in minutes
+          Continues with Google · Ready in minutes
         </div>
       </div>
     </section>
@@ -1148,15 +1310,57 @@ function Footer() {
 
 // ── Root export ───────────────────────────────────────────────────────────────
 export function LandingPage() {
+  const [authStep, setAuthStep] = useState<AuthStep>('idle')
+  const [authError, setAuthError] = useState<string | null>(null)
+
+  const handleAuth = useCallback(async () => {
+    setAuthStep('opening')
+    setAuthError(null)
+    try {
+      const result = await signInWithPopup(getFirebaseAuth(), getGoogleProvider())
+      const credential = GoogleAuthProvider.credentialFromResult(result)
+      if (!credential?.idToken) throw new Error('No credential returned')
+
+      setAuthStep('completing')
+
+      const res = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: credential.idToken }),
+      })
+      if (!res.ok) throw new Error('Session creation failed')
+
+      // Let "Setting up your workspace" breathe for a moment
+      await new Promise(r => setTimeout(r, 900))
+      window.location.href = '/dashboard'
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Sign-in failed'
+      if (msg.includes('popup-closed') || msg.includes('cancelled')) {
+        setAuthStep('idle') // user dismissed popup — just close overlay quietly
+      } else {
+        setAuthError(msg)
+        setAuthStep('error')
+      }
+    }
+  }, [])
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--px-bg)', color: 'var(--px-text)', fontFamily: 'var(--px-font)' }}>
-      <Nav />
-      <HeroSection />
+      {authStep !== 'idle' && (
+        <AuthOverlay
+          step={authStep}
+          error={authError}
+          onRetry={handleAuth}
+          onDismiss={() => setAuthStep('idle')}
+        />
+      )}
+      <Nav onAuth={handleAuth} />
+      <HeroSection onAuth={handleAuth} />
       <HowItWorks />
       <ShowcaseSection />
       <DisciplinesSection />
       <TestimonialsSection />
-      <FinalCTA />
+      <FinalCTA onAuth={handleAuth} />
       <Footer />
     </div>
   )
