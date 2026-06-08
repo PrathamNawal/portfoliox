@@ -4,8 +4,9 @@ import { CanvasLayout } from '@/components/published/CanvasLayout'
 import { SpotlightLayout } from '@/components/published/SpotlightLayout'
 import type { Metadata } from 'next'
 
-// Never cache portfolio pages — data changes in real time (RLS, publish toggles)
+// Never cache portfolio pages — data changes in real time (RLS, publish toggles, layout switches)
 export const revalidate = 0
+export const dynamic = 'force-dynamic'
 
 // Plain anon client — passes cache:'no-store' so Next.js Data Cache never
 // holds stale empty arrays from before RLS policies were in place

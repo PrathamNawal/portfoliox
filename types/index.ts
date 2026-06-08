@@ -134,6 +134,7 @@ export interface WorkExperience {
   user_id: string
   role: string
   company: string
+  logo_url: string | null
   start_month: string
   end_month: string | null
   is_current: boolean

@@ -227,7 +227,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
               {groupByCompany(experience).map(({ company, entries }) => (
                 <div key={company}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-                    <CompanyLogo company={company} />
+                    <CompanyLogo company={company} logoUrl={entries[0]?.logo_url} />
                     <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)' }}>{company}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingLeft: 8 }}>
@@ -532,14 +532,16 @@ const COMPANY_DOMAINS: Record<string, string> = {
 
 const LOGO_COLORS = ['#E53416','#7B5EE0','#1A5C38','#2A5298','#C45C26','#1B7A6E']
 
-function CompanyLogo({ company }: { company: string }) {
+function CompanyLogo({ company, logoUrl }: { company: string; logoUrl?: string | null }) {
   const domain = COMPANY_DOMAINS[company] ?? `${company.toLowerCase().replace(/\s+/g,'')}.com`
   const color = LOGO_COLORS[company.charCodeAt(0) % LOGO_COLORS.length]
+  // Prefer stored logo_url, fall back to Clearbit guess
+  const src = logoUrl || `https://logo.clearbit.com/${domain}`
   return (
     <div style={{ width: 48, height: 48, borderRadius: 'var(--px-r)', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       <span style={{ fontSize: 20, fontWeight: 800, color, position: 'absolute' }}>{company[0]}</span>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`https://logo.clearbit.com/${domain}`} alt="" aria-hidden style={{ width: 32, height: 32, objectFit: 'contain', position: 'relative', zIndex: 1 }} />
+      <img src={src} alt="" aria-hidden style={{ width: 32, height: 32, objectFit: 'contain', position: 'relative', zIndex: 1 }} />
     </div>
   )
 }

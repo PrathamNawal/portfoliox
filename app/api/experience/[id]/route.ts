@@ -8,7 +8,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const { id } = await params
     const { userId, supabase } = await requireAuthContext()
     const body = await req.json()
-    const allowed = ['role', 'company', 'start_month', 'end_month', 'is_current', 'description', 'discipline_tag', 'display_order']
+    const allowed = ['role', 'company', 'logo_url', 'start_month', 'end_month', 'is_current', 'description', 'discipline_tag', 'display_order']
     const update: Record<string, unknown> = {}
     for (const k of allowed) if (k in body) update[k] = body[k]
     if (update.is_current) update.end_month = null
