@@ -286,7 +286,7 @@ function Nav() {
           background: 'var(--px-text)', color: 'var(--px-bg)',
           textDecoration: 'none', letterSpacing: '-0.01em',
         }}>
-          Start free →
+          Build my portfolio →
         </Link>
       </div>
     </nav>
@@ -731,7 +731,7 @@ function FinalCTA() {
           color: 'rgba(255,255,255,0.55)',
           margin: '0 0 40px',
         }}>
-          Free to start. No credit card. Published in under an hour.
+          Published in under an hour. No setup required.
         </p>
 
         <Link
@@ -752,12 +752,12 @@ function FinalCTA() {
             letterSpacing: '-0.01em',
           }}
         >
-          Build my portfolio for free
+          Build my portfolio
           <span style={{ fontSize: 20 }}>→</span>
         </Link>
 
         <div style={{ marginTop: 20, fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
-          Sign in with Google · Takes 2 minutes
+          Sign in with Google · Ready in minutes
         </div>
       </div>
     </section>
