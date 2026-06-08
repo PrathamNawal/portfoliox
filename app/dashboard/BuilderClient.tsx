@@ -676,17 +676,23 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
       <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '20px 0 48px' : '32px 0 64px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', padding: isMobile ? '0 12px' : '0 24px' }}>
 
-          {/* Profile hero */}
-          <div style={{ background: 'var(--px-surface)', borderRadius: 'var(--px-r-xl)', border: '1px solid var(--px-border)', padding: isMobile ? '20px 16px 16px' : '32px 32px 28px', marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 20 }}>
-              <Avatar name={profile?.name || 'You'} src={profile?.avatar_url} size={72} editable onClick={() => setShowProfileEdit(true)} />
+          {/* Profile hero — mirrors published CanvasLayout hero hierarchy */}
+          <div style={{ background: 'var(--px-surface)', borderRadius: 'var(--px-r-xl)', border: '1px solid var(--px-border)', padding: isMobile ? '24px 16px 20px' : '36px 36px 28px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-start', gap: 24, marginBottom: 20 }}>
+              <Avatar name={profile?.name || 'You'} src={profile?.avatar_url} size={isMobile ? 64 : 80} editable onClick={() => setShowProfileEdit(true)} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                  <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)' }}>{profile?.name || 'Your Name'}</h1>
-                  {profile?.discipline && <Badge>{DISCIPLINE_LABELS[profile.discipline]}</Badge>}
+                {/* Discipline label — small, matches published hero label */}
+                {profile?.discipline && (
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--px-text-3)', fontFamily: "'Courier New', monospace", marginBottom: 6 }}>
+                    {DISCIPLINE_LABELS[profile.discipline]}
+                  </div>
+                )}
+                {/* Name — large, matches published hero headline weight */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <h1 style={{ fontSize: isMobile ? 20 : 26, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)', lineHeight: 1.1 }}>{profile?.name || 'Your Name'}</h1>
                   <IconBtn name="edit" size={26} iconSize={13} title="Edit profile" onClick={() => setShowProfileEdit(true)} />
                 </div>
-                <p style={{ fontSize: 14, color: profile?.bio ? 'var(--px-text-2)' : 'var(--px-text-3)', lineHeight: 1.6, cursor: 'text', fontStyle: profile?.bio ? 'normal' : 'italic' }}
+                <p style={{ fontSize: 14, color: profile?.bio ? 'var(--px-text-2)' : 'var(--px-text-3)', lineHeight: 1.6, cursor: 'text', fontStyle: profile?.bio ? 'normal' : 'italic', maxWidth: 480 }}
                   onClick={() => setShowProfileEdit(true)}>
                   {profile?.bio || 'Click to add your bio…'}
                 </p>
