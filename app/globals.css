@@ -200,13 +200,12 @@ a { text-decoration: none; color: inherit; }
   border-color: var(--px-text-3) !important;
 }
 /* Tool stack icon cards */
-.px-tool-icon:hover > div:first-child {
-  transform: translateY(-4px) scale(1.06);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.04);
+.px-tool-icon:hover {
+  transform: translateY(-4px) scale(1.07);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.13), 0 0 0 0.5px rgba(0,0,0,0.04);
 }
 .px-tool-icon:hover .px-tool-name {
-  opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) !important;
 }
 .px-hero-avatar {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
