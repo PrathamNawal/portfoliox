@@ -170,20 +170,37 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         {/* Testimonials — marquee */}
         {testimonials.length > 0 && (
           <div style={{ marginBottom: 56 }}>
-            <SectionLabel>Recommendations</SectionLabel>
-            <div style={{ overflow: 'hidden', marginTop: 28, marginLeft: -40, marginRight: -40, maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
-              <div style={{ display: 'flex', gap: 16, width: 'max-content', animation: 'px-marquee 40s linear infinite' }}>
+            {/* Centered label — no divider line, matches Bikiron style */}
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--px-text-3)', textAlign: 'center', marginBottom: 36 }}>
+              Recommendations
+            </p>
+            <div style={{ overflow: 'hidden', marginLeft: -40, marginRight: -40, maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
+              <div style={{ display: 'flex', gap: 20, width: 'max-content', animation: 'px-marquee 48s linear infinite', padding: '4px 40px 4px' }}>
                 {[...testimonials, ...testimonials].map((t, i) => (
-                  <div key={i} style={{ width: 320, flexShrink: 0, background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 20, padding: '28px 28px 24px' }}>
-                    <p style={{ fontSize: 15, color: 'var(--px-text)', lineHeight: 1.65, marginBottom: 24 }}>&quot;{t.quote}&quot;</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div key={i} style={{
+                    width: 340, flexShrink: 0,
+                    background: '#fff',
+                    border: '1px solid rgba(0,0,0,0.07)',
+                    borderRadius: 24,
+                    padding: '32px 32px 28px',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                  }}>
+                    {/* Quote — not italic, generous line-height */}
+                    <p style={{ fontSize: 16, fontWeight: 400, color: 'var(--px-text)', lineHeight: 1.7, marginBottom: 28, fontStyle: 'normal' }}>
+                      &ldquo;{t.quote}&rdquo;
+                    </p>
+                    {/* Attribution */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                       {t.photo_url
-                        ? <img src={t.photo_url} alt={t.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                        : <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#7B5EE0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t.name[0]}</span></div>
+                        ? <img src={t.photo_url} alt={t.name} style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        : <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--px-surface-2)', border: '1px solid var(--px-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--px-text-2)' }}>{t.name[0]}</span>
+                          </div>
                       }
                       <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>{t.name}</div>
-                        <div style={{ fontSize: 11, color: 'var(--px-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>{t.title_and_company}</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em', marginBottom: 3 }}>{t.name}</div>
+                        <div style={{ fontSize: 10, color: 'var(--px-text-3)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>{t.title_and_company}</div>
                       </div>
                     </div>
                   </div>
