@@ -167,26 +167,28 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           </div>
         )}
 
-        {/* Testimonials */}
+        {/* Testimonials — marquee */}
         {testimonials.length > 0 && (
           <div style={{ marginBottom: 56 }}>
-            <SectionLabel>What people say</SectionLabel>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14, marginTop: 24 }}>
-              {testimonials.map(t => (
-                <div key={t.id} style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '22px 24px' }}>
-                  <p style={{ fontSize: 14, color: 'var(--px-text)', lineHeight: 1.7, fontStyle: 'italic', marginBottom: 16 }}>&quot;{t.quote}&quot;</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    {t.photo_url
-                      ? <img src={t.photo_url} alt={t.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
-                      : <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#7B5EE0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{t.name[0]}</span></div>
-                    }
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>{t.name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--px-text-3)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 1 }}>{t.title_and_company}</div>
+            <SectionLabel>Recommendations</SectionLabel>
+            <div style={{ overflow: 'hidden', marginTop: 28, marginLeft: -40, marginRight: -40, maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+              <div style={{ display: 'flex', gap: 16, width: 'max-content', animation: 'px-marquee 40s linear infinite' }}>
+                {[...testimonials, ...testimonials].map((t, i) => (
+                  <div key={i} style={{ width: 320, flexShrink: 0, background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 20, padding: '28px 28px 24px' }}>
+                    <p style={{ fontSize: 15, color: 'var(--px-text)', lineHeight: 1.65, marginBottom: 24 }}>&quot;{t.quote}&quot;</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {t.photo_url
+                        ? <img src={t.photo_url} alt={t.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        : <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#7B5EE0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t.name[0]}</span></div>
+                      }
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>{t.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--px-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>{t.title_and_company}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         )}
