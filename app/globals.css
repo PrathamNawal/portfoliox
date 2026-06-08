@@ -199,6 +199,13 @@ a { text-decoration: none; color: inherit; }
 .px-work-link:hover {
   border-color: var(--px-text-3) !important;
 }
+.px-hero-avatar {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: default;
+}
+.px-hero-avatar:hover {
+  transform: scale(1.08);
+}
 
 /* ── Mobile responsive utilities ─────────────────────────────────── */
 @media (max-width: 640px) {

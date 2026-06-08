@@ -80,11 +80,11 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         padding: 'clamp(72px, 10vw, 120px) clamp(20px, 5vw, 60px) clamp(60px, 8vw, 96px)',
         textAlign: 'center',
       }}>
-        {/* Avatar */}
+        {/* Avatar — rounded rectangle, grows on hover */}
         {profile.avatar_url
-          ? <img src={profile.avatar_url} alt={profile.name} style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', display: 'block', margin: '0 auto 20px' }} />
-          : <div style={{ width: 96, height: 96, borderRadius: '50%', background: '#E53416', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <span style={{ fontSize: 36, fontWeight: 700, color: '#fff' }}>{profile.name[0]}</span>
+          ? <img src={profile.avatar_url} alt={profile.name} className="px-hero-avatar" style={{ width: 100, height: 100, borderRadius: 28, objectFit: 'cover', display: 'block', margin: '0 auto 20px' }} />
+          : <div className="px-hero-avatar" style={{ width: 100, height: 100, borderRadius: 28, background: '#E53416', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <span style={{ fontSize: 38, fontWeight: 700, color: '#fff' }}>{profile.name[0]}</span>
             </div>
         }
 
