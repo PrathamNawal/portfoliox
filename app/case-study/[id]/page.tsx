@@ -10,7 +10,7 @@ import { ImageSlot } from '@/components/editor/ImageSlot'
 import { FigmaBlock } from '@/components/editor/FigmaBlock'
 import { CompareBlock } from '@/components/editor/CompareBlock'
 import { TextBlock } from '@/components/editor/TextBlock'
-import { SECTION_DEFS, makeSection } from '@/lib/case-study-templates'
+import { SECTION_DEFS, SECTION_TITLE_EXAMPLES, makeSection } from '@/lib/case-study-templates'
 import type { Block, BlockType, CaseStudy, CaseSection, OverviewData, CaseSectionType } from '@/types'
 
 // ── Palettes ──────────────────────────────────────────────────────────────────
@@ -33,11 +33,28 @@ async function uploadFile(file: File): Promise<string> {
 }
 
 function isSectionDone(s: CaseSection) {
-  return s.type === 'overview' || s.narrative.trim().length > 20 || s.blocks.length > 0
+  return s.type === 'overview' || s.narrative.trim().length > 80 || s.blocks.length > 0
+}
+
+// Quality signals for Story Check — distinct from "done"
+function getSectionWarnings(s: CaseSection): string[] {
+  if (s.type === 'overview') return []
+  const warnings: string[] = []
+  const def = SECTION_DEFS[s.type]
+  // Title still at default
+  if (s.title === def.title) warnings.push('Rename this section — generic titles lose readers')
+  // Thin narrative
+  const wordCount = s.narrative.trim().split(/\s+/).filter(Boolean).length
+  if (wordCount > 0 && wordCount < 60) warnings.push(`${wordCount} words — aim for 100+ to tell the story`)
+  // No visuals in solution/process
+  if ((s.type === 'solution' || s.type === 'process') && s.blocks.length === 0 && s.narrative.trim().length > 0) {
+    warnings.push('Add screens or a Figma embed — show the work')
+  }
+  return warnings
 }
 
 // ── Addable section types ─────────────────────────────────────────────────────
-const ADDABLE: CaseSectionType[] = ['challenge', 'research', 'process', 'solution', 'impact', 'custom']
+const ADDABLE: CaseSectionType[] = ['challenge', 'research', 'process', 'solution', 'impact', 'whatsnext', 'custom']
 
 // ── Gallery Block ─────────────────────────────────────────────────────────────
 function GalleryBlock({ block, onChange, palette }: { block: Block; onChange: (b: Block) => void; palette: P }) {
@@ -71,6 +88,64 @@ function GalleryBlock({ block, onChange, palette }: { block: Block; onChange: (b
   )
 }
 
+// ── Video block ───────────────────────────────────────────────────────────────
+function VideoBlock({ block, onChange, palette }: { block: Block; onChange: (b: Block) => void; palette: P }) {
+  const url = block.videoUrl || ''
+  const isValid = url.includes('youtube') || url.includes('youtu.be') || url.includes('loom.com') || url.includes('vimeo.com') || url.match(/\.(mp4|webm|gif)/)
+  return (
+    <div>
+      <input
+        value={url}
+        onChange={e => onChange({ ...block, videoUrl: e.target.value })}
+        placeholder="YouTube, Loom, Vimeo URL — or direct .mp4 / .gif link"
+        style={{ width: '100%', fontSize: 13, color: palette.text, background: palette.surface2, border: `1.5px solid ${url && !isValid ? '#C94040' : palette.border}`, borderRadius: 8, padding: '9px 12px', outline: 'none', fontFamily: 'var(--px-font)', marginBottom: 8 }}
+        onFocus={e => (e.target.style.borderColor = '#E53416')}
+        onBlur={e => (e.target.style.borderColor = url && !isValid ? '#C94040' : palette.border)}
+      />
+      {url && isValid && (
+        <div style={{ fontSize: 12, color: '#1A8A4A', fontWeight: 600 }}>✓ Valid URL — will embed on the published page</div>
+      )}
+      {url && !isValid && (
+        <div style={{ fontSize: 12, color: '#C94040' }}>Paste a YouTube, Loom, Vimeo, or direct video link</div>
+      )}
+      <input
+        value={block.caption || ''}
+        onChange={e => onChange({ ...block, caption: e.target.value })}
+        placeholder="Caption (optional)"
+        style={{ width: '100%', fontSize: 12, color: palette.text2, background: 'transparent', border: 'none', borderBottom: `1px solid ${palette.border}`, padding: '4px 0', marginTop: 8, fontFamily: 'var(--px-font)', outline: 'none' }}
+      />
+    </div>
+  )
+}
+
+// ── Stat callout block ────────────────────────────────────────────────────────
+function StatBlock({ block, onChange, palette }: { block: Block; onChange: (b: Block) => void; palette: P }) {
+  return (
+    <div style={{ background: palette.surface2, borderRadius: 12, padding: '20px 24px', border: `1px solid ${palette.border}` }}>
+      <div style={{ textAlign: 'center', marginBottom: 12 }}>
+        <input
+          value={block.statValue || ''}
+          onChange={e => onChange({ ...block, statValue: e.target.value })}
+          placeholder="−32%"
+          style={{ display: 'block', width: '100%', fontSize: 48, fontWeight: 900, color: '#E53416', background: 'transparent', border: 'none', borderBottom: `2px solid ${palette.border}`, outline: 'none', fontFamily: 'var(--px-font)', letterSpacing: '-0.04em', textAlign: 'center', marginBottom: 8, paddingBottom: 6 }}
+        />
+        <input
+          value={block.statLabel || ''}
+          onChange={e => onChange({ ...block, statLabel: e.target.value })}
+          placeholder="Cart abandonment reduced"
+          style={{ display: 'block', width: '100%', fontSize: 14, fontWeight: 600, color: palette.text, background: 'transparent', border: 'none', borderBottom: `1px solid ${palette.border}`, outline: 'none', fontFamily: 'var(--px-font)', textAlign: 'center', marginBottom: 8, paddingBottom: 4 }}
+        />
+        <input
+          value={block.statNote || ''}
+          onChange={e => onChange({ ...block, statNote: e.target.value })}
+          placeholder="Context note (optional — e.g. at 90 days post-launch)"
+          style={{ display: 'block', width: '100%', fontSize: 12, color: palette.text3, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'var(--px-font)', textAlign: 'center', fontStyle: 'italic' }}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ── Visual block wrapper ──────────────────────────────────────────────────────
 function VisualBlock({ block, onChange, onDelete, dragHandleProps, innerRef, draggableProps, palette }: {
   block: Block; onChange: (b: Block) => void; onDelete: () => void
@@ -91,8 +166,10 @@ function VisualBlock({ block, onChange, onDelete, dragHandleProps, innerRef, dra
       )}
       {block.type === 'image' && <ImageSlot label="img" ratio="16/9" sectionLabel="" onSectionLabel={() => {}} caption={block.caption || ''} onCaption={v => onChange({ ...block, caption: v })} imageUrl={block.imageUrl} onImageUrl={url => onChange({ ...block, imageUrl: url })} />}
       {block.type === 'gallery' && <GalleryBlock block={block} onChange={onChange} palette={palette} />}
+      {block.type === 'video' && <VideoBlock block={block} onChange={onChange} palette={palette} />}
       {block.type === 'figma' && <FigmaBlock figmaUrl={block.figmaUrl} onFigmaUrl={url => onChange({ ...block, figmaUrl: url })} sectionLabel="" onSectionLabel={() => {}} />}
       {block.type === 'compare' && <CompareBlock beforeUrl={block.beforeUrl} afterUrl={block.afterUrl} onBefore={url => onChange({ ...block, beforeUrl: url })} onAfter={url => onChange({ ...block, afterUrl: url })} sectionLabel="" onSectionLabel={() => {}} />}
+      {block.type === 'stat' && <StatBlock block={block} onChange={onChange} palette={palette} />}
       {block.type === 'text' && <TextBlock html={block.html || ''} onHtml={v => onChange({ ...block, html: v })} sectionLabel="" onSectionLabel={() => {}} />}
     </div>
   )
@@ -152,11 +229,13 @@ function OverviewCanvas({ data, onChange, palette, coverUrl, onCoverUrl }: {
 
 // ── Section canvas ────────────────────────────────────────────────────────────
 const VISUAL_BTNS = [
-  { type: 'image',   label: 'Image',        icon: 'image' },
-  { type: 'gallery', label: 'Gallery',       icon: 'grid2' },
-  { type: 'figma',   label: 'Figma embed',  icon: 'figma' },
-  { type: 'compare', label: 'Before / After', icon: 'compareH' },
-  { type: 'text',    label: 'Text block',   icon: 'text' },
+  { type: 'image',   label: 'Image',          icon: 'image' },
+  { type: 'gallery', label: 'Gallery',         icon: 'grid2' },
+  { type: 'video',   label: 'Video / Loom',    icon: 'play' },
+  { type: 'figma',   label: 'Figma embed',     icon: 'figma' },
+  { type: 'compare', label: 'Before / After',  icon: 'compareH' },
+  { type: 'stat',    label: 'Stat callout',    icon: 'hash' },
+  { type: 'text',    label: 'Text block',      icon: 'text' },
 ] as const
 
 function SectionCanvas({ section, onUpdate, palette, generating, onGenerate, canGenerate }: {
@@ -300,14 +379,29 @@ function StoryCheckPanel({ sections, activeIdx, onJump, problem, setProblem, wha
           {sections.map((s, i) => {
             const def = SECTION_DEFS[s.type]
             const done = isSectionDone(s)
+            const warnings = getSectionWarnings(s)
+            const hasWarnings = warnings.length > 0
             const isActive = i === activeIdx
             return (
-              <button key={s.id} onClick={() => onJump(i)}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '7px 8px', borderRadius: 6, background: isActive ? `${def.color}10` : 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left', marginBottom: 2, transition: 'background 0.1s' }}>
-                <div style={{ width: 8, height: 8, borderRadius: 999, background: done ? def.color : palette.border, flexShrink: 0, transition: 'background 0.3s' }} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 400, color: isActive ? def.color : palette.text2, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{s.title}</span>
-                {done && !isActive && <Icon name="checkCircle" size={12} color={def.color} />}
-              </button>
+              <div key={s.id} style={{ marginBottom: 2 }}>
+                <button onClick={() => onJump(i)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '7px 8px', borderRadius: 6, background: isActive ? `${def.color}10` : 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left', transition: 'background 0.1s' }}>
+                  <div style={{ width: 8, height: 8, borderRadius: 999, background: done ? def.color : palette.border, flexShrink: 0, transition: 'background 0.3s' }} />
+                  <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 400, color: isActive ? def.color : palette.text2, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{s.title}</span>
+                  {hasWarnings && <span style={{ fontSize: 10, color: '#B86E0A', fontWeight: 700 }}>⚠</span>}
+                  {done && !hasWarnings && !isActive && <Icon name="checkCircle" size={12} color={def.color} />}
+                </button>
+                {/* Inline warnings on active section */}
+                {isActive && hasWarnings && (
+                  <div style={{ marginLeft: 24, marginBottom: 4 }}>
+                    {warnings.map((w, wi) => (
+                      <div key={wi} style={{ fontSize: 11, color: '#B86E0A', lineHeight: 1.4, padding: '3px 6px', background: 'rgba(184,110,10,0.08)', borderRadius: 4, marginBottom: 3 }}>
+                        {w}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>
@@ -471,10 +565,9 @@ export default function EditorPage() {
     if (!problem || !whatIDid) return
     setGeneratingSectionId(section.id)
     try {
-      const sectionMap: Record<string, string> = { challenge: 'intro', research: 'intro', process: 'process', solution: 'process', impact: 'outcome', custom: 'process' }
       const res = await fetch('/api/ai/generate', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caseStudyId: id, section: sectionMap[section.type] || 'process', problem, whatIDid, outcome: '' }),
+        body: JSON.stringify({ caseStudyId: id, sectionType: section.type, sectionTitle: section.title, problem, whatIDid }),
       })
       if (!res.ok) return
       const reader = res.body?.getReader()
@@ -587,6 +680,7 @@ export default function EditorPage() {
                   <input
                     value={activeSection.title}
                     onChange={e => updateSection({ ...activeSection, title: e.target.value })}
+                    placeholder={SECTION_TITLE_EXAMPLES[activeSection.type] || 'Section title'}
                     style={{ display: 'block', width: '100%', fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: palette.text, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'var(--px-font)', marginBottom: 0 }}
                   />
                 ) : (

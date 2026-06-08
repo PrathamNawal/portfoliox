@@ -1,4 +1,4 @@
-export type GenerationSection = 'intro' | 'process' | 'outcome'
+import type { CaseSectionType } from '@/types'
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const MODEL = 'anthropic/claude-haiku-4-5-20251001'
@@ -9,36 +9,74 @@ Rules:
 - Never fabricate metrics, percentages, or statistics not provided by the user
 - Never start with phrases like "I'm thrilled", "In this case study", "This is an exciting project", "I am excited to", or similar filler
 - Write in a confident, editorial tone — not corporate, not humble-bragging
-- Keep it under 150 words per section
+- Keep it under 180 words per section
+- Reference the section title in your framing — if the title says "The dilemma that took 3 weeks", write about a dilemma
 - Reference actual project context from the inputs`
 
-const SECTION_PROMPTS: Record<GenerationSection, (p: string, w: string, o: string) => string> = {
-  intro: (problem, whatIDid, outcome) =>
-    `Write the INTRO section for a design case study.
+// Each section type gets its own specific prompt so the AI knows what to focus on
+const SECTION_PROMPTS: Record<CaseSectionType, (title: string, problem: string, whatIDid: string) => string> = {
+  overview: (_title, problem, whatIDid) =>
+    `Write a 2-sentence project overview.
 Context:
 - Problem: ${problem}
 - What I did: ${whatIDid}
-${outcome ? `- Outcome: ${outcome}` : ''}
+One sentence on the problem, one on the approach. No heading. First person.`,
 
-Write 2–3 sentences introducing the project: what problem existed and why it mattered. No heading. First person.`,
-
-  process: (problem, whatIDid, outcome) =>
-    `Write the PROCESS section for a design case study.
+  challenge: (title, problem, whatIDid) =>
+    `Write the CHALLENGE section for a design case study. The section is titled "${title}".
 Context:
 - Problem: ${problem}
 - What I did: ${whatIDid}
-${outcome ? `- Outcome: ${outcome}` : ''}
 
-Write 3–4 sentences describing the design approach, key decisions, and methods used. No heading. First person.`,
+Write 3–4 sentences: what the problem was, who felt it, why it was hard to solve, and what made it worth solving. Be specific — name the friction, the constraint, or the tension. No heading. First person.`,
 
-  outcome: (problem, whatIDid, outcome) =>
-    `Write the OUTCOME section for a design case study.
+  research: (title, problem, whatIDid) =>
+    `Write the RESEARCH section for a design case study. The section is titled "${title}".
 Context:
 - Problem: ${problem}
 - What I did: ${whatIDid}
-${outcome ? `- Outcome/result: ${outcome}` : ''}
 
-Write 2–3 sentences describing what changed and what was learned. Only include metrics if explicitly stated in the context above. No heading. First person.`,
+Write 3–4 sentences: what methods were used, what was discovered, and what insight changed direction or confirmed a hypothesis. Name a surprising finding if there is one. No heading. First person.`,
+
+  process: (title, problem, whatIDid) =>
+    `Write the PROCESS section for a design case study. The section is titled "${title}".
+Context:
+- Problem: ${problem}
+- What I did: ${whatIDid}
+
+Write 4–5 sentences: what directions were explored, which was chosen and why, and what the key trade-off or hard decision was. Mention at least one path that was rejected and why. No heading. First person.`,
+
+  solution: (title, problem, whatIDid) =>
+    `Write the SOLUTION section for a design case study. The section is titled "${title}".
+Context:
+- Problem: ${problem}
+- What I did: ${whatIDid}
+
+Write 3–4 sentences describing the final design: what the 2–3 most important decisions were and what each one solved. Focus on design rationale, not just description. No heading. First person.`,
+
+  impact: (title, problem, whatIDid) =>
+    `Write the IMPACT section for a design case study. The section is titled "${title}".
+Context:
+- Problem: ${problem}
+- What I did: ${whatIDid}
+
+Write 3 sentences: what changed because of this work, and what you would do differently. Only include metrics if the user has provided them above. End with a genuine reflection. No heading. First person.`,
+
+  whatsnext: (title, problem, whatIDid) =>
+    `Write the WHAT'S NEXT section for a design case study. The section is titled "${title}".
+Context:
+- Problem: ${problem}
+- What I did: ${whatIDid}
+
+Write 2–3 sentences on where this project goes from here — what it unlocked, what future problems it sets up, or what you're watching. Think strategically, not just operationally. No heading. First person.`,
+
+  custom: (title, problem, whatIDid) =>
+    `Write a narrative section for a design case study. The section is titled "${title}".
+Context:
+- Problem: ${problem}
+- What I did: ${whatIDid}
+
+Write 3–4 sentences that fit the spirit of the section title. Be specific and grounded. No heading. First person.`,
 }
 
 const FILLER_OPENERS = [
@@ -52,12 +90,13 @@ function hasFiller(text: string): boolean {
 }
 
 export async function generateSection(
-  section: GenerationSection,
+  sectionType: CaseSectionType,
+  sectionTitle: string,
   problem: string,
   whatIDid: string,
-  outcome: string,
 ): Promise<ReadableStream<Uint8Array>> {
-  const userPrompt = SECTION_PROMPTS[section](problem, whatIDid, outcome)
+  const promptFn = SECTION_PROMPTS[sectionType] ?? SECTION_PROMPTS.custom
+  const userPrompt = promptFn(sectionTitle, problem, whatIDid)
 
   const response = await fetch(OPENROUTER_URL, {
     method: 'POST',
@@ -70,7 +109,7 @@ export async function generateSection(
     body: JSON.stringify({
       model: MODEL,
       stream: true,
-      max_tokens: 300,
+      max_tokens: 350,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userPrompt },
@@ -111,7 +150,6 @@ export async function generateSection(
 
               fullText += text
 
-              // Check for filler opener once we have enough text
               if (!fillerChecked && fullText.length > 30) {
                 fillerChecked = true
                 if (hasFiller(fullText)) {

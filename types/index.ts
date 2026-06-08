@@ -2,7 +2,7 @@ export type Plan = 'free' | 'pro'
 export type Role = 'user' | 'admin'
 export type Discipline = 'ux' | 'graphic' | 'motion' | 'illustration'
 export type Layout = 'canvas' | 'spotlight'
-export type BlockType = 'image' | 'gallery' | 'figma' | 'compare' | 'text'
+export type BlockType = 'image' | 'gallery' | 'figma' | 'compare' | 'text' | 'video' | 'stat'
 export type GenerationSection = 'intro' | 'process' | 'outcome'
 export type SectionLabel =
   | 'Intro' | 'Research' | 'Ideation' | 'Wireframes' | 'Process'
@@ -10,7 +10,7 @@ export type SectionLabel =
 
 // ── New section-based case study structure ───────────────────────────────────
 export type CaseSectionType =
-  | 'overview' | 'challenge' | 'research' | 'process' | 'solution' | 'impact' | 'custom'
+  | 'overview' | 'challenge' | 'research' | 'process' | 'solution' | 'impact' | 'whatsnext' | 'custom'
 
 export type CaseDiscipline = 'ux' | 'brand' | 'motion' | 'illustration' | 'custom'
 
@@ -73,6 +73,12 @@ export interface Block {
   afterUrl?: string
   // text
   html?: string
+  // video
+  videoUrl?: string
+  // stat callout
+  statValue?: string
+  statLabel?: string
+  statNote?: string
 }
 
 export interface CaseStudy {

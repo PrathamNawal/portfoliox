@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
-import { generateSection, type GenerationSection } from '@/lib/ai/generate'
+import { generateSection } from '@/lib/ai/generate'
+import type { CaseSectionType } from '@/types'
 import { hashInputs } from '@/lib/utils'
 
 export const runtime = 'nodejs'
@@ -9,16 +10,18 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   try {
     const { userId, supabase } = await requireAuthContext()
-    const { caseStudyId, section, problem, whatIDid, outcome } = await req.json()
+    const { caseStudyId, sectionType, sectionTitle, problem, whatIDid, outcome } = await req.json()
 
-    if (!section || !problem || !whatIDid) {
+    if (!sectionType || !problem || !whatIDid) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const validSections: GenerationSection[] = ['intro', 'process', 'outcome']
-    if (!validSections.includes(section)) {
-      return NextResponse.json({ error: 'Invalid section' }, { status: 400 })
+    const validSections: CaseSectionType[] = ['overview', 'challenge', 'research', 'process', 'solution', 'impact', 'whatsnext', 'custom']
+    if (!validSections.includes(sectionType)) {
+      return NextResponse.json({ error: 'Invalid section type' }, { status: 400 })
     }
+
+    const resolvedTitle = sectionTitle || sectionType
 
     // Check credits for free users
     const { data: profile } = await supabase.from('profiles').select('plan').eq('id', userId).single()
@@ -34,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Cache lookup
-    const inputHash = hashInputs(problem, whatIDid, outcome || '', section)
+    const inputHash = hashInputs(problem, whatIDid, outcome || '', sectionType, resolvedTitle)
     const { data: cached } = await supabase.from('ai_generation_cache').select('generated_text').eq('input_hash', inputHash).maybeSingle()
 
     if (cached?.generated_text) {
@@ -62,7 +65,7 @@ export async function POST(req: NextRequest) {
     // Generate
     let generationStream: ReadableStream<Uint8Array>
     try {
-      generationStream = await generateSection(section, problem, whatIDid, outcome || '')
+      generationStream = await generateSection(sectionType, resolvedTitle, problem, whatIDid)
     } catch {
       // Refund the credit since generation never started
       if (creditBalance !== null) {
@@ -90,10 +93,10 @@ export async function POST(req: NextRequest) {
           }
 
           if (fullText) {
-            await supabase.from('ai_generation_cache').upsert({ input_hash: inputHash, section_type: section, generated_text: fullText })
+            await supabase.from('ai_generation_cache').upsert({ input_hash: inputHash, section_type: sectionType, generated_text: fullText })
             if (caseStudyId) {
               const { data: cs } = await supabase.from('case_studies').select('ai_generated').eq('id', caseStudyId).single()
-              await supabase.from('case_studies').update({ ai_generated: { ...(cs?.ai_generated || {}), [section]: fullText } }).eq('id', caseStudyId)
+              await supabase.from('case_studies').update({ ai_generated: { ...(cs?.ai_generated || {}), [sectionType]: fullText } }).eq('id', caseStudyId)
             }
           }
 

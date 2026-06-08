@@ -42,6 +42,50 @@ function CompareSlider({ beforeUrl, afterUrl }: { beforeUrl: string; afterUrl: s
   )
 }
 
+// ── Video embed ───────────────────────────────────────────────────────────────
+function VideoEmbed({ url }: { url: string }) {
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/)
+  if (ytMatch) {
+    return (
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 8, overflow: 'hidden', background: '#000' }}>
+        <iframe src={`https://www.youtube.com/embed/${ytMatch[1]}?autoplay=0&rel=0`} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+      </div>
+    )
+  }
+  // Loom
+  const loomMatch = url.match(/loom\.com\/share\/([a-f0-9]+)/)
+  if (loomMatch) {
+    return (
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 8, overflow: 'hidden', background: '#000' }}>
+        <iframe src={`https://www.loom.com/embed/${loomMatch[1]}`} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen title="Loom video" />
+      </div>
+    )
+  }
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/)
+  if (vimeoMatch) {
+    return (
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 8, overflow: 'hidden', background: '#000' }}>
+        <iframe src={`https://player.vimeo.com/video/${vimeoMatch[1]}`} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen title="Vimeo video" />
+      </div>
+    )
+  }
+  // Direct mp4 / GIF
+  if (url.match(/\.(mp4|webm|mov|gif)(\?|$)/i)) {
+    return (
+      <video src={url} controls={!url.match(/\.gif/i)} autoPlay={!!url.match(/\.gif/i)} loop muted playsInline
+        style={{ width: '100%', borderRadius: 8, display: 'block', maxHeight: 540, objectFit: 'contain', background: '#000' }} />
+    )
+  }
+  // Fallback — link
+  return (
+    <a href={url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#E53416', fontWeight: 600 }}>
+      ▶ Watch video ↗
+    </a>
+  )
+}
+
 // ── Figma embed ───────────────────────────────────────────────────────────────
 function FigmaEmbed({ url }: { url: string }) {
   const [active, setActive] = useState(false)
@@ -126,6 +170,33 @@ export function BlockRenderer({ block, accent = '#E53416' }: Props) {
       {block.type === 'text' && block.html && (
         <div className="px-prose" dangerouslySetInnerHTML={{ __html: block.html }}
           style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--px-text)', maxWidth: '65ch' }} />
+      )}
+
+      {/* Video */}
+      {block.type === 'video' && block.videoUrl && (
+        <div>
+          <VideoEmbed url={block.videoUrl} />
+          {block.caption && <p style={{ fontSize: 13, color: 'var(--px-text-3)', marginTop: 8, lineHeight: 1.5, fontStyle: 'italic' }}>{block.caption}</p>}
+        </div>
+      )}
+
+      {/* Stat callout */}
+      {block.type === 'stat' && block.statValue && (
+        <div style={{ padding: '28px 32px', background: 'var(--px-surface-2)', borderRadius: 12, border: '1px solid var(--px-border)', textAlign: 'center', display: 'inline-block', minWidth: 160 }}>
+          <div style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 900, letterSpacing: '-0.04em', color: accent, lineHeight: 1, marginBottom: 8 }}>
+            {block.statValue}
+          </div>
+          {block.statLabel && (
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--px-text)', letterSpacing: '-0.01em', marginBottom: block.statNote ? 6 : 0 }}>
+              {block.statLabel}
+            </div>
+          )}
+          {block.statNote && (
+            <div style={{ fontSize: 12, color: 'var(--px-text-3)', fontStyle: 'italic', lineHeight: 1.4 }}>
+              {block.statNote}
+            </div>
+          )}
+        </div>
       )}
     </div>
   )
