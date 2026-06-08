@@ -713,6 +713,36 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
             <div style={{ marginBottom: 4 }}>
               <Tag onClick={() => setShowProfileEdit(true)}>Edit skills</Tag>
             </div>
+
+            {/* Layout switcher */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--px-border)' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-3)', flexShrink: 0 }}>Layout</span>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {([
+                  { id: 'canvas',    label: 'Canvas',    desc: 'Card grid' },
+                  { id: 'spotlight', label: 'Spotlight', desc: 'Editorial' },
+                ] as const).map(opt => {
+                  const active = (profile?.layout || 'canvas') === opt.id
+                  return (
+                    <button key={opt.id} onClick={async () => {
+                      if (active) return
+                      setProfile(p => p ? { ...p, layout: opt.id } : p)
+                      await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ layout: opt.id }) })
+                    }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 8, border: `1.5px solid ${active ? 'var(--px-accent)' : 'var(--px-border)'}`, background: active ? 'var(--px-accent-subtle)' : 'transparent', cursor: active ? 'default' : 'pointer', fontFamily: 'var(--px-font)', transition: 'all 0.12s' }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: active ? 'var(--px-accent)' : 'var(--px-text-2)', letterSpacing: '-0.01em' }}>{opt.label}</span>
+                      <span style={{ fontSize: 11, color: active ? 'var(--px-accent)' : 'var(--px-text-3)' }}>{opt.desc}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              {profile?.slug && (
+                <a href={`/preview`} target="_blank" rel="noreferrer"
+                  style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--px-text-3)', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  Preview ↗
+                </a>
+              )}
+            </div>
             {/* Social + Resume links */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
               {(profile?.social_links as any)?.linkedin && <Btn variant="ghost" size="sm" icon="linkedin" style={{ color: 'var(--px-text-3)', fontSize: 12 }}>{(profile?.social_links as any).linkedin}</Btn>}

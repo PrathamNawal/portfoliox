@@ -214,6 +214,17 @@ a { text-decoration: none; color: inherit; }
 .px-hero-avatar:hover {
   transform: scale(1.08);
 }
+/* ── Scroll-reveal ───────────────────────────────────────────────────────── */
+.px-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.px-reveal.px-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Work experience description — bullet list styling */
 .px-exp-description ul {
   list-style: disc;

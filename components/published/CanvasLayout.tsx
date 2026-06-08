@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { AnalyticsTracker } from './AnalyticsTracker'
+import { ScrollReveal } from './ScrollReveal'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const TOOL_COLORS: Record<string, string> = {
@@ -142,6 +143,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
 
         {/* Skills — marquee */}
         {profile.skills?.length > 0 && (
+          <ScrollReveal>
           <div style={{ marginBottom: 56 }}>
             <SectionLabel>Skills</SectionLabel>
             <div style={{ overflow: 'hidden', marginTop: 20, maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
@@ -152,10 +154,12 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
               </div>
             </div>
           </div>
+          </ScrollReveal>
         )}
 
         {/* Case studies */}
         {caseStudies.length > 0 && (
+          <ScrollReveal delay={60}>
           <div style={{ marginBottom: 56 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 24 }}>
               <h2 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--px-text)', lineHeight: 1 }}>Case Studies</h2>
@@ -165,10 +169,12 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
               {caseStudies.map((cs, i) => <CanvasCaseCard key={cs.id} cs={cs as CaseStudy} index={i} slug={profile.slug!} />)}
             </div>
           </div>
+          </ScrollReveal>
         )}
 
         {/* Testimonials — marquee */}
         {testimonials.length > 0 && (
+          <ScrollReveal delay={80}>
           <div style={{ marginBottom: 56 }}>
             {/* Centered label — no divider line, matches Bikiron style */}
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--px-text-3)', textAlign: 'center', marginBottom: 36 }}>
@@ -208,10 +214,12 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
               </div>
             </div>
           </div>
+          </ScrollReveal>
         )}
 
         {/* Work experience */}
         {experience.length > 0 && (
+          <ScrollReveal delay={100}>
           <div style={{ marginBottom: 56 }}>
             {/* Section header with total experience */}
             <div style={{ marginBottom: 32 }}>
@@ -260,10 +268,12 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
               ))}
             </div>
           </div>
+          </ScrollReveal>
         )}
 
         {/* Tool Stack — marquee */}
         {tools.length > 0 && (
+          <ScrollReveal delay={120}>
           <div style={{ marginBottom: 56 }}>
             <SectionLabel>Tool Stack</SectionLabel>
             <div style={{ overflow: 'hidden', marginTop: 28, marginLeft: -40, marginRight: -40, maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
@@ -272,6 +282,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
               </div>
             </div>
           </div>
+          </ScrollReveal>
         )}
 
         {/* Let's work together */}
