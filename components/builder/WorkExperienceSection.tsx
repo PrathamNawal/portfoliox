@@ -62,8 +62,9 @@ function RichTextEditor({ value, onChange, placeholder }: { value: string; onCha
       </div>
       <style>{`
         [contenteditable]:empty:before { content: attr(data-placeholder); color: var(--px-text-3); pointer-events: none; }
-        [contenteditable] ul { padding-left: 18px; margin: 4px 0; }
-        [contenteditable] li { margin: 2px 0; }
+        [contenteditable] ul { list-style: disc; padding-left: 18px; margin: 4px 0; }
+        [contenteditable] ol { list-style: decimal; padding-left: 18px; margin: 4px 0; }
+        [contenteditable] li { margin: 2px 0; display: list-item; }
       `}</style>
     </div>
   )
