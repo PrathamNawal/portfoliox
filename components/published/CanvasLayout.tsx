@@ -249,8 +249,8 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         {tools.length > 0 && (
           <div style={{ marginBottom: 56 }}>
             <SectionLabel>Tool Stack</SectionLabel>
-            <div style={{ overflow: 'hidden', marginTop: 24, maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
-              <div style={{ display: 'flex', gap: 10, width: 'max-content', animation: 'px-marquee 28s linear infinite' }}>
+            <div style={{ overflow: 'hidden', marginTop: 28, marginLeft: -40, marginRight: -40, maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
+              <div style={{ display: 'flex', gap: 16, width: 'max-content', animation: 'px-marquee 36s linear infinite', padding: '8px 0 16px' }}>
                 {[...tools, ...tools].map((t, i) => <PublishedToolIcon key={i} name={t.tool_name} />)}
               </div>
             </div>
@@ -405,13 +405,37 @@ const TOOL_ICON_SLUGS: Record<string, string> = {
 
 function PublishedToolIcon({ name }: { name: string }) {
   const slug = TOOL_ICON_SLUGS[name]
+  const color = TOOL_COLORS[name] || '#888'
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 8 }}>
-      {slug
-        ? <img src={`https://cdn.simpleicons.org/${slug}`} alt={name} width={16} height={16} style={{ display: 'block' }} />
-        : <div style={{ width: 16, height: 16, borderRadius: 3, background: TOOL_COLORS[name] || '#888', flexShrink: 0 }} />
-      }
-      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text)' }}>{name}</span>
+    <div className="px-tool-icon" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+      {/* Card */}
+      <div style={{
+        width: 88, height: 88,
+        borderRadius: 22,
+        background: '#fff',
+        border: '1px solid rgba(0,0,0,0.07)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.04)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'transform 0.22s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s cubic-bezier(0.16,1,0.3,1)',
+        flexShrink: 0,
+      }}>
+        {slug
+          ? <img src={`https://cdn.simpleicons.org/${slug}`} alt={name} width={48} height={48} style={{ display: 'block' }} />
+          : <div style={{ width: 48, height: 48, borderRadius: 12, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>{name[0]}</span>
+            </div>
+        }
+      </div>
+      {/* Name — appears below on hover */}
+      <span className="px-tool-name" style={{
+        fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)',
+        marginTop: 8, letterSpacing: '-0.01em', whiteSpace: 'nowrap',
+        opacity: 0, transform: 'translateY(4px)',
+        transition: 'opacity 0.18s ease, transform 0.18s ease',
+      }}>
+        {name}
+      </span>
     </div>
   )
 }
