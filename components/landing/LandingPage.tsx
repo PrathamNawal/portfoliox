@@ -561,6 +561,349 @@ function HowItWorks() {
   )
 }
 
+// ── Showcase: stat count-up helper ───────────────────────────────────────────
+function StatCount({ to, suffix = '', active, delay = 0 }: { to: number; suffix?: string; active: boolean; delay?: number }) {
+  const [v, setV] = useState(0)
+  useEffect(() => {
+    if (!active) return
+    let iv: ReturnType<typeof setInterval>
+    const t = setTimeout(() => {
+      let i = 0
+      const steps = 32
+      iv = setInterval(() => {
+        i++
+        setV(Math.round((i / steps) * to))
+        if (i >= steps) { setV(to); clearInterval(iv) }
+      }, 900 / steps)
+    }, delay)
+    return () => { clearTimeout(t); clearInterval(iv) }
+  }, [active, to, delay])
+  return <>{v}{suffix}</>
+}
+
+// ── Showcase: the actual case study content ───────────────────────────────────
+function CaseStudyContent({ counting }: { counting: boolean }) {
+  return (
+    <div style={{ fontFamily: 'var(--px-font)', background: '#F8F7F4', minHeight: 1200 }}>
+
+      {/* Sticky mini-nav */}
+      <div style={{
+        height: 46, background: '#fff', borderBottom: '1px solid #E4E2DC',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 24px', position: 'sticky', top: 0, zIndex: 5,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#9A978E', fontWeight: 500 }}>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+            <line x1="16" y1="10" x2="4" y2="10"/><polyline points="9 15 4 10 9 5"/>
+          </svg>
+          Aryan Mehta
+        </div>
+        <span style={{ fontSize: 11, color: '#9A978E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          Making rewards feel worth redeeming
+        </span>
+      </div>
+
+      {/* Cover */}
+      <div style={{
+        width: '100%', height: 260,
+        background: 'linear-gradient(135deg, #0A0A12 0%, #1A1040 40%, #3B1F7A 75%, #6B3FA6 100%)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+        padding: '0 32px 28px', position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(107,63,166,0.25)', filter: 'blur(40px)' }} />
+        <div style={{ position: 'absolute', top: 20, left: '40%', width: 120, height: 120, borderRadius: '50%', background: 'rgba(229,52,22,0.15)', filter: 'blur(30px)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        <div style={{ position: 'relative' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>
+            UX / Product · CRED
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.15, maxWidth: 480 }}>
+            Making rewards feel worth redeeming
+          </div>
+        </div>
+      </div>
+
+      {/* Content body */}
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '36px 24px 80px' }}>
+
+        <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.04em', color: '#1C1B18', lineHeight: 1.15, marginBottom: 28, marginTop: 0 }}>
+          Making rewards feel worth redeeming
+        </h1>
+
+        <p style={{ fontSize: 17, lineHeight: 1.65, color: '#1C1B18', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: 28, maxWidth: 540 }}>
+          67% of CRED users had never redeemed a single coin. The rewards shelf existed — users just couldn&apos;t find value in it. I led the redesign that changed that.
+        </p>
+
+        {/* Metrics */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 20 }}>
+          {[
+            { val: 47, suffix: '%', label: 'redemption rate lift' },
+            { val: 2.3, suffix: '×', label: 'more reward exploration' },
+            { val: 28, suffix: '%', label: 'drop in support tickets' },
+          ].map((m, i) => (
+            <div key={i} style={{ padding: '14px 16px', background: '#fff', border: '1px solid #E4E2DC', borderRadius: 10 }}>
+              <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.04em', color: '#E53416', marginBottom: 3, lineHeight: 1 }}>
+                <StatCount to={m.val} suffix={m.suffix} active={counting} delay={i * 120} />
+              </div>
+              <div style={{ fontSize: 11, color: '#9A978E', fontWeight: 500, lineHeight: 1.3 }}>{m.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Meta pills */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 40 }}>
+          {[['Role', 'Lead Product Designer'], ['Timeline', '8 weeks'], ['Team', '2 designers · 1 researcher']].map(([label, value], i) => (
+            <div key={i} style={{ padding: '8px 14px', background: '#fff', border: '1px solid #E4E2DC', borderRadius: 9, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#9A978E' }}>{label}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#1C1B18' }}>{value}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ height: 1, background: '#E4E2DC', marginBottom: 44 }} />
+
+        {/* Challenge */}
+        <div style={{ marginBottom: 52 }}>
+          <div style={{ fontSize: 10, color: '#9A978E', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8 }}>⚡ challenge</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: '#1C1B18', lineHeight: 1.2, marginBottom: 16, marginTop: 0 }}>
+            A shelf full of rewards, but nobody browsing
+          </h2>
+          <p style={{ fontSize: 14, lineHeight: 1.8, color: '#6C6960', margin: '0 0 14px' }}>
+            CRED&apos;s reward catalogue had grown to 400+ partner offers. Yet internal data showed 67% of users had never redeemed — and those who had, redeemed once and never returned. The business was funding a rewards programme that wasn&apos;t creating loyalty.
+          </p>
+          <p style={{ fontSize: 14, lineHeight: 1.8, color: '#6C6960', margin: 0 }}>
+            My brief: understand why users weren&apos;t engaging with rewards and redesign the experience without increasing the marketing budget.
+          </p>
+        </div>
+
+        {/* Research */}
+        <div style={{ marginBottom: 52 }}>
+          <div style={{ fontSize: 10, color: '#9A978E', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8 }}>🔍 research</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: '#1C1B18', lineHeight: 1.2, marginBottom: 16, marginTop: 0 }}>
+            It wasn&apos;t a value problem. It was a discovery problem.
+          </h2>
+          <p style={{ fontSize: 14, lineHeight: 1.8, color: '#6C6960', margin: '0 0 20px' }}>
+            8 user interviews and a competitive audit of 5 reward programmes revealed a consistent pattern: users didn&apos;t know what they could get, and when they did find something relevant, they didn&apos;t trust their coins were &ldquo;enough&rdquo; to claim it.
+          </p>
+          <div style={{ padding: '16px 20px', borderLeft: '3px solid #E53416', background: '#fff', borderRadius: '0 10px 10px 0', border: '1px solid #E4E2DC', borderLeftColor: '#E53416', borderLeftWidth: 3, marginBottom: 14 }}>
+            <p style={{ fontSize: 14, lineHeight: 1.65, color: '#1C1B18', margin: 0, fontStyle: 'italic' }}>
+              &ldquo;I have 8,000 coins but I have no idea what I can actually get with them. I just assume it&apos;s not enough for anything good.&rdquo;
+            </p>
+            <div style={{ fontSize: 11, color: '#9A978E', marginTop: 8, fontWeight: 600 }}>— User interview, 27, Bangalore</div>
+          </div>
+          <p style={{ fontSize: 14, lineHeight: 1.8, color: '#6C6960', margin: 0 }}>
+            Key insight: users needed a personalised &ldquo;what you can get right now&rdquo; view — not a catalogue they had to browse.
+          </p>
+        </div>
+
+        {/* Solution + Before/After */}
+        <div style={{ marginBottom: 52 }}>
+          <div style={{ fontSize: 10, color: '#9A978E', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8 }}>💡 solution</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: '#1C1B18', lineHeight: 1.2, marginBottom: 16, marginTop: 0 }}>
+            Show users exactly what they can claim today
+          </h2>
+          <p style={{ fontSize: 14, lineHeight: 1.8, color: '#6C6960', margin: '0 0 24px' }}>
+            We replaced the catalogue grid with a personalised &ldquo;unlockable now&rdquo; shelf — surfacing the 3 highest-value rewards a user could claim with their current coin balance, zero browsing required.
+          </p>
+
+          {/* Before / After */}
+          <div style={{ background: '#fff', border: '1px solid #E4E2DC', borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}>
+            <div style={{ padding: '10px 16px', borderBottom: '1px solid #E4E2DC', background: '#F8F7F4' }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#9A978E' }}>Before → After</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+              <div style={{ padding: 16, borderRight: '1px solid #E4E2DC' }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#C94040', marginBottom: 10, letterSpacing: '0.06em' }}>BEFORE</div>
+                <div style={{ background: '#1C1B18', borderRadius: 8, padding: 10, minHeight: 130 }}>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>All Rewards (412)</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                    {[0,1,2,3].map(i => <div key={i} style={{ height: 40, background: '#2A2926', borderRadius: 4, border: '1px solid rgba(255,255,255,0.06)' }} />)}
+                  </div>
+                  <div style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)' }}>Sorted by: Featured</div>
+                </div>
+              </div>
+              <div style={{ padding: 16 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#1A8A4A', marginBottom: 10, letterSpacing: '0.06em' }}>AFTER</div>
+                <div style={{ background: '#0F0E12', borderRadius: 8, padding: 10, minHeight: 130 }}>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', marginBottom: 6 }}>Unlock with your 8,200 coins</div>
+                  {[['#1A3A2A','Swiggy ₹200 off','7,500'], ['#1A2A3A','Myntra ₹300 off','8,000']].map(([c, label, coins], i) => (
+                    <div key={i} style={{ background: c, borderRadius: 6, padding: '7px 8px', marginBottom: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{label}</span>
+                      <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)' }}>{coins} coins</span>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 6, height: 22, background: '#E53416', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 9, color: '#fff', fontWeight: 700 }}>Claim now →</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p style={{ fontSize: 12, color: '#9A978E', margin: 0, lineHeight: 1.5 }}>
+            Left: original catalogue (412 items, no personalisation). Right: personalised &ldquo;unlock now&rdquo; shelf showing only what&apos;s reachable.
+          </p>
+        </div>
+
+        {/* Impact */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontSize: 10, color: '#9A978E', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8 }}>📈 impact</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: '#1C1B18', lineHeight: 1.2, marginBottom: 16, marginTop: 0 }}>
+            47% more users now redeem every month
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
+            {[
+              { val: 47, suffix: '%', label: 'monthly active redeemers', color: '#E53416' },
+              { val: 63, suffix: '%', label: 'repeat redemption rate', color: '#7B5EE0' },
+              { val: 28, suffix: '%', label: 'fewer support tickets', color: '#1A8A4A' },
+            ].map((s, i) => (
+              <div key={i} style={{ padding: 16, background: '#fff', border: '1px solid #E4E2DC', borderRadius: 10, textAlign: 'center' }}>
+                <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.05em', color: s.color, lineHeight: 1 }}>
+                  <StatCount to={s.val} suffix={s.suffix} active={counting} delay={600 + i * 120} />
+                </div>
+                <div style={{ fontSize: 10, color: '#9A978E', marginTop: 6, lineHeight: 1.4 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 14, lineHeight: 1.8, color: '#6C6960', margin: 0 }}>
+            Rolled out to 100% of users over 3 weeks. The &ldquo;unlock now&rdquo; shelf became one of CRED&apos;s highest-engagement surfaces within the first month.
+          </p>
+        </div>
+
+        {/* What's next */}
+        <div style={{ padding: '20px 22px', background: '#fff', border: '1px solid #E4E2DC', borderRadius: 12 }}>
+          <div style={{ fontSize: 10, color: '#9A978E', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8 }}>🔭 what&apos;s next</div>
+          <p style={{ fontSize: 14, lineHeight: 1.7, color: '#6C6960', margin: 0 }}>
+            Phase 2 explores predictive coin earning nudges — surfacing &ldquo;earn X more coins to unlock Y&rdquo; prompts at the bill payment moment. Early concept testing shows 71% of users find it motivating.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+// ── Showcase section wrapper ──────────────────────────────────────────────────
+function ShowcaseSection() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const rafRef = useRef<number>(0)
+  const posRef = useRef(0)
+  const pausedRef = useRef(false)
+  const [counting, setCounting] = useState(false)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    const container = scrollRef.current
+    if (!section || !container) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        observer.disconnect()
+        setCounting(true)
+        const tick = () => {
+          if (!pausedRef.current) {
+            posRef.current += 0.45
+            const maxScroll = container.scrollHeight - container.clientHeight
+            if (posRef.current >= maxScroll) posRef.current = 0
+            container.scrollTop = posRef.current
+          }
+          rafRef.current = requestAnimationFrame(tick)
+        }
+        setTimeout(() => { rafRef.current = requestAnimationFrame(tick) }, 1200)
+      }
+    }, { threshold: 0.3 })
+
+    observer.observe(section)
+
+    const pause = () => { pausedRef.current = true }
+    const resume = () => { pausedRef.current = false }
+    container.addEventListener('mouseenter', pause)
+    container.addEventListener('mouseleave', resume)
+
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(rafRef.current)
+      container.removeEventListener('mouseenter', pause)
+      container.removeEventListener('mouseleave', resume)
+    }
+  }, [])
+
+  return (
+    <section ref={sectionRef} style={{
+      padding: 'clamp(72px,9vh,108px) clamp(16px,4vw,48px)',
+    }}>
+      <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+
+        <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--px-accent)', marginBottom: 14 }}>
+            See it in action
+          </div>
+          <h2 style={{
+            fontFamily: 'var(--px-font-display)',
+            fontSize: 'clamp(28px,4vw,52px)',
+            fontWeight: 400,
+            letterSpacing: '-0.03em',
+            color: 'var(--px-text)',
+            margin: '0 0 16px',
+            lineHeight: 1.1,
+          }}>
+            A case study that gets you the callback.
+          </h2>
+          <p style={{ fontSize: 16, color: 'var(--px-text-3)', margin: '0 auto', lineHeight: 1.6, maxWidth: 480 }}>
+            This was built entirely inside PortfolioX — case study editor, AI writing, before/after blocks, and impact stats.
+          </p>
+        </div>
+
+        {/* Browser frame */}
+        <div style={{
+          maxWidth: 820, margin: '0 auto',
+          borderRadius: 16, overflow: 'hidden',
+          boxShadow: 'var(--px-shadow-xl)',
+          border: '1px solid var(--px-border)',
+        }}>
+          {/* Chrome bar */}
+          <div style={{
+            height: 40, background: 'var(--px-surface-2)',
+            borderBottom: '1px solid var(--px-border)',
+            display: 'flex', alignItems: 'center',
+            padding: '0 14px', gap: 7,
+          }}>
+            {['#FC5F5A','#FDBC2C','#34C749'].map((c, i) => (
+              <div key={i} style={{ width: 11, height: 11, borderRadius: '50%', background: c, opacity: 0.85 }} />
+            ))}
+            <div style={{
+              flex: 1, marginLeft: 10, height: 22,
+              background: 'var(--px-surface)', borderRadius: 7,
+              border: '1px solid var(--px-border)',
+              display: 'flex', alignItems: 'center', padding: '0 10px', gap: 5,
+            }}>
+              <svg viewBox="0 0 14 14" fill="none" width="10" height="10"><circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2" opacity="0.3"/><path d="M7 1C7 1 5 4 5 7s2 6 2 6M7 1c0 0 2 3 2 6s-2 6-2 6M1 7h12" stroke="currentColor" strokeWidth="1.2" opacity="0.3"/></svg>
+              <span style={{ fontSize: 11, color: 'var(--px-text-3)', fontFamily: 'var(--px-font)' }}>
+                aryan.portfoliox.me/case/cred-rewards
+              </span>
+            </div>
+            <div style={{ marginLeft: 8, fontSize: 10, fontWeight: 600, color: 'var(--px-accent)', padding: '3px 8px', background: 'var(--px-accent-subtle)', borderRadius: 4, flexShrink: 0 }}>
+              ↑ Share
+            </div>
+          </div>
+
+          {/* Scrolling content */}
+          <div
+            ref={scrollRef}
+            style={{ height: 580, overflowY: 'scroll', overflowX: 'hidden', scrollbarWidth: 'none' }}
+          >
+            <CaseStudyContent counting={counting} />
+          </div>
+        </div>
+
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: 'var(--px-text-3)' }}>
+          Hover to pause · Built with the PortfolioX case study editor
+        </p>
+      </div>
+    </section>
+  )
+}
+
 // ── Disciplines ───────────────────────────────────────────────────────────────
 function DisciplinesSection() {
   return (
@@ -810,6 +1153,7 @@ export function LandingPage() {
       <Nav />
       <HeroSection />
       <HowItWorks />
+      <ShowcaseSection />
       <DisciplinesSection />
       <TestimonialsSection />
       <FinalCTA />
