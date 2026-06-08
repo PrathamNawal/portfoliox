@@ -263,7 +263,7 @@ function Nav() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="px-nav-hide-mobile">
-        {['How it works', 'Disciplines', 'Pricing'].map(link => (
+        {['How it works', 'Disciplines'].map(link => (
           <a key={link} href={`#${link.toLowerCase().replace(/\s+/g,'-')}`} style={{
             fontSize: 13, fontWeight: 500, color: 'var(--px-text-2)',
             textDecoration: 'none', transition: 'color 0.15s',
@@ -685,116 +685,6 @@ function TestimonialsSection() {
   )
 }
 
-// ── Pricing ───────────────────────────────────────────────────────────────────
-function PricingSection() {
-  const plans = [
-    {
-      name: 'Free',
-      price: '₹0',
-      period: 'forever',
-      desc: 'Perfect to get started and see if PortfolioX fits your workflow.',
-      features: ['1 published portfolio', 'Up to 3 case studies', 'Canvas layout', 'portfoliox.me subdomain', 'Basic analytics'],
-      cta: 'Start for free',
-      accent: false,
-    },
-    {
-      name: 'Pro',
-      price: '₹499',
-      period: 'per month',
-      desc: 'For designers serious about landing their next role or freelance client.',
-      features: ['Unlimited case studies', 'Canvas + Spotlight layouts', 'Custom domain', 'AI writing (unlimited)', 'Password-protected NDA sections', 'Advanced analytics + viewer tracking'],
-      cta: 'Start Pro trial',
-      accent: true,
-    },
-  ]
-
-  return (
-    <section id="pricing" style={{
-      padding: 'clamp(64px,8vh,100px) clamp(16px,4vw,48px)',
-    }}>
-      <div style={{ maxWidth: 860, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--px-text-3)', marginBottom: 12 }}>
-            Pricing
-          </div>
-          <h2 style={{
-            fontFamily: 'var(--px-font-display)',
-            fontSize: 'clamp(28px,4vw,48px)',
-            fontWeight: 400, letterSpacing: '-0.03em',
-            color: 'var(--px-text)', margin: 0,
-          }}>
-            Simple, honest pricing.
-          </h2>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-          {plans.map((plan, i) => (
-            <div key={i} style={{
-              padding: '32px 28px',
-              borderRadius: 16,
-              background: plan.accent ? 'var(--px-text)' : 'var(--px-surface)',
-              border: `1.5px solid ${plan.accent ? 'var(--px-text)' : 'var(--px-border)'}`,
-              display: 'flex', flexDirection: 'column', gap: 0,
-            }}>
-              <div style={{ marginBottom: 8 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: plan.accent ? 'rgba(255,255,255,0.6)' : 'var(--px-text-3)', marginBottom: 10, letterSpacing: '0.04em' }}>
-                  {plan.name.toUpperCase()}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 40, fontWeight: 800, color: plan.accent ? '#fff' : 'var(--px-text)', letterSpacing: '-0.04em', lineHeight: 1 }}>
-                    {plan.price}
-                  </span>
-                  <span style={{ fontSize: 13, color: plan.accent ? 'rgba(255,255,255,0.5)' : 'var(--px-text-3)' }}>
-                    / {plan.period}
-                  </span>
-                </div>
-                <p style={{ fontSize: 13, lineHeight: 1.6, color: plan.accent ? 'rgba(255,255,255,0.65)' : 'var(--px-text-3)', margin: 0 }}>
-                  {plan.desc}
-                </p>
-              </div>
-
-              <div style={{ height: 1, background: plan.accent ? 'rgba(255,255,255,0.1)' : 'var(--px-border)', margin: '20px 0' }} />
-
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
-                {plan.features.map((f, fi) => (
-                  <div key={fi} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{
-                      width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
-                      background: plan.accent ? 'rgba(255,255,255,0.15)' : 'var(--px-surface-2)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 9, color: plan.accent ? '#fff' : 'var(--px-accent)',
-                    }}>
-                      ✓
-                    </div>
-                    <span style={{ fontSize: 13, color: plan.accent ? 'rgba(255,255,255,0.8)' : 'var(--px-text-2)' }}>
-                      {f}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <Link
-                href="/sign-in"
-                className={plan.accent ? 'px-cta-glow' : undefined}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  height: 44, borderRadius: 9, fontSize: 14, fontWeight: 700,
-                  textDecoration: 'none', letterSpacing: '-0.01em',
-                  ...(plan.accent
-                    ? { background: 'var(--px-accent)', color: '#fff' }
-                    : { background: 'var(--px-surface-2)', color: 'var(--px-text)', border: '1px solid var(--px-border)' }
-                  ),
-                }}
-              >
-                {plan.cta}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 // ── Final CTA (Motion Priority 4: pulse glow) ─────────────────────────────────
 function FinalCTA() {
@@ -922,7 +812,6 @@ export function LandingPage() {
       <HowItWorks />
       <DisciplinesSection />
       <TestimonialsSection />
-      <PricingSection />
       <FinalCTA />
       <Footer />
     </div>
