@@ -118,15 +118,22 @@ function ContentSection({ section }: { section: CaseSection }) {
   if (!hasNarrative && !hasBlocks) return null
 
   return (
-    <div style={{ marginBottom: 56 }}>
-      {/* Section label */}
-      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', background: `${def.color}12`, borderRadius: 999, border: `1px solid ${def.color}25`, marginBottom: 14 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: def.color, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{def.icon} {section.title || def.title}</span>
+    <div style={{ marginBottom: 64 }}>
+      {/* Section type — quiet, no pill chrome */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <span style={{ fontSize: 11, color: 'var(--px-text-3)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>
+          {def.icon} {section.type}
+        </span>
       </div>
+
+      {/* Section title — the actual heading */}
+      <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)', lineHeight: 1.2, marginBottom: 20 }}>
+        {section.title || def.title}
+      </h2>
 
       {/* Narrative */}
       {hasNarrative && (
-        <div style={{ marginBottom: hasBlocks ? 28 : 0 }}>
+        <div style={{ marginBottom: hasBlocks ? 32 : 0 }}>
           {renderNarrative(section.narrative)}
         </div>
       )}
@@ -138,7 +145,7 @@ function ContentSection({ section }: { section: CaseSection }) {
             if (block.type === 'image' && !block.imageUrl) return null
             if (block.type === 'compare' && (!block.beforeUrl || !block.afterUrl)) return null
             if (block.type === 'figma' && !block.figmaUrl) return null
-            return <BlockRenderer key={block.id || i} block={block} accent={def.color} />
+            return <BlockRenderer key={block.id || i} block={block} accent="var(--px-text-3)" />
           })}
         </div>
       )}
