@@ -90,7 +90,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
 
         {/* Identity label — small, spaced, mono */}
         <p style={{
-          fontSize: 11, fontWeight: 600, letterSpacing: '0.2em',
+          fontSize: 14, fontWeight: 600, letterSpacing: '0.15em',
           textTransform: 'uppercase', color: 'var(--px-text-3)',
           marginBottom: 14, fontFamily: "'Courier New', Courier, monospace",
         }}>
