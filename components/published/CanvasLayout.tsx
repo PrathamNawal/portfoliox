@@ -196,23 +196,49 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         {/* Work experience */}
         {experience.length > 0 && (
           <div style={{ marginBottom: 56 }}>
-            <SectionLabel>Work Experience</SectionLabel>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
-              {experience.map(exp => (
-                <div key={exp.id} style={{ background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '20px 24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: exp.description ? 8 : 0 }}>
-                    <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.02em', marginBottom: 2 }}>{exp.role}</div>
-                      <div style={{ fontSize: 13, color: 'var(--px-text-2)' }}>{exp.company}</div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      {exp.discipline_tag && <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4, background: 'var(--px-surface-2)', color: 'var(--px-text-3)', border: '1px solid var(--px-border)' }}>{exp.discipline_tag}</span>}
-                      <span style={{ fontSize: 12, color: 'var(--px-text-3)', whiteSpace: 'nowrap' }}>{exp.start_month} – {exp.is_current ? 'Present' : exp.end_month}</span>
-                    </div>
+            {/* Section header with total experience */}
+            <div style={{ marginBottom: 32 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--px-text-3)', marginBottom: 4 }}>
+                Experience {calcTotalExperience(experience)}
+              </p>
+              <SectionLabel>Work Experience</SectionLabel>
+            </div>
+
+            {/* Group by company */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+              {groupByCompany(experience).map(({ company, entries }) => (
+                <div key={company}>
+                  {/* Company header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+                    <CompanyLogo company={company} />
+                    <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)' }}>{company}</span>
                   </div>
-                  {exp.description && (
-                    <div style={{ fontSize: 13, color: 'var(--px-text-3)', lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: exp.description }} />
-                  )}
+
+                  {/* Roles */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingLeft: 8 }}>
+                    {entries.map(exp => {
+                      const duration = calcDuration(exp.start_month, exp.end_month, exp.is_current)
+                      return (
+                        <div key={exp.id} style={{ display: 'flex', gap: 16 }}>
+                          {/* Bullet */}
+                          <div style={{ marginTop: 6, width: 8, height: 8, borderRadius: '50%', background: 'var(--px-border)', flexShrink: 0 }} />
+                          <div style={{ flex: 1 }}>
+                            {/* Role + date */}
+                            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 10px', marginBottom: exp.description ? 10 : 0 }}>
+                              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.02em' }}>{exp.role}</span>
+                              <span style={{ fontSize: 13, color: 'var(--px-text-3)', fontWeight: 400 }}>
+                                {exp.start_month}–{exp.is_current ? 'Present' : exp.end_month}{duration ? ` (${duration})` : ''}
+                              </span>
+                            </div>
+                            {/* Description */}
+                            {exp.description && (
+                              <div className="px-exp-description" style={{ fontSize: 14, color: 'var(--px-text-2)', lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: exp.description }} />
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               ))}
             </div>
@@ -417,5 +443,79 @@ function OutlineBtn({ href, children }: { href: string; children: React.ReactNod
 function CTALink({ children }: { children: React.ReactNode }) {
   return (
     <a href="mailto:?subject=Hello" style={{ display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 14px', fontSize: 13, fontWeight: 600, borderRadius: 'var(--px-r)', background: 'var(--px-accent)', color: '#fff', textDecoration: 'none' }}>{children}</a>
+  )
+}
+
+// ── Work experience helpers ───────────────────────────────────────────────────
+
+// Parse "Jan 2026" → Date (1st of that month)
+function parseMonthYear(s: string): Date {
+  const MONTHS: Record<string, number> = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 }
+  const [mon, year] = s.trim().split(' ')
+  return new Date(parseInt(year), MONTHS[mon] ?? 0, 1)
+}
+
+function calcDuration(start: string, end: string | null, isCurrent: boolean): string {
+  try {
+    const s = parseMonthYear(start)
+    const e = isCurrent || !end ? new Date() : parseMonthYear(end)
+    const months = Math.max(0, (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()))
+    const y = Math.floor(months / 12), m = months % 12
+    if (y === 0) return `${m} mo`
+    if (m === 0) return `${y} yr${y !== 1 ? 's' : ''}`
+    return `${y} yr${y !== 1 ? 's' : ''} ${m} mo`
+  } catch { return '' }
+}
+
+function calcTotalExperience(experience: WorkExperience[]): string {
+  try {
+    let total = 0
+    for (const exp of experience) {
+      const s = parseMonthYear(exp.start_month)
+      const e = exp.is_current || !exp.end_month ? new Date() : parseMonthYear(exp.end_month)
+      total += Math.max(0, (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()))
+    }
+    const years = Math.round(total / 12)
+    return years < 1 ? '' : `~${years} year${years !== 1 ? 's' : ''}`
+  } catch { return '' }
+}
+
+function groupByCompany(experience: WorkExperience[]): { company: string; entries: WorkExperience[] }[] {
+  const map = new Map<string, WorkExperience[]>()
+  for (const exp of experience) {
+    const list = map.get(exp.company) ?? []
+    list.push(exp)
+    map.set(exp.company, list)
+  }
+  return Array.from(map.entries()).map(([company, entries]) => ({ company, entries }))
+}
+
+// Known company → domain mapping for logo lookup
+const COMPANY_DOMAINS: Record<string, string> = {
+  'Google': 'google.com', 'Apple': 'apple.com', 'Meta': 'meta.com',
+  'Microsoft': 'microsoft.com', 'Amazon': 'amazon.com', 'Netflix': 'netflix.com',
+  'Spotify': 'spotify.com', 'Figma': 'figma.com', 'Notion': 'notion.so',
+  'Swiggy': 'swiggy.in', 'Zomato': 'zomato.com', 'Hiver': 'hiverhq.com',
+  'Rocketium': 'rocketium.com', 'Adobe': 'adobe.com', 'Atlassian': 'atlassian.com',
+  'Slack': 'slack.com', 'Airbnb': 'airbnb.com', 'Uber': 'uber.com',
+  'LinkedIn': 'linkedin.com', 'Twitter': 'twitter.com', 'Flipkart': 'flipkart.com',
+  'Razorpay': 'razorpay.com', 'Zepto': 'zeptonow.com', 'Meesho': 'meesho.com',
+  'Cred': 'cred.club', 'PhonePe': 'phonepe.com', 'Paytm': 'paytm.com',
+}
+
+// Colored initials palette — cycles by index
+const LOGO_COLORS = ['#E53416','#7B5EE0','#1A5C38','#2A5298','#C45C26','#1B7A6E']
+
+function CompanyLogo({ company }: { company: string }) {
+  const domain = COMPANY_DOMAINS[company] ?? `${company.toLowerCase().replace(/\s+/g,'')}.com`
+  const color = LOGO_COLORS[company.charCodeAt(0) % LOGO_COLORS.length]
+  return (
+    <div style={{ width: 48, height: 48, borderRadius: 14, background: '#F2F1EE', border: '1px solid var(--px-border)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+      {/* Fallback initial — visible when logo doesn't load */}
+      <span style={{ fontSize: 20, fontWeight: 800, color, position: 'absolute' }}>{company[0]}</span>
+      {/* Clearbit logo — covers the initial if it loads */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={`https://logo.clearbit.com/${domain}`} alt="" aria-hidden style={{ width: 32, height: 32, objectFit: 'contain', position: 'relative', zIndex: 1 }} />
+    </div>
   )
 }

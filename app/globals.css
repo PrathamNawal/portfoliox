@@ -206,6 +206,23 @@ a { text-decoration: none; color: inherit; }
 .px-hero-avatar:hover {
   transform: scale(1.08);
 }
+/* Work experience description — bullet list styling */
+.px-exp-description ul {
+  list-style: disc;
+  padding-left: 18px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.px-exp-description li {
+  padding-left: 4px;
+}
+.px-exp-description li strong,
+.px-exp-description li b {
+  color: var(--px-text);
+  font-weight: 600;
+}
 
 /* ── Mobile responsive utilities ─────────────────────────────────── */
 @media (max-width: 640px) {
