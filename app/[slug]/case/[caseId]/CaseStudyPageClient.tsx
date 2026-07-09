@@ -131,9 +131,9 @@ function ContentSection({ section }: { section: CaseSection }) {
         {section.title || def.title}
       </h2>
 
-      {/* Narrative */}
+      {/* Narrative — kept to a readable line length even though the canvas is wide */}
       {hasNarrative && (
-        <div style={{ marginBottom: hasBlocks ? 32 : 0 }}>
+        <div style={{ maxWidth: 680, marginBottom: hasBlocks ? 32 : 0 }}>
           {renderNarrative(section.narrative)}
         </div>
       )}
@@ -198,8 +198,8 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
             <div style={{ width: '100%', height: 300, background: 'linear-gradient(135deg,#2A1B4A 0%,#5B3FA6 60%,#7B5EE0 100%)' }} />
           )}
 
-          {/* Content */}
-          <div style={{ maxWidth: 740, margin: '0 auto', padding: 'clamp(32px, 5vw, 56px) clamp(16px, 4vw, 24px) 96px' }}>
+          {/* Content — wide canvas so visual blocks have room; prose stays narrow within it */}
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(32px, 5vw, 56px) clamp(16px, 4vw, 40px) 96px' }}>
 
             {/* Title */}
             <h1 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--px-text)', lineHeight: 1.15, marginBottom: 32 }}>
