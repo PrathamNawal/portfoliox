@@ -84,7 +84,7 @@ create table if not exists work_experience (
   start_month      text not null,
   end_month        text,
   is_current       boolean not null default false,
-  description      text check (char_length(description) <= 400),
+  description      text check (char_length(description) <= 4000),
   discipline_tag   text,
   display_order    integer not null default 0,
   created_at       timestamptz not null default now()
