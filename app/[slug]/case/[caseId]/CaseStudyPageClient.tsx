@@ -16,29 +16,79 @@ interface Props {
 }
 
 // ── Narrative renderer ────────────────────────────────────────────────────────
-// Narrative is plain text with \n\n paragraphs and **bold** / *italic* markers
+// Narrative is plain text with paragraphs, **bold**/*italic* markers, and
+// "- " / "1. " list lines — which can appear right after a bold label line
+// with no blank line in between, so we parse line-by-line rather than by
+// blank-line-separated paragraph, and group consecutive list lines together.
+const BODY_TEXT_STYLE: React.CSSProperties = { fontSize: 16, lineHeight: 1.75, color: 'var(--px-text-2)', fontFamily: 'var(--px-font-body)' }
+
+const BULLET_RE = /^[-*•]\s+/
+const NUMBERED_RE = /^\d+\.\s+/
+
+type NarrativeBlock = { kind: 'ul' | 'ol' | 'p'; lines: string[] }
+
+function parseNarrativeBlocks(text: string): NarrativeBlock[] {
+  const lines = text.split('\n')
+  const blocks: NarrativeBlock[] = []
+  let i = 0
+  while (i < lines.length) {
+    if (lines[i].trim() === '') { i++; continue }
+    if (BULLET_RE.test(lines[i].trim())) {
+      const items: string[] = []
+      while (i < lines.length && BULLET_RE.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(BULLET_RE, ''))
+        i++
+      }
+      blocks.push({ kind: 'ul', lines: items })
+      continue
+    }
+    if (NUMBERED_RE.test(lines[i].trim())) {
+      const items: string[] = []
+      while (i < lines.length && NUMBERED_RE.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(NUMBERED_RE, ''))
+        i++
+      }
+      blocks.push({ kind: 'ol', lines: items })
+      continue
+    }
+    const paraLines: string[] = []
+    while (i < lines.length && lines[i].trim() !== '' && !BULLET_RE.test(lines[i].trim()) && !NUMBERED_RE.test(lines[i].trim())) {
+      paraLines.push(lines[i])
+      i++
+    }
+    blocks.push({ kind: 'p', lines: paraLines })
+  }
+  return blocks
+}
+
 function renderNarrative(text: string): React.ReactNode {
   if (!text?.trim()) return null
-  return text.split(/\n\n+/).map((para, pi) => {
-    const trimmed = para.trim()
-    if (!trimmed) return null
-    // Detect numbered list paragraph (lines starting with digit.)
-    const lines = trimmed.split('\n')
-    const isList = lines.every(l => /^\d+\./.test(l.trim()) || l.trim() === '')
-    if (isList) {
+  return parseNarrativeBlocks(text).map((block, bi) => {
+    if (block.kind === 'ul') {
       return (
-        <ol key={pi} style={{ paddingLeft: 22, margin: '0 0 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {lines.filter(l => l.trim()).map((l, li) => (
-            <li key={li} style={{ fontSize: 16, lineHeight: 1.75, color: 'var(--px-text-2)' }}>
-              <InlineMarkdown text={l.replace(/^\d+\.\s*/, '')} />
+        <ul key={bi} style={{ paddingLeft: 20, margin: '0 0 18px', display: 'flex', flexDirection: 'column', gap: 8, listStyle: 'disc' }}>
+          {block.lines.map((l, li) => (
+            <li key={li} style={{ ...BODY_TEXT_STYLE, paddingLeft: 4 }}>
+              <InlineMarkdown text={l} />
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    if (block.kind === 'ol') {
+      return (
+        <ol key={bi} style={{ paddingLeft: 22, margin: '0 0 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {block.lines.map((l, li) => (
+            <li key={li} style={{ ...BODY_TEXT_STYLE, paddingLeft: 4 }}>
+              <InlineMarkdown text={l} />
             </li>
           ))}
         </ol>
       )
     }
     return (
-      <p key={pi} style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--px-text-2)', margin: '0 0 18px', whiteSpace: 'pre-wrap' }}>
-        <InlineMarkdown text={trimmed} />
+      <p key={bi} style={{ ...BODY_TEXT_STYLE, margin: '0 0 18px', whiteSpace: 'pre-wrap' }}>
+        <InlineMarkdown text={block.lines.join('\n')} />
       </p>
     )
   })
@@ -71,7 +121,7 @@ function OverviewSection({ data, summary }: { data: OverviewData; summary?: stri
     <div style={{ marginBottom: 56 }}>
       {/* Summary */}
       {(summary || data.summary) && (
-        <p style={{ fontSize: 20, lineHeight: 1.65, color: 'var(--px-text)', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: 36, maxWidth: 640 }}>
+        <p style={{ fontSize: 20, lineHeight: 1.65, color: 'var(--px-text)', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: 36, maxWidth: 620, fontFamily: 'var(--px-font-body)' }}>
           {summary || data.summary}
         </p>
       )}
@@ -119,21 +169,14 @@ function ContentSection({ section }: { section: CaseSection }) {
 
   return (
     <div style={{ marginBottom: 64 }}>
-      {/* Section type — quiet, no pill chrome */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-        <span style={{ fontSize: 11, color: 'var(--px-text-3)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>
-          {def.icon} {section.type}
-        </span>
-      </div>
-
       {/* Section title — the actual heading */}
-      <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--px-text)', lineHeight: 1.2, marginBottom: 20 }}>
+      <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.015em', color: 'var(--px-text)', lineHeight: 1.2, marginBottom: 20 }}>
         {section.title || def.title}
       </h2>
 
       {/* Narrative — kept to a readable line length even though the canvas is wide */}
       {hasNarrative && (
-        <div style={{ maxWidth: 680, marginBottom: hasBlocks ? 32 : 0 }}>
+        <div style={{ maxWidth: 620, marginBottom: hasBlocks ? 32 : 0 }}>
           {renderNarrative(section.narrative)}
         </div>
       )}
@@ -202,7 +245,7 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(32px, 5vw, 56px) clamp(16px, 4vw, 40px) 96px' }}>
 
             {/* Title */}
-            <h1 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--px-text)', lineHeight: 1.15, marginBottom: 32 }}>
+            <h1 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--px-text)', lineHeight: 1.15, marginBottom: 32 }}>
               {cs.title}
             </h1>
 

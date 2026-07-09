@@ -8,6 +8,7 @@
   /* Typefaces */
   --px-font:         'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --px-font-display: 'DM Serif Display', Georgia, serif;
+  --px-font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Helvetica, Arial, sans-serif;
 
   /* ── Type scale (1.25 modular ratio) ─────────────────────────── */
   --px-text-xs:      11px;   /* Labels, captions, breadcrumbs     */
