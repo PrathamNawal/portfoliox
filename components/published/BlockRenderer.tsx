@@ -140,7 +140,7 @@ export function BlockRenderer({ block, accent = '#E53416' }: Props) {
       {block.type === 'image' && block.imageUrl && (
         <div>
           <img src={block.imageUrl} alt={block.caption || block.sectionLabel} style={{ width: '100%', borderRadius: 8, display: 'block', maxHeight: 600, objectFit: 'cover' }} />
-          {block.caption && <p style={{ fontSize: 13, color: 'var(--px-text-3)', marginTop: 8, lineHeight: 1.5, fontStyle: 'italic' }}>{block.caption}</p>}
+          {block.caption && <p style={{ fontSize: 14, color: 'var(--px-text-2)', marginTop: 8, lineHeight: 1.6 }}>{block.caption}</p>}
         </div>
       )}
 
@@ -151,7 +151,7 @@ export function BlockRenderer({ block, accent = '#E53416' }: Props) {
             {block.images.filter(i => i.url).map((img, idx) => (
               <div key={idx}>
                 <img src={img.url} alt={img.caption || ''} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6, display: 'block' }} />
-                {img.caption && <p style={{ fontSize: 12, color: 'var(--px-text-3)', marginTop: 6, fontStyle: 'italic' }}>{img.caption}</p>}
+                {img.caption && <p style={{ fontSize: 13, color: 'var(--px-text-2)', marginTop: 6, lineHeight: 1.5 }}>{img.caption}</p>}
               </div>
             ))}
           </div>
@@ -176,7 +176,7 @@ export function BlockRenderer({ block, accent = '#E53416' }: Props) {
       {block.type === 'video' && block.videoUrl && (
         <div>
           <VideoEmbed url={block.videoUrl} />
-          {block.caption && <p style={{ fontSize: 13, color: 'var(--px-text-3)', marginTop: 8, lineHeight: 1.5, fontStyle: 'italic' }}>{block.caption}</p>}
+          {block.caption && <p style={{ fontSize: 14, color: 'var(--px-text-2)', marginTop: 8, lineHeight: 1.6 }}>{block.caption}</p>}
         </div>
       )}
 
