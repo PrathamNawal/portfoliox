@@ -4,6 +4,10 @@ import { createClient } from '@supabase/supabase-js'
 import type { Metadata } from 'next'
 import { CaseStudyPageClient } from './CaseStudyPageClient'
 
+// Never cache case study pages — data changes in real time (edits, publish toggles, NDA state)
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ slug: string; caseId: string }>
 }
