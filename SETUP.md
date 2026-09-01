@@ -10,8 +10,8 @@ cp .env.local.example .env.local
 
 Required values:
 - **Supabase** — get from your Supabase project → Settings → API
-- **Stack Auth** — get from `app.stack-auth.com` → your project
-- **Anthropic** — get from `console.anthropic.com`
+- **Firebase** — get from `console.firebase.google.com` → your project → Settings → General → Web app
+- **OpenRouter** — get from `openrouter.ai` → Keys (used for AI section generation, routed to Claude Haiku)
 
 ## 2. Supabase project
 
@@ -27,12 +27,12 @@ Create these two buckets in Storage → New bucket:
 - `avatars` — Public
 - `resumes` — Private (signed URLs)
 
-## 3. Stack Auth setup
+## 3. Firebase Auth setup
 
-1. Go to `app.stack-auth.com` and create a project named "PortfolioX"
-2. Enable: Google OAuth + Email/Password
-3. Copy the three keys into `.env.local`
-4. Install the Stack Auth handler in your app — the onboarding page already uses `/api/auth/google` as the OAuth redirect; configure this URL in your Stack Auth dashboard
+1. Go to `console.firebase.google.com` and create a project named "PortfolioX"
+2. Add a Web app, then enable sign-in methods: Google + Email/Password (Authentication → Sign-in method)
+3. Copy the five `NEXT_PUBLIC_FIREBASE_*` values into `.env.local`
+4. The app exchanges the Firebase client sign-in for a signed `px_session` cookie via `POST /api/auth/session` (see `lib/firebase/session.ts`) — every server route then re-derives the user from that cookie through `requireAuthContext()`. There's no Supabase Auth/RLS involved; Supabase is written to server-side with the service role key once the Firebase session is verified.
 
 ### Admin seeding
 After your first login with `pratham.nawal21@gmail.com`, run this in Supabase SQL Editor:
@@ -76,11 +76,13 @@ And set `NEXT_PUBLIC_APP_DOMAIN=portfoliox.me` — then `testuser.portfoliox.me:
 ## Build sequence status
 
 - [x] Step 1: Scaffold + schema + design system
-- [ ] Step 2: Stack Auth integration (needs your Stack Auth keys)
-- [ ] Step 3: Onboarding flow (page built, needs auth wired)
-- [ ] Step 4: Builder main view (built)
-- [ ] Step 5: Case study editor (built)
-- [ ] Step 6: Published portfolios — Canvas + Spotlight (built)
-- [ ] Step 7: Testimonials, tool stack, work experience, social links, resume
-- [ ] Step 8: Analytics dashboard
-- [ ] Step 9: Admin console (built)
+- [x] Step 2: Firebase Auth integration
+- [x] Step 3: Onboarding flow
+- [x] Step 4: Builder main view
+- [x] Step 5: Case study editor
+- [x] Step 6: Published portfolios — Canvas + Spotlight
+- [x] Step 7: Testimonials, tool stack, work experience, social links, resume
+- [x] Step 8: Analytics dashboard
+- [x] Step 9: Admin console
+
+All nine steps are built and live. A fresh clone only needs its own Supabase project, Firebase project, and OpenRouter key — nothing above is still in progress.
