@@ -90,7 +90,8 @@
   --t-h2-pad: 0;
 
   /* avatar */
-  --t-avatar-r: 28px;
+  --t-avatar-size: clamp(132px, 15vw, 176px);
+  --t-avatar-r: calc(var(--t-avatar-size) * 0.28);
   --t-avatar-bd: 0 solid transparent;
   --t-avatar-shadow: none;
   --t-avatar-rot: 0deg;
@@ -270,7 +271,7 @@
   color: var(--t-on-hero);
 }
 .pxp-avatar {
-  display: block; width: 100px; height: 100px; margin: 0 auto 20px;
+  display: block; width: var(--t-avatar-size); height: var(--t-avatar-size); margin: 0 auto 28px;
   object-fit: cover;
   padding: var(--t-avatar-pad);
   border-radius: var(--t-avatar-r);
@@ -281,7 +282,7 @@
   transition: transform var(--px-dur-base) var(--px-ease-hover);
 }
 .pxp-avatar:hover { transform: rotate(var(--t-avatar-rot)) scale(1.08); }
-.pxp-avatar--fallback { display: flex; align-items: center; justify-content: center; color: var(--px-accent-fg); font-size: 38px; font-weight: 700; }
+.pxp-avatar--fallback { display: flex; align-items: center; justify-content: center; color: var(--px-accent-fg); font-size: calc(var(--t-avatar-size) * 0.38); font-weight: 700; }
 .pxp-eyebrow { margin-bottom: 14px; font-family: 'Courier New', Courier, monospace; font-size: 14px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--t-on-hero-3); }
 .pxp-h1 {
   max-width: 800px; margin: 0 auto 24px;
@@ -457,7 +458,7 @@
 
 /* spotlight layout */
 .pxp-spot-hero { text-align: center; padding: 64px 24px 52px; }
-.pxp-spot-hero .pxp-avatar { width: 96px; height: 96px; margin-bottom: 24px; }
+.pxp-spot-hero .pxp-avatar { width: calc(var(--t-avatar-size) * 0.85); height: calc(var(--t-avatar-size) * 0.85); margin-bottom: 24px; }
 .pxp-spot-name { margin: 0 0 10px; font-size: 36px; font-weight: 800; letter-spacing: -0.045em; line-height: 1.1; color: var(--t-h1-color); background: var(--t-h1-bg); -webkit-background-clip: text; background-clip: text; text-shadow: var(--t-h1-shadow); text-transform: var(--t-h1-transform); filter: var(--t-h1-filter); }
 .pxp-spot-role { margin: 0 0 12px; font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--t-on-hero-3); }
 .pxp-spot-bio { max-width: 480px; margin: 0 auto 20px; font-size: 17px; line-height: 1.7; color: var(--t-on-hero-2); }
