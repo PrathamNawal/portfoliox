@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
 import { SectionHead, Toggle } from '@/components/ui/Misc'
 import type { WorkExperience } from '@/types'
+import { sortExperience } from '@/lib/experience'
 
 // ── Lightweight rich-text editor ─────────────────────────────────────────────
 function RichTextEditor({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
@@ -301,14 +302,15 @@ interface Props {
   onChange: (exp: WorkExperience[]) => void
 }
 
-export function WorkExperienceSection({ experience, onChange }: Props) {
+export function WorkExperienceSection({ experience: unsorted, onChange }: Props) {
+  // Latest first, always: whatever order the parent holds, the list shows (and edits) this order.
+  const experience = sortExperience(unsorted)
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<WorkExperience | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const handleSaved = (e: WorkExperience) => {
-    if (editTarget) onChange(experience.map(x => x.id === e.id ? e : x))
-    else onChange([e, ...experience])
+    onChange(sortExperience(editTarget ? experience.map(x => x.id === e.id ? e : x) : [e, ...experience]))
     setEditTarget(null)
   }
 

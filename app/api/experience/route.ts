@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
+import { sortExperience } from '@/lib/experience'
 
 export async function GET() {
   try {
     const { userId, supabase } = await requireAuthContext()
     const { data, error } = await supabase.from('work_experience').select('*').eq('user_id', userId).order('display_order')
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json(data)
+    return NextResponse.json(sortExperience(data))
   } catch { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
 }
 

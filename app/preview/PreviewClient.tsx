@@ -17,9 +17,10 @@ interface Props {
   caseStudies: CaseStudy[]
   tools: ToolStackItem[]
   testimonials: Testimonial[]
+  experience: WorkExperience[]
 }
 
-export function PreviewClient({ profile, caseStudies, tools, testimonials }: Props) {
+export function PreviewClient({ profile, caseStudies, tools, testimonials, experience }: Props) {
   const router = useRouter()
   const [layout, setLayout] = useState<'canvas' | 'spotlight'>(profile.layout as 'canvas' | 'spotlight')
 
@@ -33,7 +34,7 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials }: Pro
     caseStudies,
     tools,
     testimonials,
-    experience: [] as WorkExperience[],
+    experience,
   }
 
   return (

@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { getSessionUser } from '@/lib/firebase/session'
 import { redirect } from 'next/navigation'
 import { PreviewClient } from './PreviewClient'
+import { sortExperience } from '@/lib/experience'
 
 export default async function PreviewPage() {
   
@@ -10,11 +11,12 @@ export default async function PreviewPage() {
 
   const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-  const [{ data: profile }, { data: caseStudies }, { data: tools }, { data: testimonials }] = await Promise.all([
+  const [{ data: profile }, { data: caseStudies }, { data: tools }, { data: testimonials }, { data: experience }] = await Promise.all([
     db.from('profiles').select('*').eq('id', user.uid).single(),
     db.from('case_studies').select('*').eq('user_id', user.uid).order('display_order'),
     db.from('tool_stack').select('*').eq('user_id', user.uid).order('display_order'),
     db.from('testimonials').select('*').eq('user_id', user.uid).order('display_order'),
+    db.from('work_experience').select('*').eq('user_id', user.uid).order('display_order'),
   ])
 
   if (!profile) redirect('/onboarding')
@@ -25,6 +27,7 @@ export default async function PreviewPage() {
       caseStudies={caseStudies || []}
       tools={tools || []}
       testimonials={testimonials || []}
+      experience={sortExperience(experience)}
     />
   )
 }

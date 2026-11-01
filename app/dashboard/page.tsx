@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { getSessionUser } from '@/lib/firebase/session'
 import { BuilderClient } from './BuilderClient'
+import { sortExperience } from '@/lib/experience'
 
 export default async function DashboardPage() {
   
@@ -22,7 +23,7 @@ export default async function DashboardPage() {
       initialProfile={profile}
       initialCaseStudies={caseStudies || []}
       initialTestimonials={testimonials || []}
-      initialExperience={experience || []}
+      initialExperience={sortExperience(experience)}
       initialTools={tools || []}
       freeLimit={parseInt(setting?.value || '6', 10)}
     />
