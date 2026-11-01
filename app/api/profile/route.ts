@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
 import { isThemeId } from '@/lib/themes'
+import { isMotionLevel } from '@/lib/motion'
 
 export async function GET() {
   try {
@@ -22,9 +23,12 @@ export async function PATCH(req: NextRequest) {
   try {
     const { userId, supabase } = await requireAuthContext()
     const body = await req.json()
-    const allowed = ['name','bio','avatar_url','discipline','skills','layout','theme','social_links','resume_url']
+    const allowed = ['name','bio','avatar_url','discipline','skills','layout','theme','motion','social_links','resume_url']
     if ('theme' in body && !isThemeId(body.theme)) {
       return NextResponse.json({ error: 'Unknown theme' }, { status: 400 })
+    }
+    if ('motion' in body && !isMotionLevel(body.motion)) {
+      return NextResponse.json({ error: 'Unknown motion level' }, { status: 400 })
     }
     const update: Record<string, unknown> = {}
     for (const key of allowed) {

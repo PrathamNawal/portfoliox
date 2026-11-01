@@ -9,6 +9,7 @@ import { Btn } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { ThemePicker } from '@/components/builder/ThemePicker'
 import { resolveTheme, type ThemeId } from '@/lib/themes'
+import { resolveMotion, type MotionLevel } from '@/lib/motion'
 import type { Profile, CaseStudy, Testimonial, ToolStackItem, WorkExperience } from '@/types'
 
 interface Props {
@@ -23,10 +24,12 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials }: Pro
   const [layout, setLayout] = useState<'canvas' | 'spotlight'>(profile.layout as 'canvas' | 'spotlight')
 
   const [theme, setTheme] = useState<ThemeId>(resolveTheme(profile.theme))
+  const [motion, setMotion] = useState<MotionLevel>(resolveMotion(profile.motion))
 
   const sharedProps = {
     profile: { ...profile, theme },
     trackViews: false,
+    motion,
     caseStudies,
     tools,
     testimonials,
@@ -51,6 +54,12 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials }: Pro
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <ThemePicker value={theme} onChange={setTheme} />
+          <select aria-label="Preview motion" value={motion} onChange={e => setMotion(resolveMotion(e.target.value))}
+            style={{ height: 28, padding: '0 8px', fontSize: 12, fontWeight: 600, borderRadius: 8, border: '1px solid var(--px-border)', background: 'var(--px-surface)', color: 'var(--px-text-2)', fontFamily: 'var(--px-font)' }}>
+            <option value="still">Still</option>
+            <option value="subtle">Subtle</option>
+            <option value="expressive">Expressive</option>
+          </select>
           {profile.slug && (
             <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>/p/{profile.slug}</span>
           )}

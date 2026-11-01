@@ -44,7 +44,7 @@ export default async function ThemeGallery({ searchParams }: Props) {
             style={{ padding: '5px 9px', borderRadius: 999, color: '#16151a', background: m === motion ? '#7dd3fc' : '#d6d4dc', textDecoration: 'none' }}>motion: {m}</Link>
         ))}
       </nav>
-      <PickerDemo value={id} />
+      <PickerDemo value={id} motion={motion} />
       {spotlight ? <SpotlightLayout {...props} /> : <CanvasLayout {...props} />}
     </>
   )
