@@ -151,7 +151,7 @@ create table if not exists app_settings (
 );
 
 insert into app_settings (key, value)
-values ('free_tier_case_study_limit', '6')
+values ('free_tier_case_study_limit', '8')
 on conflict (key) do nothing;
 
 -- ── Updated-at trigger ─────────────────────────────────────────────
