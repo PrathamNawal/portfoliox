@@ -1153,6 +1153,9 @@
 .pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-bio { animation: pxp-rise 0.8s var(--t-ease) 0.35s backwards; }
 .pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-actions { animation: pxp-rise 0.8s var(--t-ease) 0.5s backwards; }
 
+/* Designer scene (expressive): the looping illustration under the hero buttons (components/scene) */
+.pxp-scene-wrap { max-width: 640px; margin: 40px auto 0; }
+
 /* Moodboard wall (expressive): covers pinned in the margins, decorative */
 .pxp-wall__slot {
   position: absolute; display: none; pointer-events: auto;
