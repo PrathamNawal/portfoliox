@@ -4,6 +4,8 @@ import { ScrollReveal } from './ScrollReveal'
 import { Marquee } from './Marquee'
 import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
+import { HeroMotion } from './HeroMotion'
+import type { MotionLevel } from '@/lib/motion'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const TOOL_COLORS: Record<string, string> = {
@@ -49,9 +51,14 @@ interface Props {
   tools: ToolStackItem[]
   /** false for in-editor previews and the dev gallery, so they never record analytics. */
   trackViews?: boolean
+  /** Motion level; 'still' (default) leaves the page exactly as before. */
+  motion?: MotionLevel
 }
 
-export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true }: Props) {
+export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true, motion = 'still' }: Props) {
+  const wallCovers = caseStudies
+    .filter(cs => cs.cover_image_url && !cs.nda_enabled)
+    .map(cs => ({ id: cs.id!, title: cs.title || '', url: cs.cover_image_url!, fit: cs.cover_fit }))
   const social = (profile.social_links || {}) as Record<string, string>
   const heroTitle = (profile.discipline ? HERO_DISCIPLINE[profile.discipline] : null) || 'Designer'
   const skills = profile.skills || []
@@ -62,7 +69,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
   if (social.website) links.push({ href: social.website, label: 'Website' })
 
   return (
-    <ThemeScope theme={profile.theme}>
+    <ThemeScope theme={profile.theme} motion={motion}>
       {trackViews && <AnalyticsTracker userId={profile.id} eventType="page_view" />}
 
       <header className="pxp-header">
@@ -80,6 +87,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
       </header>
 
       <section className="pxp-hero">
+        {motion !== 'still' && <HeroMotion covers={wallCovers} slug={profile.slug!} level={motion} />}
         {profile.avatar_url
           ? <img className="pxp-avatar" src={profile.avatar_url} alt={profile.name} />
           : <div className="pxp-avatar pxp-avatar--fallback" aria-hidden="true">{profile.name[0]}</div>}
@@ -106,7 +114,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         )}
 
         {caseStudies.length > 0 && (
-          <ScrollReveal delay={60}>
+          <ScrollReveal delay={60} className="pxp-first">
             <section className="pxp-section" aria-labelledby="pxp-cases">
               <div className="pxp-heading-row">
                 <h2 id="pxp-cases" className="pxp-h2 pxp-h2--lg">Case Studies</h2>

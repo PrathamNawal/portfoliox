@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AnalyticsTracker } from './AnalyticsTracker'
 import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
+import type { MotionLevel } from '@/lib/motion'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const GRAD = [
@@ -22,13 +23,14 @@ interface Props {
   tools: ToolStackItem[]
   /** false for in-editor previews and the dev gallery, so they never record analytics. */
   trackViews?: boolean
+  motion?: MotionLevel
 }
 
-export function SpotlightLayout({ profile, caseStudies, testimonials, tools, trackViews = true }: Props) {
+export function SpotlightLayout({ profile, caseStudies, testimonials, tools, trackViews = true, motion = 'still' }: Props) {
   const social = (profile.social_links || {}) as Record<string, string>
 
   return (
-    <ThemeScope theme={profile.theme} layout="spotlight">
+    <ThemeScope theme={profile.theme} layout="spotlight" motion={motion}>
       {trackViews && <AnalyticsTracker userId={profile.id} eventType="page_view" />}
 
       <header className="pxp-hero pxp-spot-hero">

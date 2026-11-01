@@ -285,7 +285,7 @@
 .pxp-avatar--fallback { display: flex; align-items: center; justify-content: center; color: var(--px-accent-fg); font-size: calc(var(--t-avatar-size) * 0.38); font-weight: 700; }
 .pxp-eyebrow { margin-bottom: 14px; font-family: 'Courier New', Courier, monospace; font-size: 14px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--t-on-hero-3); }
 .pxp-h1 {
-  max-width: 800px; margin: 0 auto 24px;
+  max-width: var(--t-h1-max, 800px); margin: 0 auto 24px;
   font-size: var(--t-h1-size); font-weight: var(--t-h1-weight); letter-spacing: var(--t-h1-ls); line-height: 1;
   color: var(--t-h1-color);
   background: var(--t-h1-bg); -webkit-background-clip: text; background-clip: text;
@@ -1072,3 +1072,79 @@
 .pxp[data-pxtheme="handwritten"] .pxp-card__media { border: 2px solid #2b2b3a; }
 .pxp[data-pxtheme="handwritten"] .pxp-card::before { content: ''; position: absolute; top: 6px; left: 50%; z-index: 3; width: 92px; height: 24px; transform: translateX(-50%) rotate(-3deg); background: rgba(255,226,120,.8); box-shadow: 0 1px 2px rgba(0,0,0,.18); pointer-events: none; }
 .pxp[data-pxtheme="handwritten"] .pxp-card:nth-child(even)::before { background: rgba(160,220,235,.8); transform: translateX(-50%) rotate(3deg); }
+
+/* ==========================================================================
+   Motion  (.pxp[data-motion] = still | subtle | expressive; "still" has no rules here)
+   subtle     intro choreography, headline wipe, colour-from-work glow, tighter hero
+   expressive + moodboard wall of covers in the hero margins (>= 1360px wide)
+   Components: components/published/HeroMotion.tsx. Tokens: --t-ease, --t-glow-opacity.
+   Everything animates transform / opacity / clip-path only; reduced motion is handled by
+   the global rule near the top of this file (durations collapse, nothing is hidden).
+   ========================================================================== */
+.pxp { --t-ease: cubic-bezier(0.16, 1, 0.3, 1); --t-glow-opacity: 0.5; }
+.pxp[data-pxtheme="inflated"], .pxp[data-pxtheme="clay"] { --t-ease: cubic-bezier(0.34, 1.56, 0.64, 1); }
+.pxp[data-pxtheme="steampunk"], .pxp[data-pxtheme="skeuomorphism"] { --t-ease: cubic-bezier(0.3, 0.7, 0.2, 1); }
+.pxp[data-pxtheme="brutalism"], .pxp[data-pxtheme="isometric"], .pxp[data-pxtheme="neon"] { --t-ease: cubic-bezier(0.7, 0, 0.2, 1); }
+.pxp[data-pxtheme="minimal"], .pxp[data-pxtheme="brutalism"] { --t-glow-opacity: 0; }
+.pxp[data-pxtheme="neumorphism"] { --t-glow-opacity: 0.22; }
+.pxp[data-pxtheme="vector"], .pxp[data-pxtheme="handwritten"], .pxp[data-pxtheme="isometric"] { --t-glow-opacity: 0.32; }
+
+/* Tighter hero so the first row of work shows above the fold; bigger type on wide screens */
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]):not([data-pxtheme="minimal"]) {
+  --t-hero-pt: clamp(40px, 5vw, 72px);
+  --t-hero-pb: clamp(36px, 4vw, 56px);
+  --t-main-pt: 40px;
+  --t-section-gap: 48px;
+}
+@media (min-width: 1280px) {
+  .pxp:is([data-motion="subtle"], [data-motion="expressive"]):not([data-pxtheme="minimal"], [data-pxtheme="neon"], [data-pxtheme="brutalism"]) { --t-h1-size: clamp(64px, 8vw, 112px); --t-h1-max: 1180px; }
+  .pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-bio { max-width: 600px; }
+}
+
+/* Work first: with motion on, the case studies lead and the skills strip follows them */
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-main { display: flex; flex-direction: column; }
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-first { order: -1; }
+
+/* Layers inside the hero */
+.pxp-motion { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.pxp-hero > :not(.pxp-motion) { position: relative; z-index: 1; }
+.pxp[data-motion="expressive"] .pxp-eyebrow, .pxp[data-motion="expressive"] .pxp-actions { width: fit-content; margin-left: auto; margin-right: auto; }
+
+/* Colour taken from the owner's own covers */
+.pxp-glow {
+  position: absolute; left: 50%; top: -12%; width: min(1100px, 92%); aspect-ratio: 1.5; transform: translateX(-50%);
+  border-radius: 50%; filter: blur(28px); opacity: 0;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--pxp-glow, transparent) 60%, transparent), transparent);
+  transition: opacity 1.4s var(--t-ease);
+}
+.pxp-glow[data-on="true"] { opacity: var(--t-glow-opacity); }
+
+/* Intro choreography: one orchestrated moment, then still */
+@keyframes pxp-rise { from { opacity: 0; transform: translateY(16px); } }
+@keyframes pxp-pop { from { opacity: 0; transform: rotate(var(--t-avatar-rot)) scale(0.82); } }
+@keyframes pxp-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(-30% -8% -30% -8%); } }
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-avatar { animation: pxp-pop 0.9s var(--t-ease) backwards; }
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-eyebrow { animation: pxp-rise 0.8s var(--t-ease) 0.1s backwards; }
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-h1 { animation: pxp-wipe 1s var(--t-ease) 0.15s backwards; }
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-bio { animation: pxp-rise 0.8s var(--t-ease) 0.35s backwards; }
+.pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-actions { animation: pxp-rise 0.8s var(--t-ease) 0.5s backwards; }
+
+/* Moodboard wall (expressive): covers pinned in the margins, decorative */
+.pxp-wall__slot {
+  position: absolute; display: none; pointer-events: auto;
+  width: calc(clamp(120px, 11vw, 196px) * var(--w, 1));
+  transform: translate3d(calc(var(--mx, 0) * var(--depth, 1) * 16px), calc(var(--my, 0) * var(--depth, 1) * 12px), 0);
+  transition: transform 0.6s var(--t-ease);
+}
+@media (min-width: 1360px) { .pxp-wall__slot { display: block; } }
+@keyframes pxp-wall-in { from { opacity: 0; transform: translateY(-36px) rotate(calc(var(--rot) + 10deg)) scale(0.88); } to { opacity: 1; transform: rotate(var(--rot)); } }
+@keyframes pxp-wall-drift { from { transform: rotate(var(--rot)) translateY(0); } to { transform: rotate(calc(var(--rot) + 1.4deg)) translateY(-10px); } }
+.pxp-wall__tile {
+  position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 3;
+  background: var(--t-card-bg); border: var(--t-bw) solid var(--t-border); border-radius: var(--t-card-r); box-shadow: var(--t-shadow);
+  transform: rotate(var(--rot));
+  animation: pxp-wall-in 0.9s var(--t-ease) var(--delay, 0s) backwards, pxp-wall-drift var(--dur, 10s) ease-in-out calc(var(--delay, 0s) + 0.9s) infinite alternate;
+  transition: scale 0.35s var(--t-ease);
+}
+.pxp-wall__tile .px-cover { inset: calc(var(--t-media-inset) * 0.5); border-radius: var(--t-media-r); }
+.pxp-wall__slot:hover .pxp-wall__tile { animation-play-state: paused; scale: 1.08; z-index: 2; }
