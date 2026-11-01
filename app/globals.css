@@ -253,52 +253,6 @@ a { text-decoration: none; color: inherit; }
 .ProseMirror p  { margin: 0 0 8px; }
 .ProseMirror ul { padding-left: 20px; margin: 0 0 8px; }
 
-/* ── Published portfolio hover effects (CSS-only, no JS in RSC) ──── */
-.px-canvas-case-card:hover {
-  box-shadow: var(--px-shadow-lg);
-  transform: translateY(-2px);
-}
-.px-spotlight-case-card:hover {
-  box-shadow: var(--px-shadow-lg);
-}
-.px-social-link:hover {
-  background: var(--px-surface-2);
-}
-.px-work-link:hover {
-  border-color: var(--px-text-3) !important;
-}
-
-/* ── Tool stack icon cards ───────────────────────────────────────── */
-.px-tool-icon:hover {
-  transform: translateY(-4px) scale(1.07);
-  box-shadow: var(--px-shadow-lg);
-}
-.px-tool-icon:hover .px-tool-name {
-  transform: translateY(0) !important;
-}
-
-/* ── Hero avatar ─────────────────────────────────────────────────── */
-.px-hero-avatar {
-  transition: transform var(--px-dur-base) var(--px-ease-hover);
-  cursor: default;
-}
-.px-hero-avatar:hover {
-  transform: scale(1.08);
-}
-
-/* ── Scroll-reveal ───────────────────────────────────────────────── */
-.px-reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition:
-    opacity  var(--px-dur-reveal) var(--px-ease-hover),
-    transform var(--px-dur-reveal) var(--px-ease-hover);
-}
-.px-reveal.px-revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* ── Work experience description ─────────────────────────────────── */
 .px-exp-description ul {
   list-style: disc;
@@ -440,11 +394,4 @@ a { text-decoration: none; color: inherit; }
     align-items: flex-start !important;
     gap: 16px !important;
   }
-  .px-canvas-hero { padding: 52px 20px 44px !important; }
-  .px-canvas-main  { padding: 32px 16px 60px !important; }
-  .px-canvas-header { padding: 0 16px !important; }
-  .px-canvas-header-links { display: none !important; }
-  .px-cta-grid { grid-template-columns: 1fr !important; }
-  .px-spotlight-card { grid-template-columns: 1fr !important; }
-  .px-spotlight-card-cover { min-height: 160px !important; }
 }

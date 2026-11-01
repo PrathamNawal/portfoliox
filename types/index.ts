@@ -1,3 +1,5 @@
+import type { ThemeId } from '@/lib/themes'
+
 export type Plan = 'free' | 'pro'
 export type Role = 'user' | 'admin'
 export type Discipline = 'ux' | 'graphic' | 'motion' | 'illustration'
@@ -39,6 +41,8 @@ export interface Profile {
   discipline: Discipline | null
   skills: string[]
   layout: Layout
+  /** Published-portfolio theme. Optional until the profile_theme migration is applied. */
+  theme?: ThemeId
   slug: string | null
   plan: Plan
   role: Role

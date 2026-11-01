@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { CanvasLayout } from '@/components/published/CanvasLayout'
 import { SpotlightLayout } from '@/components/published/SpotlightLayout'
+import { resolveTheme } from '@/lib/themes'
 import type { Metadata } from 'next'
 
 // Never cache portfolio pages — data changes in real time (RLS, publish toggles, layout switches)
@@ -77,6 +78,7 @@ export default async function PublishedPortfolio({ params }: Props) {
     { data: testimonials },
     { data: experience },
     { data: tools },
+    themeRes,
   ] = await Promise.all([
     supabase
       .from('case_studies')
@@ -87,12 +89,15 @@ export default async function PublishedPortfolio({ params }: Props) {
     supabase.from('testimonials').select('*').eq('user_id', profile.id).order('display_order'),
     supabase.from('work_experience').select('*').eq('user_id', profile.id).order('display_order'),
     supabase.from('tool_stack').select('*').eq('user_id', profile.id).order('display_order'),
+    // Separate, error-tolerant query: before the profile_theme migration runs the column
+    // does not exist, and that must fall back to the default theme, not take the page down.
+    supabase.from('profiles').select('theme').eq('id', profile.id).maybeSingle(),
   ])
 
   if (csError) console.error('[portfolio] case_studies error:', csError)
 
   const props = {
-    profile,
+    profile: { ...profile, theme: resolveTheme((themeRes.data as { theme?: string } | null)?.theme) },
     caseStudies: caseStudies || [],
     testimonials: testimonials || [],
     experience: experience || [],

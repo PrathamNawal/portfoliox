@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { BlockRenderer } from '@/components/published/BlockRenderer'
 import { NDAGate } from '@/components/published/NDAGate'
 import { AnalyticsTracker } from '@/components/published/AnalyticsTracker'
+import { ThemeScope } from '@/components/published/ThemeScope'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
 
@@ -209,7 +210,7 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
   const overviewData = cs.overview_data
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--px-bg)', color: 'var(--px-text)' }}>
+    <ThemeScope theme={profile.theme}>
       <AnalyticsTracker userId={profile.id} caseStudyId={cs.id} eventType="case_study_view" />
 
       {/* Sticky nav */}
@@ -272,13 +273,13 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
                 </svg>
                 Back to {profile.name}&apos;s portfolio
               </Link>
-              <a href="mailto:?subject=Let's work together" style={{ display: 'inline-flex', alignItems: 'center', height: 36, padding: '0 16px', fontSize: 13, fontWeight: 600, background: '#E53416', color: '#fff', borderRadius: 8, textDecoration: 'none' }}>
+              <a href="mailto:?subject=Let's work together" style={{ display: 'inline-flex', alignItems: 'center', height: 36, padding: '0 16px', fontSize: 13, fontWeight: 600, background: 'var(--px-accent)', color: 'var(--px-accent-fg)', borderRadius: 8, textDecoration: 'none' }}>
                 Get in touch
               </a>
             </div>
           </div>
         </>
       )}
-    </div>
+    </ThemeScope>
   )
 }

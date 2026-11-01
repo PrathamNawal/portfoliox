@@ -15,6 +15,7 @@ create table if not exists profiles (
   discipline    text check (discipline in ('ux','graphic','motion','illustration')),
   skills        text[] not null default '{}',
   layout        text not null default 'canvas' check (layout in ('canvas','spotlight')),
+  theme         text not null default 'light' check (theme in ('light','skeuomorphism','neumorphism','glass','papercut','chrome','inflated','steampunk','isometric','brutalism','minimal','clay','neon','holo','vector','handwritten')),
   slug          text unique check (slug ~ '^[a-z0-9][a-z0-9\-]{1,28}[a-z0-9]$'),
   plan          text not null default 'free' check (plan in ('free','pro')),
   role          text not null default 'user' check (role in ('user','admin')),
