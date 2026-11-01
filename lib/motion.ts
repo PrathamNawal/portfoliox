@@ -8,6 +8,10 @@ export const MOTION_LEVELS = ['still', 'subtle', 'expressive'] as const
 export type MotionLevel = (typeof MOTION_LEVELS)[number]
 export const DEFAULT_MOTION: MotionLevel = 'still'
 
+export function isMotionLevel(value: unknown): value is MotionLevel {
+  return typeof value === 'string' && (MOTION_LEVELS as readonly string[]).includes(value)
+}
+
 export function resolveMotion(value: unknown): MotionLevel {
   return typeof value === 'string' && (MOTION_LEVELS as readonly string[]).includes(value) ? (value as MotionLevel) : DEFAULT_MOTION
 }

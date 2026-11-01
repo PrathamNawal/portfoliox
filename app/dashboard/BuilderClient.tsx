@@ -16,6 +16,8 @@ import { TestimonialsSection } from '@/components/builder/TestimonialsSection'
 import { ToolStackSection } from '@/components/builder/ToolStackSection'
 import { WorkExperienceSection } from '@/components/builder/WorkExperienceSection'
 import { ThemePicker } from '@/components/builder/ThemePicker'
+import { MotionPicker } from '@/components/builder/MotionPicker'
+import type { MotionLevel } from '@/lib/motion'
 import { CoverImage } from '@/components/published/CoverImage'
 import type { ThemeId } from '@/lib/themes'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
@@ -546,8 +548,22 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
   const isMobile = useIsMobile()
   const [profile, setProfile] = useState<Profile | null>(initialProfile)
   const [themeError, setThemeError] = useState<string | null>(null)
+  const [motionError, setMotionError] = useState<string | null>(null)
 
   // Optimistic update; roll back and say so if the save fails.
+  const changeMotion = async (level: MotionLevel) => {
+    const previous = profile?.motion
+    setMotionError(null)
+    setProfile(p => p ? { ...p, motion: level } : p)
+    try {
+      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ motion: level }) })
+      if (!res.ok) throw new Error(String(res.status))
+    } catch {
+      setProfile(p => p ? { ...p, motion: previous } : p)
+      setMotionError('Could not save motion. Try again.')
+    }
+  }
+
   const changeTheme = async (id: ThemeId) => {
     const previous = profile?.theme
     setThemeError(null)
@@ -767,6 +783,12 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
               <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-3)', flexShrink: 0 }}>Theme</span>
               <ThemePicker value={profile?.theme} onChange={changeTheme} />
               {themeError && <span role="alert" style={{ fontSize: 11, color: '#C94040' }}>{themeError}</span>}
+            </div>
+            {/* Motion level — how animated the published portfolio is */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-3)', flexShrink: 0, paddingTop: 6 }}>Motion</span>
+              <MotionPicker value={profile?.motion} onChange={changeMotion} />
+              {motionError && <span role="alert" style={{ fontSize: 11, color: '#C94040', paddingTop: 7 }}>{motionError}</span>}
             </div>
             {/* Social + Resume links */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>

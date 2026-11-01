@@ -1,5 +1,6 @@
 import type { ThemeId } from '@/lib/themes'
 import type { CoverFit } from '@/lib/cover'
+import type { MotionLevel } from '@/lib/motion'
 
 export type Plan = 'free' | 'pro'
 export type Role = 'user' | 'admin'
@@ -44,6 +45,8 @@ export interface Profile {
   layout: Layout
   /** Published-portfolio theme. Optional until the profile_theme migration is applied. */
   theme?: ThemeId
+  /** Motion level. Optional until the profile_motion migration is applied. */
+  motion?: MotionLevel
   slug: string | null
   plan: Plan
   role: Role
