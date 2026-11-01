@@ -1,0 +1,137 @@
+/* Designer scene (components/scene/DesignerScene.tsx)
+   One 18s loop, all timings below are percentages of it:
+     0-34   she writes on the whiteboard (strokes draw one by one)
+     34-46  walks to the desk            46-88  sits and designs on the laptop
+     88-100 walks back; the board is erased (90-97) and the screen clears (90)
+   Base (no animation) = the calm final frame: at the desk, board filled, screen built.
+   Animations only run under prefers-reduced-motion: no-preference, and only while on screen. */
+
+.sc-root {
+  --sc-delay: 0s;
+  --sc-state: paused;
+  --sc-eye: #2bb3a3;
+  --sc-board: #ffffff;
+  --sc-floor: var(--px-border-strong, #c8c5be);
+  --sc-shadow: rgba(40, 30, 80, 0.14);
+  --sc-wood: #d2a679;
+  --sc-wood-dark: #a9784f;
+  --sc-outfit: var(--px-accent, #e53416);
+  --sc-outfit-dark: color-mix(in srgb, var(--sc-outfit) 70%, #1c1840);
+  width: 100%;
+  max-width: 720px;
+}
+.sc-root[data-play="true"] { --sc-state: running; }
+.sc-root svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* base poses: only the seated pose is visible */
+.sc-stand, .sc-walk-r, .sc-walk-l { opacity: 0; }
+.sc-sparkles { opacity: 0; }
+.sc-sticky { opacity: 1; }
+.sc-board path { stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+.sc-cursor { opacity: 0; }
+.sc-ahoge, .sc-head, .sc-eyes, .sc-steam { transform-box: fill-box; }
+.sc-u1, .sc-u2, .sc-u3, .sc-u4, .sc-u5, .sc-u6, .sc-u7, .sc-u8 { transform-box: fill-box; transform-origin: center; }
+.sc-u1, .sc-u3, .sc-u4 { transform-origin: left center; }
+.sc-eyes { transform-origin: center; }
+.sc-ahoge { transform-origin: 0 0; transform-box: view-box; }
+.sc-steam { opacity: 0.6; }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* poses */
+  .sc-stand  { animation: sc-stand 18s linear; }
+  .sc-walk-r { animation: sc-walk-r 18s linear; }
+  .sc-walk-l { animation: sc-walk-l 18s linear; }
+  .sc-sit    { animation: sc-sit 18s linear; }
+  @keyframes sc-stand  { 0%, 33.9% { opacity: 1; } 34%, 99.9% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes sc-walk-r { 0%, 33.9% { opacity: 0; transform: translateX(0); } 34% { opacity: 1; transform: translateX(0); } 46% { opacity: 1; transform: translateX(135px); } 46.1%, 100% { opacity: 0; transform: translateX(135px); } }
+  @keyframes sc-walk-l { 0%, 87.9% { opacity: 0; transform: translateX(135px); } 88% { opacity: 1; transform: translateX(135px); } 99.9% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(0); } }
+  @keyframes sc-sit { 0%, 45.9% { opacity: 0; } 46%, 87.9% { opacity: 1; } 88%, 100% { opacity: 0; } }
+
+  /* writing and typing */
+  .sc-write-arm { animation: sc-write 0.9s ease-in-out alternate; }
+  @keyframes sc-write { from { transform: rotate(-7deg); } to { transform: rotate(8deg); } }
+  .sc-type-a { animation: sc-type 0.34s ease-in-out alternate; }
+  .sc-type-b { animation: sc-type 0.34s ease-in-out alternate-reverse; }
+  @keyframes sc-type { from { transform: rotate(-2.5deg); } to { transform: rotate(3deg); } }
+
+  /* walking */
+  .sc-bob { animation: sc-bob 0.56s ease-in-out; }
+  @keyframes sc-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  .sc-leg-a { animation: sc-swing 0.56s ease-in-out alternate; }
+  .sc-leg-b { animation: sc-swing 0.56s ease-in-out alternate-reverse; }
+  .sc-arm-a { animation: sc-swing-arm 0.56s ease-in-out alternate-reverse; }
+  .sc-arm-b { animation: sc-swing-arm 0.56s ease-in-out alternate; }
+  @keyframes sc-swing { from { transform: rotate(-24deg); } to { transform: rotate(24deg); } }
+  @keyframes sc-swing-arm { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+
+  /* life */
+  .sc-eyes { animation: sc-blink 4.6s ease-in-out; }
+  @keyframes sc-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+  .sc-ahoge { animation: sc-sway 3s ease-in-out alternate; }
+  @keyframes sc-sway { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+  .sc-steam { animation: sc-steam 2.4s ease-in-out; }
+  @keyframes sc-steam { 0% { opacity: 0; transform: translateY(4px); } 50% { opacity: 0.7; } 100% { opacity: 0; transform: translateY(-6px); } }
+
+  /* whiteboard: strokes draw in turn, then the board is erased */
+  .sc-board { animation: sc-board 18s linear; }
+  @keyframes sc-board { 0%, 89% { opacity: 1; } 96% { opacity: 0; } 99.9% { opacity: 0; } 100% { opacity: 1; } }
+  .sc-sticky { animation: sc-sticky 18s linear; }
+  @keyframes sc-sticky { 0%, 29.9% { opacity: 0; } 30.5%, 100% { opacity: 1; } }
+
+  .sc-b1 { animation: sc-draw-b1 18s linear; }
+  @keyframes sc-draw-b1 { 0%, 1% { stroke-dashoffset: 1.02; } 5%, 100% { stroke-dashoffset: 0; } }
+  .sc-b2 { animation: sc-draw-b2 18s linear; }
+  @keyframes sc-draw-b2 { 0%, 5% { stroke-dashoffset: 1.02; } 9%, 100% { stroke-dashoffset: 0; } }
+  .sc-b3 { animation: sc-draw-b3 18s linear; }
+  @keyframes sc-draw-b3 { 0%, 9% { stroke-dashoffset: 1.02; } 11%, 100% { stroke-dashoffset: 0; } }
+  .sc-b4 { animation: sc-draw-b4 18s linear; }
+  @keyframes sc-draw-b4 { 0%, 11% { stroke-dashoffset: 1.02; } 15%, 100% { stroke-dashoffset: 0; } }
+  .sc-b5 { animation: sc-draw-b5 18s linear; }
+  @keyframes sc-draw-b5 { 0%, 15% { stroke-dashoffset: 1.02; } 17%, 100% { stroke-dashoffset: 0; } }
+  .sc-b6 { animation: sc-draw-b6 18s linear; }
+  @keyframes sc-draw-b6 { 0%, 17% { stroke-dashoffset: 1.02; } 21%, 100% { stroke-dashoffset: 0; } }
+  .sc-b7 { animation: sc-draw-b7 18s linear; }
+  @keyframes sc-draw-b7 { 0%, 21% { stroke-dashoffset: 1.02; } 23%, 100% { stroke-dashoffset: 0; } }
+  .sc-b8 { animation: sc-draw-b8 18s linear; }
+  @keyframes sc-draw-b8 { 0%, 23% { stroke-dashoffset: 1.02; } 27%, 100% { stroke-dashoffset: 0; } }
+  .sc-b9 { animation: sc-draw-b9 18s linear; }
+  @keyframes sc-draw-b9 { 0%, 27% { stroke-dashoffset: 1.02; } 31%, 100% { stroke-dashoffset: 0; } }
+  .sc-b10 { animation: sc-draw-b10 18s linear; }
+  @keyframes sc-draw-b10 { 0%, 31% { stroke-dashoffset: 1.02; } 33%, 100% { stroke-dashoffset: 0; } }
+
+  /* laptop screen: the UI builds up, then clears */
+  .sc-ui { animation: sc-ui 18s linear; }
+  @keyframes sc-ui { 0%, 45.9% { opacity: 0; } 46%, 89.9% { opacity: 1; } 90%, 100% { opacity: 0; } }
+  .sc-u1 { animation: sc-pop-u1 18s ease-out; }
+  @keyframes sc-pop-u1 { 0%, 48% { opacity: 0; transform: scaleX(0.1); } 51%, 100% { opacity: 1; transform: none; } }
+  .sc-u2 { animation: sc-pop-u2 18s ease-out; }
+  @keyframes sc-pop-u2 { 0%, 51% { opacity: 0; transform: scale(0.6); } 54%, 100% { opacity: 1; transform: none; } }
+  .sc-u3 { animation: sc-pop-u3 18s ease-out; }
+  @keyframes sc-pop-u3 { 0%, 54% { opacity: 0; transform: scaleX(0.1); } 56%, 100% { opacity: 1; transform: none; } }
+  .sc-u4 { animation: sc-pop-u4 18s ease-out; }
+  @keyframes sc-pop-u4 { 0%, 56% { opacity: 0; transform: scaleX(0.1); } 58%, 100% { opacity: 1; transform: none; } }
+  .sc-u5 { animation: sc-pop-u5 18s ease-out; }
+  @keyframes sc-pop-u5 { 0%, 58% { opacity: 0; transform: scale(0.6); } 61%, 100% { opacity: 1; transform: none; } }
+  .sc-u6 { animation: sc-pop-u6 18s ease-out; }
+  @keyframes sc-pop-u6 { 0%, 62% { opacity: 0; transform: scale(0.6); } 64%, 100% { opacity: 1; transform: none; } }
+  .sc-u7 { animation: sc-pop-u7 18s ease-out; }
+  @keyframes sc-pop-u7 { 0%, 64% { opacity: 0; transform: scale(0.6); } 66%, 100% { opacity: 1; transform: none; } }
+  .sc-u8 { animation: sc-pop-u8 18s ease-out; }
+  @keyframes sc-pop-u8 { 0%, 66% { opacity: 0; transform: scale(0.6); } 68%, 100% { opacity: 1; transform: none; } }
+  .sc-cursor { animation: sc-cursor 18s linear; }
+  @keyframes sc-cursor { 0%, 47.9% { opacity: 0; transform: translate(0, 0); } 48% { opacity: 1; transform: translate(0, 0); } 53% { transform: translate(40px, -8px); } 58% { transform: translate(44px, 22px); } 63% { transform: translate(-6px, 36px); } 68% { transform: translate(40px, 36px); } 72%, 89.9% { opacity: 1; transform: translate(70px, 14px); } 90%, 100% { opacity: 0; transform: translate(70px, 14px); } }
+
+  /* sparkles when the design lands */
+  .sc-sparkles { animation: sc-sparkles 18s linear; }
+  @keyframes sc-sparkles { 0%, 77.9% { opacity: 0; } 78%, 87% { opacity: 1; } 88%, 100% { opacity: 0; } }
+  .sc-sp1, .sc-sp2, .sc-sp3 { transform-box: fill-box; transform-origin: center; }
+  .sc-sp1 { animation: sc-twinkle 1.1s ease-in-out; }
+  .sc-sp2 { animation: sc-twinkle 1.1s ease-in-out 0.25s; }
+  .sc-sp3 { animation: sc-twinkle 1.1s ease-in-out 0.5s; }
+  @keyframes sc-twinkle { 0%, 100% { transform: scale(0.4) rotate(0); } 50% { transform: scale(1.1) rotate(25deg); } }
+
+  /* shared playback settings: must stay AFTER every `animation:` shorthand above (shorthand resets them) */
+  .sc-root * { animation-play-state: var(--sc-state); animation-delay: var(--sc-delay); animation-iteration-count: infinite; animation-fill-mode: both; }
+  .sc-root[data-frozen="true"] * { animation-play-state: paused; }
+}
