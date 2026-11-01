@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { AnalyticsTracker } from './AnalyticsTracker'
 import { ScrollReveal } from './ScrollReveal'
 import { Marquee } from './Marquee'
@@ -7,6 +8,9 @@ import { CoverImage } from './CoverImage'
 import { HeroMotion } from './HeroMotion'
 import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
+
+// The designer scene (SVG + a large generated stylesheet) is only loaded for portfolios at Expressive motion.
+const DesignerScene = dynamic(() => import('@/components/scene/DesignerScene').then(m => m.DesignerScene))
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const TOOL_COLORS: Record<string, string> = {
@@ -100,6 +104,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           {profile.resume_url && <a href={profile.resume_url} target="_blank" rel="noreferrer" className="pxp-btn pxp-btn--ghost">Resume ↗</a>}
           <a href="mailto:?subject=Hello" className="pxp-btn">Get in touch</a>
         </div>
+        {motion === 'expressive' && <div className="pxp-scene-wrap"><DesignerScene /></div>}
       </section>
 
       <main className="pxp-main">

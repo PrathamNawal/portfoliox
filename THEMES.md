@@ -53,3 +53,15 @@ The public pages read `theme` in a separate, error-tolerant query and fall back 
 - The default `light` theme fails WCAG AA for secondary text (about 2.7:1 for `--px-text-3`) and for white text on the `#e53416` accent (4.3:1). The audit lists these as known baseline and does not fail on them, because changing `light` is a product decision.
 - The audit checks tokens with flat stand-in colours. Gradient and translucent surfaces use a worst-case colour chosen by hand.
 - Not yet checked: Safari and Firefox rendering, a real device for blur and animation cost.
+
+## Designer scene (Expressive motion)
+
+At **Expressive**, a 20 second looping illustration sits under the hero buttons: a chibi-style character sketches a flow on a whiteboard, has an idea, walks to her desk, designs a screen on her laptop, cheers, and walks back.
+
+- Component: `components/scene/DesignerScene.tsx` (inline SVG). Its stylesheet `designer-scene.css` is generated, so edit `scripts/gen-designer-scene-css.py` (the timeline: one skeleton, per-joint keyframes) and run `python3 scripts/gen-designer-scene-css.py`.
+- Outfit and accents follow the theme accent colour, so it fits every theme.
+- It plays only while on screen. With reduced motion it shows one still frame (seated at the desk, board filled).
+- It is loaded with `next/dynamic` and only rendered at Expressive. The stylesheet is a separate chunk (about 65 KB, 5.5 KB gzipped).
+- Dev only: `/dev/scene?theme=<id>&freeze=0..1` pins a moment of the loop; add `&clean` for just the scene.
+- The scene adds about 400px to the hero, so at Expressive the work starts lower on the page than at Subtle.
+
