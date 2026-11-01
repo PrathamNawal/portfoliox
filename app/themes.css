@@ -188,6 +188,8 @@
   --t-linkcard-hover-t: none;
   --t-divider: 1px solid var(--px-border);
   --t-navlink-hover: var(--px-surface-2);
+  --t-metric-bg: linear-gradient(transparent 58%, color-mix(in srgb, var(--px-accent) 26%, transparent) 58%);
+  --t-metric-weight: 700;
 
   /* marquee edge fade (glass sets none: a mask would defeat backdrop blur) */
   --t-mask: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
@@ -401,18 +403,35 @@
 .pxp-quote__name { margin-bottom: 3px; font-size: 14px; font-weight: 700; letter-spacing: -0.01em; color: var(--t-on-surface); }
 .pxp-quote__role { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t-on-surface-3); }
 
-/* experience (sits on the page background, so uses on-page tokens) */
-.pxp-exp-list { display: flex; flex-direction: column; gap: 40px; }
-.pxp-exp-company { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-.pxp-exp-company__name { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: var(--px-text); }
-.pxp-exp-roles { display: flex; flex-direction: column; gap: 24px; padding-left: 8px; }
-.pxp-exp-role { display: flex; gap: 16px; }
-.pxp-exp-dot { flex-shrink: 0; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--px-border-strong); }
-.pxp-exp-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; }
-.pxp-exp-head--bare { margin-bottom: 0; }
-.pxp-exp-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; color: var(--px-text); }
-.pxp-exp-when { font-size: 13px; color: var(--px-text-3); }
-.pxp-exp-desc { font-size: 14px; line-height: 1.7; color: var(--px-text-2); }
+/* experience: dates in a left rail, role + bullets on a timeline (sits on the page background: on-page tokens) */
+.pxp-exp-list { display: flex; flex-direction: column; gap: 56px; }
+.pxp-exp-company { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.pxp-exp-company__name { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--px-text); }
+.pxp-exp-company__tenure { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--px-text-2); }
+.pxp-exp-company__tenure::before { content: '\00b7'; margin-right: 8px; }
+.pxp-exp-roles { display: flex; flex-direction: column; }
+.pxp-exp-role { display: grid; grid-template-columns: 190px minmax(0, 600px); column-gap: 32px; }
+.pxp-exp-rail { padding-top: 3px; text-align: right; }
+.pxp-exp-range { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--px-text); }
+.pxp-exp-dur { margin-top: 2px; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--px-text-2); }
+.pxp-exp-content { position: relative; padding: 0 0 36px 28px; border-left: 1px solid var(--px-border-strong); }
+.pxp-exp-role:last-child .pxp-exp-content { padding-bottom: 0; }
+.pxp-exp-content::before { content: ''; position: absolute; left: -5px; top: 7px; width: 9px; height: 9px; border-radius: 50%; background: var(--px-text-2); }
+.pxp-exp-title { margin: 0 0 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; color: var(--px-text); }
+.pxp-exp-desc { font-size: 15px; line-height: 1.65; color: var(--px-text-2); }
+.pxp-exp-desc p { margin: 0 0 8px; }
+.pxp-exp-desc ul { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.pxp-exp-desc li { position: relative; padding-left: 18px; }
+.pxp-exp-desc li::before { content: ''; position: absolute; left: 0; top: 0.8em; width: 8px; height: 1.5px; background: var(--px-text-3); }
+.pxp-exp-desc strong, .pxp-exp-desc b { font-weight: 600; color: var(--px-text); }
+.pxp-metric { padding: 0 1px; border-radius: 2px; background: var(--t-metric-bg); color: var(--px-text); font-weight: var(--t-metric-weight); font-variant-numeric: tabular-nums; }
+.pxp-exp-more { margin-top: 10px; }
+.pxp-exp-more > .pxp-exp-desc { margin-top: 10px; }
+.pxp-exp-more summary { display: inline-flex; list-style: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--px-text); border-bottom: 1.5px solid var(--px-accent); }
+.pxp-exp-more summary::-webkit-details-marker { display: none; }
+.pxp-exp-more__hide { display: none; }
+.pxp-exp-more[open] .pxp-exp-more__show { display: none; }
+.pxp-exp-more[open] .pxp-exp-more__hide { display: inline; }
 .pxp-logo { position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 48px; height: 48px; overflow: hidden; background: var(--px-surface-2); border: 1px solid var(--px-border); border-radius: var(--px-r); }
 .pxp-logo__initial { position: absolute; font-size: 20px; font-weight: 800; }
 .pxp-logo__img { position: relative; z-index: 1; width: 32px; height: 32px; object-fit: contain; }
@@ -494,6 +513,9 @@
   .pxp-hero { padding: 52px 20px 44px; }
   .pxp-main { padding: 32px 16px 60px; }
   .pxp-cta__grid { grid-template-columns: 1fr; }
+  .pxp-exp-role { grid-template-columns: 1fr; }
+  .pxp-exp-rail { display: flex; gap: 8px; align-items: baseline; margin-bottom: 8px; padding: 0 0 0 28px; text-align: left; }
+  .pxp-exp-dur { margin-top: 0; }
   .pxp-marquee-wrap--bleed { margin-left: -16px; margin-right: -16px; }
   .pxp-spot-card { grid-template-columns: 1fr; }
   .pxp-spot-card__cover { min-height: 160px; }
@@ -537,6 +559,7 @@
   --t-tile-bg: transparent; --t-tile-bd: transparent; --t-tile-shadow: none; --t-tile-shadow-hover: none; --t-tile-hover-t: none; --t-tile-img-filter: grayscale(1) opacity(0.75);
   --t-quote-bg-0: transparent; --t-quote-bg-1: transparent; --t-linkcard-hover-bd: #111111;
   --t-navlink-hover: #f5f5f5;
+  --t-metric-bg: none; --t-metric-weight: 600;
 }
 .pxp[data-pxtheme="minimal"] .pxp-card { border: 0; }
 .pxp[data-pxtheme="minimal"] .pxp-card:hover { opacity: 0.82; }
@@ -892,6 +915,7 @@
   --t-quote-bg-0: #ffe500; --t-quote-bg-1: #8fb4ff;
   --t-linkcard-r: 0px; --t-linkcard-shadow: 6px 6px 0 #000; --t-linkcard-hover-bd: #000; --t-linkcard-hover-t: translate(-3px, -3px);
   --t-divider: 4px solid #000; --t-navlink-hover: #ffe500;
+  --t-metric-bg: #ffe500; --t-metric-weight: 800;
 }
 .pxp[data-pxtheme="brutalism"] .pxp-h1 { display: inline-block; padding: .06em .28em; background: #fff; border: 4px solid #000; box-shadow: 10px 10px 0 #000; line-height: .95; }
 .pxp[data-pxtheme="brutalism"] .pxp-linkcard:hover { box-shadow: 9px 9px 0 #000; }

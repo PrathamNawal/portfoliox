@@ -51,3 +51,72 @@ function compare(a: Sortable, b: Sortable): number {
 export function sortExperience<T extends Sortable>(items: readonly T[] | null | undefined): T[] {
   return [...(items ?? [])].sort(compare)
 }
+
+// ── Display helpers (readability of the experience section) ──────────────────
+
+type Span = Pick<WorkExperience, 'is_current' | 'start_month' | 'end_month'>
+
+/** Whole months a role lasted; current roles run to `now`. Unreadable start = 0. */
+export function durationMonths(e: Span, now: Date = new Date()): number {
+  const start = monthIndex(e.start_month)
+  if (start === null) return 0
+  const end = e.is_current || !e.end_month ? now.getFullYear() * 12 + now.getMonth() : (monthIndex(e.end_month) ?? start)
+  return Math.max(0, end - start)
+}
+
+/** 7 -> "7 mo", 12 -> "1 yr", 19 -> "1 yr 7 mo". Never shows "0 mo". */
+export function formatDuration(months: number): string {
+  const total = Math.max(1, months)
+  const y = Math.floor(total / 12), m = total % 12
+  if (y === 0) return `${m} mo`
+  if (m === 0) return `${y} yr${y !== 1 ? 's' : ''}`
+  return `${y} yr${y !== 1 ? 's' : ''} ${m} mo`
+}
+
+/** "Jul 2025 – Mar 2026" or "Jan 2025 – Present". */
+export function formatRange(e: Span): string {
+  return `${e.start_month} – ${e.is_current ? 'Present' : e.end_month || e.start_month}`
+}
+
+const UNIT = String.raw`(?:days?|weeks?|hours?|hrs?|minutes?|mins?)`
+const METRIC = new RegExp(
+  [
+    String.raw`[₹$€£]\s?\d[\d,]*(?:\.\d+)?\s?(?:[KMB]|lakh|crore|Cr|L)?\+?`, // ₹5L, $2.5M
+    String.raw`\d+(?:\.\d+)?\s?%`, // 30%
+    String.raw`\d+\s+${UNIT}\s+to\s+\d+\s+${UNIT}`, // 7 days to 2 days
+    String.raw`\d+(?:[.,]\d+)?\s?[KMB]\+?(?![A-Za-z0-9])`, // 260K+, 1.2M
+    String.raw`\d+(?:\.\d+)?x(?![A-Za-z0-9])`, // 3x
+    String.raw`\d[\d,]*\+`, // 750+, 8+
+  ].join('|'),
+  'gi',
+)
+
+/**
+ * Wraps numbers that read as impact (30%, 260K+, 7 days to 2 days, ₹5L, 3x) in <mark class="pxp-metric">.
+ * Only text is touched: tags, attributes and HTML entities are left exactly as they were.
+ */
+export function highlightMetrics(html: string): string {
+  return html
+    .split(/(<[^>]*>)/)
+    .map((part, i) => {
+      if (i % 2 === 1) return part // a tag
+      return part
+        .split(/(&#?\w+;)/)
+        .map((seg, j) => (j % 2 === 1 ? seg : seg.replace(METRIC, match => `<mark class="pxp-metric">${match}</mark>`)))
+        .join('')
+    })
+    .join('')
+}
+
+/**
+ * For a description that is one plain bullet list, split it after `limit` bullets so the rest can
+ * sit inside a <details>. Anything else (text, nested lists, no list) returns null: render as is.
+ */
+export function splitBullets(html: string, limit = 3): { head: string; rest: string; restCount: number } | null {
+  const outer = html.trim().match(/^<ul\b[^>]*>([\s\S]*)<\/ul>$/i)
+  if (!outer || /<ul\b/i.test(outer[1])) return null
+  const items = outer[1].match(/<li\b[^>]*>[\s\S]*?<\/li>/gi)
+  if (!items || outer[1].replace(/<li\b[^>]*>[\s\S]*?<\/li>/gi, '').trim() !== '') return null
+  if (items.length <= limit) return null
+  return { head: `<ul>${items.slice(0, limit).join('')}</ul>`, rest: `<ul>${items.slice(limit).join('')}</ul>`, restCount: items.length - limit }
+}
