@@ -16,6 +16,7 @@ import { TestimonialsSection } from '@/components/builder/TestimonialsSection'
 import { ToolStackSection } from '@/components/builder/ToolStackSection'
 import { WorkExperienceSection } from '@/components/builder/WorkExperienceSection'
 import { ThemePicker } from '@/components/builder/ThemePicker'
+import { CoverImage } from '@/components/published/CoverImage'
 import type { ThemeId } from '@/lib/themes'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
@@ -328,7 +329,7 @@ function CaseStudyCard({
   const [coverHover, setCoverHover] = useState(false)
   const [toggling, setToggling] = useState(false)
   const grad = CASE_GRADS[cs.id.charCodeAt(0) % CASE_GRADS.length]
-  const bg = cs.cover_image_url ? `url(${cs.cover_image_url}) center/cover` : grad
+  const bg = cs.cover_image_url ? undefined : grad
   const discipline = cs.discipline || 'ux'
   const disciplineLabel = DISCIPLINE_LABELS[discipline] || discipline
   const disciplineColor = DISCIPLINE_COLORS[discipline] || DISCIPLINE_COLORS.custom
@@ -373,6 +374,7 @@ function CaseStudyCard({
           zIndex: 1,
         }}
       >
+        {cs.cover_image_url && <CoverImage url={cs.cover_image_url} fit={cs.cover_fit} label="" />}
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(160deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.32) 100%)',

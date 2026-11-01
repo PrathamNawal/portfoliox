@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
+import { isCoverFit } from '@/lib/cover'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -30,7 +31,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const allowed = ['title','problem','what_i_did','outcome_notes','cover_image_url',
       'blocks','section_labels','metadata','nda_enabled','nda_password_hash',
       'published','display_order','ai_generated',
-      'sections','overview_data','discipline']
+      'sections','overview_data','discipline','cover_fit']
+    if ('cover_fit' in body && !isCoverFit(body.cover_fit)) {
+      return NextResponse.json({ error: 'Unknown cover_fit' }, { status: 400 })
+    }
     const update: Record<string, unknown> = {}
     for (const key of allowed) {
       if (key in body) update[key] = body[key]

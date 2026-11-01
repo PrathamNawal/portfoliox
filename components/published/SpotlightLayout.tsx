@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { AnalyticsTracker } from './AnalyticsTracker'
 import { ThemeScope } from './ThemeScope'
+import { CoverImage } from './CoverImage'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const GRAD = [
@@ -98,12 +99,12 @@ export function SpotlightLayout({ profile, caseStudies, testimonials, tools, tra
 }
 
 function SpotlightCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; slug: string }) {
-  const bg = cs.cover_image_url ? `url(${cs.cover_image_url})` : GRAD[index % GRAD.length]
   const meta = (cs.metadata || {}) as Record<string, string>
 
   return (
     <Link href={`/${slug}/case/${cs.id}`} className="pxp-spot-card">
-      <div className="pxp-spot-card__cover" style={{ backgroundImage: bg }}>
+      <div className="pxp-spot-card__cover" style={cs.cover_image_url ? undefined : { backgroundImage: GRAD[index % GRAD.length] }}>
+        {cs.cover_image_url && <CoverImage url={cs.cover_image_url} fit={cs.cover_fit} label={`${cs.title} cover`} />}
         {cs.nda_enabled && (
           <div className="pxp-card__nda">
             <svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="20" height="20" aria-hidden="true"><rect x="4" y="9.5" width="12" height="8.5" rx="2"/><path d="M7.5 9.5V7a2.5 2.5 0 0 1 5 0v2.5"/></svg>

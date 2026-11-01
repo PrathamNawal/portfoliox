@@ -3,6 +3,7 @@ import { AnalyticsTracker } from './AnalyticsTracker'
 import { ScrollReveal } from './ScrollReveal'
 import { Marquee } from './Marquee'
 import { ThemeScope } from './ThemeScope'
+import { CoverImage } from './CoverImage'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const TOOL_COLORS: Record<string, string> = {
@@ -240,7 +241,7 @@ function CanvasCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; slu
     <Link href={`/${slug}/case/${cs.id}`} className="pxp-card" data-i={index % 4}>
       <div className="pxp-card__media">
         {cs.cover_image_url ? (
-          <div className="pxp-card__cover" role="img" aria-label={`${cs.title} cover`} style={{ backgroundImage: `url(${cs.cover_image_url})` }} />
+          <CoverImage url={cs.cover_image_url} fit={cs.cover_fit} label={`${cs.title} cover`} />
         ) : (
           <div className="pxp-card__ph" style={{ background: grad }}>
             <span className="pxp-card__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
