@@ -9,7 +9,7 @@ import { THEMES, resolveTheme } from '@/lib/themes'
 //   /dev/scene?theme=papercut&freeze=0.55 pinned at 55% of the 18s loop (typing)
 export const dynamic = 'force-dynamic'
 
-interface Props { searchParams: Promise<{ theme?: string; freeze?: string }> }
+interface Props { searchParams: Promise<{ theme?: string; freeze?: string; clean?: string }> }
 
 const MOMENTS: { at: number; label: string }[] = [
   { at: 0.1, label: 'writing' }, { at: 0.2, label: 'bulb' }, { at: 0.4, label: 'walking' }, { at: 0.55, label: 'typing' }, { at: 0.8, label: 'sparkle' }, { at: 0.93, label: 'return' },
@@ -17,9 +17,13 @@ const MOMENTS: { at: number; label: string }[] = [
 
 export default async function ScenePage({ searchParams }: Props) {
   if (process.env.NODE_ENV === 'production') notFound()
-  const { theme, freeze } = await searchParams
+  const { theme, freeze, clean } = await searchParams
   const id = resolveTheme(theme)
   const f = freeze === undefined ? undefined : Math.min(1, Math.max(0, Number(freeze) || 0))
+  if (clean !== undefined) {
+    // just the scene, for rendering frames (GIF) and screenshots
+    return <ThemeScope theme={id}><div style={{ padding: '8px 14px' }}><DesignerScene freeze={f} /></div></ThemeScope>
+  }
   return (
     <ThemeScope theme={id}>
       <main style={{ maxWidth: 820, margin: '0 auto', padding: '48px 24px 120px' }}>
