@@ -2,7 +2,6 @@
 //   still      no motion beyond hover states: today's behaviour
 //   subtle     intro choreography, headline wipe, colour-from-work glow, tighter hero
 //   expressive subtle + moodboard wall of covers in the hero margins (wide screens)
-//              + the looping designer-at-work illustration under the hero buttons
 // Styles: "Motion" section of app/themes.css, keyed on .pxp[data-motion].
 
 export const MOTION_LEVELS = ['still', 'subtle', 'expressive'] as const

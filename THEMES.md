@@ -54,14 +54,14 @@ The public pages read `theme` in a separate, error-tolerant query and fall back 
 - The audit checks tokens with flat stand-in colours. Gradient and translucent surfaces use a worst-case colour chosen by hand.
 - Not yet checked: Safari and Firefox rendering, a real device for blur and animation cost.
 
-## Designer scene (Expressive motion)
+## Designer scene (own on/off switch)
 
-At **Expressive**, a 20 second looping illustration sits under the hero buttons: a chibi-style character sketches a flow on a whiteboard, has an idea, walks to her desk, designs a screen on her laptop, cheers, and walks back.
+A 20 second looping illustration sits under the hero buttons when the owner turns on **Designer illustration** (dashboard, under the Motion row; Canvas layout only; stored in `profiles.scene`). It animates unless Motion is **Still**, which shows one still frame (the moment seated at the desk, board filled). Published pages read `scene` in a tolerant query; if the column is missing they fall back to the old rule (shown at Expressive). The illustration: a chibi-style character sketches a flow on a whiteboard, has an idea, walks to her desk, designs a screen on her laptop, cheers, and walks back.
 
 - Component: `components/scene/DesignerScene.tsx` (inline SVG). Its stylesheet `designer-scene.css` is generated, so edit `scripts/gen-designer-scene-css.py` (the timeline: one skeleton, per-joint keyframes) and run `python3 scripts/gen-designer-scene-css.py`.
 - Outfit and accents follow the theme accent colour, so it fits every theme.
 - It plays only while on screen. With reduced motion it shows one still frame (seated at the desk, board filled).
-- It is loaded with `next/dynamic` and only rendered at Expressive. The stylesheet is a separate chunk (about 65 KB, 5.5 KB gzipped).
+- It is loaded with `next/dynamic` and only rendered when the switch is on. The stylesheet is a separate chunk (about 65 KB, 5.5 KB gzipped).
 - Dev only: `/dev/scene?theme=<id>&freeze=0..1` pins a moment of the loop; add `&clean` for just the scene.
-- The scene adds about 400px to the hero, so at Expressive the work starts lower on the page than at Subtle.
+- The scene adds about 400px to the hero, so with it on the work starts lower on the page.
 

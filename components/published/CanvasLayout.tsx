@@ -9,7 +9,9 @@ import { HeroMotion } from './HeroMotion'
 import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
 
-// The designer scene (SVG + a large generated stylesheet) is only loaded for portfolios at Expressive motion.
+// The designer scene (SVG + a large generated stylesheet) is only loaded for portfolios that turn it on.
+// Moment of the loop shown when Motion is Still: seated at the desk, board filled, screen built.
+const STILL_FRAME = 0.7
 const DesignerScene = dynamic(() => import('@/components/scene/DesignerScene').then(m => m.DesignerScene))
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
@@ -58,9 +60,11 @@ interface Props {
   trackViews?: boolean
   /** Motion level; 'still' (default) leaves the page exactly as before. */
   motion?: MotionLevel
+  /** Show the designer illustration under the hero buttons. At motion 'still' it is one still frame. */
+  scene?: boolean
 }
 
-export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true, motion = 'still' }: Props) {
+export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true, motion = 'still', scene = false }: Props) {
   const wallCovers = caseStudies
     .filter(cs => cs.cover_image_url && !cs.nda_enabled)
     .map(cs => ({ id: cs.id!, title: cs.title || '', url: cs.cover_image_url!, fit: cs.cover_fit }))
@@ -104,7 +108,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           {profile.resume_url && <a href={profile.resume_url} target="_blank" rel="noreferrer" className="pxp-btn pxp-btn--ghost">Resume ↗</a>}
           <a href="mailto:?subject=Hello" className="pxp-btn">Get in touch</a>
         </div>
-        {motion === 'expressive' && <div className="pxp-scene-wrap"><DesignerScene /></div>}
+        {scene && <div className="pxp-scene-wrap"><DesignerScene freeze={motion === 'still' ? STILL_FRAME : undefined} /></div>}
       </section>
 
       <main className="pxp-main">

@@ -14,6 +14,7 @@ create table if not exists profiles (
   avatar_url    text,
   discipline    text check (discipline in ('ux','graphic','motion','illustration')),
   skills        text[] not null default '{}',
+  scene         boolean not null default false,
   motion        text not null default 'still' check (motion in ('still','subtle','expressive')),
   layout        text not null default 'canvas' check (layout in ('canvas','spotlight')),
   theme         text not null default 'light' check (theme in ('light','skeuomorphism','neumorphism','glass','papercut','chrome','inflated','steampunk','isometric','brutalism','minimal','clay','neon','holo','vector','handwritten')),

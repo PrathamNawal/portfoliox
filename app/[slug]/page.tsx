@@ -84,6 +84,7 @@ export default async function PublishedPortfolio({ params }: Props) {
     themeRes,
     fitRes,
     motionRes,
+    sceneRes,
   ] = await Promise.all([
     supabase
       .from('case_studies')
@@ -101,6 +102,8 @@ export default async function PublishedPortfolio({ params }: Props) {
     supabase.from('case_studies').select('id, cover_fit').eq('user_id', profile.id).eq('published', true),
     // And for motion: a missing column falls back to 'still'.
     supabase.from('profiles').select('motion').eq('id', profile.id).maybeSingle(),
+    // And for scene: if the column is missing, keep the old rule (the scene showed at Expressive).
+    supabase.from('profiles').select('scene').eq('id', profile.id).maybeSingle(),
   ])
 
   if (csError) console.error('[portfolio] case_studies error:', csError)
@@ -109,8 +112,12 @@ export default async function PublishedPortfolio({ params }: Props) {
 
   const motion = resolveMotion((motionRes.data as { motion?: string } | null)?.motion)
 
+  const sceneValue = (sceneRes.data as { scene?: boolean } | null)?.scene
+  const scene = typeof sceneValue === 'boolean' ? sceneValue : motion === 'expressive'
+
   const props = {
     motion,
+    scene,
     profile: { ...profile, theme: resolveTheme((themeRes.data as { theme?: string } | null)?.theme) },
     caseStudies: (caseStudies || []).map(cs => ({ ...cs, cover_fit: resolveCoverFit(fitById.get(cs.id)) })),
     testimonials: testimonials || [],
