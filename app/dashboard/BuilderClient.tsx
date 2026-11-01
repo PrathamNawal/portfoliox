@@ -15,6 +15,8 @@ import { Icon } from '@/components/ui/Icon'
 import { TestimonialsSection } from '@/components/builder/TestimonialsSection'
 import { ToolStackSection } from '@/components/builder/ToolStackSection'
 import { WorkExperienceSection } from '@/components/builder/WorkExperienceSection'
+import { ThemePicker } from '@/components/builder/ThemePicker'
+import type { ThemeId } from '@/lib/themes'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const CASE_GRADS = [
@@ -541,6 +543,21 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
   const router = useRouter()
   const isMobile = useIsMobile()
   const [profile, setProfile] = useState<Profile | null>(initialProfile)
+  const [themeError, setThemeError] = useState<string | null>(null)
+
+  // Optimistic update; roll back and say so if the save fails.
+  const changeTheme = async (id: ThemeId) => {
+    const previous = profile?.theme
+    setThemeError(null)
+    setProfile(p => p ? { ...p, theme: id } : p)
+    try {
+      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: id }) })
+      if (!res.ok) throw new Error(String(res.status))
+    } catch {
+      setProfile(p => p ? { ...p, theme: previous } : p)
+      setThemeError('Could not save theme. Try again.')
+    }
+  }
   const [cases, setCases] = useState<CaseStudy[]>(initialCaseStudies)
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials)
   const [experience, setExperience] = useState<WorkExperience[]>(initialExperience)
@@ -742,6 +759,12 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                   Preview ↗
                 </a>
               )}
+            </div>
+            {/* Theme picker — persisted on the profile, rendered on the published pages */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-3)', flexShrink: 0 }}>Theme</span>
+              <ThemePicker value={profile?.theme} onChange={changeTheme} />
+              {themeError && <span role="alert" style={{ fontSize: 11, color: '#C94040' }}>{themeError}</span>}
             </div>
             {/* Social + Resume links */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>

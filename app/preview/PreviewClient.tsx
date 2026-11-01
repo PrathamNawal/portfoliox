@@ -7,6 +7,8 @@ import { CanvasLayout } from '@/components/published/CanvasLayout'
 import { SpotlightLayout } from '@/components/published/SpotlightLayout'
 import { Btn } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import { ThemePicker } from '@/components/builder/ThemePicker'
+import { resolveTheme, type ThemeId } from '@/lib/themes'
 import type { Profile, CaseStudy, Testimonial, ToolStackItem, WorkExperience } from '@/types'
 
 interface Props {
@@ -20,8 +22,11 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials }: Pro
   const router = useRouter()
   const [layout, setLayout] = useState<'canvas' | 'spotlight'>(profile.layout as 'canvas' | 'spotlight')
 
+  const [theme, setTheme] = useState<ThemeId>(resolveTheme(profile.theme))
+
   const sharedProps = {
-    profile,
+    profile: { ...profile, theme },
+    trackViews: false,
     caseStudies,
     tools,
     testimonials,
@@ -45,6 +50,7 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials }: Pro
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <ThemePicker value={theme} onChange={setTheme} />
           {profile.slug && (
             <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>/p/{profile.slug}</span>
           )}

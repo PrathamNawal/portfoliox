@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
+import { isThemeId } from '@/lib/themes'
 
 export async function GET() {
   try {
@@ -21,7 +22,10 @@ export async function PATCH(req: NextRequest) {
   try {
     const { userId, supabase } = await requireAuthContext()
     const body = await req.json()
-    const allowed = ['name','bio','avatar_url','discipline','skills','layout','social_links','resume_url']
+    const allowed = ['name','bio','avatar_url','discipline','skills','layout','theme','social_links','resume_url']
+    if ('theme' in body && !isThemeId(body.theme)) {
+      return NextResponse.json({ error: 'Unknown theme' }, { status: 400 })
+    }
     const update: Record<string, unknown> = {}
     for (const key of allowed) {
       if (key in body) update[key] = body[key]

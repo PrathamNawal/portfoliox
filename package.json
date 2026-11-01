@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "audit:themes": "node scripts/audit-theme-contrast.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
