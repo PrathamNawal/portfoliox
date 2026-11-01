@@ -5,7 +5,7 @@ import { Marquee } from './Marquee'
 import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
 import { HeroMotion } from './HeroMotion'
-import { parseMonthYear, sortExperience } from '@/lib/experience'
+import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
@@ -160,30 +160,15 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
                 <h2 id="pxp-work" className="pxp-h2">Work Experience</h2>
               </div>
               <div className="pxp-exp-list">
-                {groupByCompany(experience).map(({ company, entries }) => (
+                {groupByCompany(experience).map(({ company, entries }, gi) => (
                   <div key={company}>
                     <div className="pxp-exp-company">
                       <CompanyLogo company={company} logoUrl={entries[0]?.logo_url} />
                       <span className="pxp-exp-company__name">{company}</span>
+                      <span className="pxp-exp-company__tenure">{formatDuration(entries.reduce((n, e) => n + durationMonths(e), 0))}</span>
                     </div>
                     <div className="pxp-exp-roles">
-                      {entries.map(exp => {
-                        const duration = calcDuration(exp.start_month, exp.end_month, exp.is_current)
-                        return (
-                          <div key={exp.id} className="pxp-exp-role">
-                            <div className="pxp-exp-dot" />
-                            <div style={{ flex: 1 }}>
-                              <div className={`pxp-exp-head${exp.description ? '' : ' pxp-exp-head--bare'}`}>
-                                <span className="pxp-exp-title">{exp.role}</span>
-                                <span className="pxp-exp-when">
-                                  {exp.start_month}–{exp.is_current ? 'Present' : exp.end_month}{duration ? ` (${duration})` : ''}
-                                </span>
-                              </div>
-                              {exp.description && <div className="px-exp-description pxp-exp-desc" dangerouslySetInnerHTML={{ __html: exp.description }} />}
-                            </div>
-                          </div>
-                        )
-                      })}
+                      {entries.map((exp, ri) => <ExperienceRole key={exp.id} exp={exp} open={gi === 0 && ri === 0} />)}
                     </div>
                   </div>
                 ))}
@@ -308,19 +293,38 @@ function PublishedToolIcon({ name, index }: { name: string; index: number }) {
   )
 }
 
-// ── Work experience helpers ───────────────────────────────────────────────────
-
-function calcDuration(start: string, end: string | null, isCurrent: boolean): string {
-  try {
-    const s = parseMonthYear(start)
-    const e = isCurrent || !end ? new Date() : parseMonthYear(end)
-    const months = Math.max(0, (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()))
-    const y = Math.floor(months / 12), m = months % 12
-    if (y === 0) return `${m} mo`
-    if (m === 0) return `${y} yr${y !== 1 ? 's' : ''}`
-    return `${y} yr${y !== 1 ? 's' : ''} ${m} mo`
-  } catch { return '' }
+// ── One role: dates in the rail, title and bullets beside it ─────────────────
+function ExperienceRole({ exp, open }: { exp: WorkExperience; open: boolean }) {
+  const parts = exp.description ? splitBullets(exp.description) : null
+  const html = (h: string) => ({ __html: highlightMetrics(h) })
+  return (
+    <div className="pxp-exp-role">
+      <div className="pxp-exp-rail">
+        <div className="pxp-exp-range">{formatRange(exp)}</div>
+        <div className="pxp-exp-dur">{formatDuration(durationMonths(exp))}</div>
+      </div>
+      <div className="pxp-exp-content">
+        <h3 className="pxp-exp-title">{exp.role}</h3>
+        {exp.description && (parts ? (
+          <>
+            <div className="pxp-exp-desc" dangerouslySetInnerHTML={html(parts.head)} />
+            <details className="pxp-exp-more" open={open}>
+              <summary>
+                <span className="pxp-exp-more__show">Show {parts.restCount} more</span>
+                <span className="pxp-exp-more__hide">Show less</span>
+              </summary>
+              <div className="pxp-exp-desc" dangerouslySetInnerHTML={html(parts.rest)} />
+            </details>
+          </>
+        ) : (
+          <div className="pxp-exp-desc" dangerouslySetInnerHTML={html(exp.description)} />
+        ))}
+      </div>
+    </div>
+  )
 }
+
+// ── Work experience helpers ───────────────────────────────────────────────────
 
 function calcTotalExperience(experience: WorkExperience[]): string {
   try {
