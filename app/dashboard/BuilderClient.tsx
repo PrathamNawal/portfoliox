@@ -272,7 +272,7 @@ function ProfileEditModal({ open, onClose, profile, onSaved }: {
 }
 
 // ── Upgrade Modal ─────────────────────────────────────────────────────────────
-function UpgradeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function UpgradeModal({ open, onClose, freeLimit }: { open: boolean; onClose: () => void; freeLimit: number }) {
   return (
     <Modal open={open} onClose={onClose} width={500} noPad>
       <div style={{ padding: '28px 28px 24px', textAlign: 'center', borderBottom: '1px solid var(--px-border)' }}>
@@ -280,12 +280,12 @@ function UpgradeModal({ open, onClose }: { open: boolean; onClose: () => void })
           <Icon name="zap" size={22} color="var(--px-accent)" />
         </div>
         <h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 6 }}>Free case study limit reached</h2>
-        <p style={{ fontSize: 14, color: 'var(--px-text-2)', lineHeight: 1.5 }}>Free accounts can publish up to <strong>6 case studies</strong>. Upgrade to Pro for unlimited.</p>
+        <p style={{ fontSize: 14, color: 'var(--px-text-2)', lineHeight: 1.5 }}>Free accounts can publish up to <strong>{freeLimit} case studies</strong>. Upgrade to Pro for unlimited.</p>
       </div>
       <div style={{ padding: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
           {[
-            { label: 'Free', price: '$0', features: ['6 case studies', 'Canvas + Spotlight', 'Basic analytics', 'Subdomain'], highlight: false },
+            { label: 'Free', price: '$0', features: [`${freeLimit} case studies`, 'Canvas + Spotlight', 'Basic analytics', 'Subdomain'], highlight: false },
             { label: 'Pro', price: '$12/mo', features: ['Unlimited case studies', 'All layouts', 'Advanced analytics', 'Custom domain (soon)'], highlight: true },
           ].map(plan => (
             <div key={plan.label} style={{ padding: 16, borderRadius: 'var(--px-r-lg)', border: `1.5px solid ${plan.highlight ? 'var(--px-accent)' : 'var(--px-border)'}`, background: plan.highlight ? 'var(--px-accent-subtle)' : 'var(--px-surface-2)' }}>
@@ -834,7 +834,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
       <DisciplinePickerModal open={showDisciplinePicker} onClose={() => setShowDisciplinePicker(false)} onCreate={handleCreateWithDiscipline} />
       <PublishModal open={showPublish} onClose={() => setShowPublish(false)} profile={profile} onPublished={slug => setProfile(p => p ? { ...p, slug } : p)} />
       <ProfileEditModal open={showProfileEdit} onClose={() => setShowProfileEdit(false)} profile={profile} onSaved={setProfile} />
-      <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
+      <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} freeLimit={freeLimit} />
       <Modal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="Delete case study" width={400}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={{ fontSize: 14, color: 'var(--px-text-2)', lineHeight: 1.55 }}>Delete <strong>{deleteTarget?.title}</strong>? This permanently removes the case study and cannot be undone.</p>
