@@ -17,6 +17,7 @@ import { ToolStackSection } from '@/components/builder/ToolStackSection'
 import { WorkExperienceSection } from '@/components/builder/WorkExperienceSection'
 import { ThemePicker } from '@/components/builder/ThemePicker'
 import { MotionPicker } from '@/components/builder/MotionPicker'
+import { SceneToggle } from '@/components/builder/SceneToggle'
 import type { MotionLevel } from '@/lib/motion'
 import { CoverImage } from '@/components/published/CoverImage'
 import type { ThemeId } from '@/lib/themes'
@@ -549,6 +550,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
   const [profile, setProfile] = useState<Profile | null>(initialProfile)
   const [themeError, setThemeError] = useState<string | null>(null)
   const [motionError, setMotionError] = useState<string | null>(null)
+  const [sceneError, setSceneError] = useState<string | null>(null)
 
   // Optimistic update; roll back and say so if the save fails.
   const changeMotion = async (level: MotionLevel) => {
@@ -561,6 +563,19 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
     } catch {
       setProfile(p => p ? { ...p, motion: previous } : p)
       setMotionError('Could not save motion. Try again.')
+    }
+  }
+
+  const changeScene = async (on: boolean) => {
+    const previous = profile?.scene
+    setSceneError(null)
+    setProfile(p => p ? { ...p, scene: on } : p)
+    try {
+      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scene: on }) })
+      if (!res.ok) throw new Error(String(res.status))
+    } catch {
+      setProfile(p => p ? { ...p, scene: previous } : p)
+      setSceneError('Could not save. Try again.')
     }
   }
 
@@ -789,6 +804,11 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
               <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-3)', flexShrink: 0, paddingTop: 6 }}>Motion</span>
               <MotionPicker value={profile?.motion} onChange={changeMotion} />
               {motionError && <span role="alert" style={{ fontSize: 11, color: '#C94040', paddingTop: 7 }}>{motionError}</span>}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--px-text-3)', flexShrink: 0, minWidth: 40 }} aria-hidden="true" />
+              <SceneToggle value={!!profile?.scene} onChange={changeScene} />
+              {sceneError && <span role="alert" style={{ fontSize: 11, color: '#C94040' }}>{sceneError}</span>}
             </div>
             {/* Social + Resume links */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>

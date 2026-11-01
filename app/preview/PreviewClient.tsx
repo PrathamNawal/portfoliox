@@ -26,11 +26,13 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials, exper
 
   const [theme, setTheme] = useState<ThemeId>(resolveTheme(profile.theme))
   const [motion, setMotion] = useState<MotionLevel>(resolveMotion(profile.motion))
+  const [scene, setScene] = useState<boolean>(!!profile.scene)
 
   const sharedProps = {
     profile: { ...profile, theme },
     trackViews: false,
     motion,
+    scene,
     caseStudies,
     tools,
     testimonials,
@@ -61,6 +63,9 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials, exper
             <option value="subtle">Subtle</option>
             <option value="expressive">Expressive</option>
           </select>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)', cursor: 'pointer' }}>
+            <input type="checkbox" checked={scene} onChange={e => setScene(e.target.checked)} /> Illustration
+          </label>
           {profile.slug && (
             <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>/p/{profile.slug}</span>
           )}

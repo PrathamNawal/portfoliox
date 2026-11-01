@@ -23,12 +23,15 @@ export async function PATCH(req: NextRequest) {
   try {
     const { userId, supabase } = await requireAuthContext()
     const body = await req.json()
-    const allowed = ['name','bio','avatar_url','discipline','skills','layout','theme','motion','social_links','resume_url']
+    const allowed = ['name','bio','avatar_url','discipline','skills','layout','theme','motion','scene','social_links','resume_url']
     if ('theme' in body && !isThemeId(body.theme)) {
       return NextResponse.json({ error: 'Unknown theme' }, { status: 400 })
     }
     if ('motion' in body && !isMotionLevel(body.motion)) {
       return NextResponse.json({ error: 'Unknown motion level' }, { status: 400 })
+    }
+    if ('scene' in body && typeof body.scene !== 'boolean') {
+      return NextResponse.json({ error: 'scene must be true or false' }, { status: 400 })
     }
     const update: Record<string, unknown> = {}
     for (const key of allowed) {

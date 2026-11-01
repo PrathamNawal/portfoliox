@@ -47,6 +47,8 @@ export interface Profile {
   theme?: ThemeId
   /** Motion level. Optional until the profile_motion migration is applied. */
   motion?: MotionLevel
+  /** Show the designer illustration (Canvas layout). Optional until the profile_scene migration is applied. */
+  scene?: boolean
   slug: string | null
   plan: Plan
   role: Role
