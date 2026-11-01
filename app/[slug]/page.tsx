@@ -6,6 +6,7 @@ import { resolveTheme } from '@/lib/themes'
 import { resolveCoverFit } from '@/lib/cover'
 import { resolveMotion } from '@/lib/motion'
 import type { Metadata } from 'next'
+import { sortExperience } from '@/lib/experience'
 
 // Never cache portfolio pages — data changes in real time (RLS, publish toggles, layout switches)
 export const revalidate = 0
@@ -113,7 +114,7 @@ export default async function PublishedPortfolio({ params }: Props) {
     profile: { ...profile, theme: resolveTheme((themeRes.data as { theme?: string } | null)?.theme) },
     caseStudies: (caseStudies || []).map(cs => ({ ...cs, cover_fit: resolveCoverFit(fitById.get(cs.id)) })),
     testimonials: testimonials || [],
-    experience: experience || [],
+    experience: sortExperience(experience),
     tools: tools || [],
   }
 

@@ -55,9 +55,13 @@ export const FIXTURE_TESTIMONIALS: Testimonial[] = [
 ]
 
 const w = (n: number, company: string, role: string, start: string, end: string | null, current: boolean, description: string): WorkExperience => ({ ...base, id: `w-${n}`, company, role, logo_url: null, start_month: start, end_month: end, is_current: current, description, discipline_tag: null, display_order: n })
+// Deliberately NOT in latest-first order, so the gallery proves the sort (lib/experience.ts).
 export const FIXTURE_EXPERIENCE: WorkExperience[] = [
-  w(1, 'Soccal', 'Product Designer', 'Jan 2025', null, true, '<ul><li><strong>Onboarding:</strong> redesigned the first-run flow.</li><li>Homepage refresh for 60K+ users.</li></ul>'),
-  w(2, 'Here to Care', 'UI/UX Designer', 'Mar 2023', 'Dec 2024', false, '<ul><li>Shipped the patient app to 60K+ users.</li></ul>'),
+  w(1, 'Here to Care', 'UI/UX Designer', 'Mar 2023', 'Dec 2024', false, '<ul><li>Shipped the patient app to 60K+ users.</li></ul>'),
+  w(2, 'Soccal', 'Associate Designer', 'Jan 2024', 'Dec 2024', false, '<ul><li>Homepage refresh.</li></ul>'),
+  w(3, 'Hiver', 'Design Intern', 'Jun 2021', 'Aug 2021', false, '<ul><li>Icon set and illustrations.</li></ul>'),
+  w(4, 'Soccal', 'Product Designer', 'Jan 2025', null, true, '<ul><li><strong>Onboarding:</strong> redesigned the first-run flow.</li></ul>'),
+  w(5, 'Rocketium', 'Graphic Designer', 'Sep 2021', 'Feb 2023', false, '<ul><li>Brand templates.</li></ul>'),
 ]
 
 export const FIXTURE_TOOLS: ToolStackItem[] = ['Figma', 'Notion', 'Framer', 'Miro', 'Adobe Illustrator', 'Adobe Photoshop', 'Principle', 'Spline'].map((tool_name, i) => ({ id: `tool-${i}`, user_id: 'fixture', tool_name, display_order: i }))

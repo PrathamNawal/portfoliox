@@ -5,6 +5,7 @@ import { Marquee } from './Marquee'
 import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
 import { HeroMotion } from './HeroMotion'
+import { parseMonthYear, sortExperience } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
@@ -309,12 +310,6 @@ function PublishedToolIcon({ name, index }: { name: string; index: number }) {
 
 // ── Work experience helpers ───────────────────────────────────────────────────
 
-function parseMonthYear(s: string): Date {
-  const MONTHS: Record<string, number> = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 }
-  const [mon, year] = s.trim().split(' ')
-  return new Date(parseInt(year), MONTHS[mon] ?? 0, 1)
-}
-
 function calcDuration(start: string, end: string | null, isCurrent: boolean): string {
   try {
     const s = parseMonthYear(start)
@@ -340,9 +335,10 @@ function calcTotalExperience(experience: WorkExperience[]): string {
   } catch { return '' }
 }
 
+// Companies appear in order of their most recent role; roles inside a company are latest first.
 function groupByCompany(experience: WorkExperience[]): { company: string; entries: WorkExperience[] }[] {
   const map = new Map<string, WorkExperience[]>()
-  for (const exp of experience) {
+  for (const exp of sortExperience(experience)) {
     const list = map.get(exp.company) ?? []
     list.push(exp)
     map.set(exp.company, list)
