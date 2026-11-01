@@ -1,4 +1,5 @@
 import type { ThemeId } from '@/lib/themes'
+import type { CoverFit } from '@/lib/cover'
 
 export type Plan = 'free' | 'pro'
 export type Role = 'user' | 'admin'
@@ -93,6 +94,8 @@ export interface CaseStudy {
   what_i_did: string | null
   outcome_notes: string | null
   cover_image_url: string | null
+  /** How the cover fills card shapes. Optional until the cover_fit migration is applied. */
+  cover_fit?: CoverFit
   blocks: Block[]
   metadata: CaseStudyMetadata
   section_labels: Record<string, string>

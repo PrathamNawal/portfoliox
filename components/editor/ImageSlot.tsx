@@ -62,7 +62,7 @@ export function ImageSlot({ label, ratio = '4/3', sectionLabel, onSectionLabel, 
           style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: D.text2, cursor: 'pointer', userSelect: 'none', padding: '2px 6px', borderRadius: 3, background: 'rgba(255,255,255,0.04)', border: `1px solid ${D.border}`, transition: 'background 0.1s' }}>
           {sectionLabel}
         </span>
-        {enforceRatio && <span style={{ fontSize: 9, color: D.text3, letterSpacing: '0.06em' }}>16:9 COVER</span>}
+        {enforceRatio && <span style={{ fontSize: 9, color: D.text3, letterSpacing: '0.06em' }}>COVER</span>}
       </div>
 
       {/* Drop zone */}

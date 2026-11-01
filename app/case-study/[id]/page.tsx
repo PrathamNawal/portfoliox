@@ -7,6 +7,8 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { Toggle, Spinner } from '@/components/ui/Misc'
 import { Icon } from '@/components/ui/Icon'
 import { ImageSlot } from '@/components/editor/ImageSlot'
+import { CoverFitControl } from '@/components/editor/CoverFitControl'
+import { resolveCoverFit, type CoverFit } from '@/lib/cover'
 import { FigmaBlock } from '@/components/editor/FigmaBlock'
 import { CompareBlock } from '@/components/editor/CompareBlock'
 import { TextBlock } from '@/components/editor/TextBlock'
@@ -177,9 +179,10 @@ function VisualBlock({ block, onChange, onDelete, dragHandleProps, innerRef, dra
 }
 
 // ── Overview canvas ───────────────────────────────────────────────────────────
-function OverviewCanvas({ data, onChange, palette, coverUrl, onCoverUrl }: {
+function OverviewCanvas({ data, onChange, palette, coverUrl, onCoverUrl, coverFit, onCoverFit }: {
   data: OverviewData; onChange: (d: OverviewData) => void; palette: P
   coverUrl: string | undefined; onCoverUrl: (url: string | undefined) => void
+  coverFit: CoverFit; onCoverFit: (fit: CoverFit) => void
 }) {
   const set = <K extends keyof OverviewData>(k: K, v: OverviewData[K]) => onChange({ ...data, [k]: v })
   return (
@@ -190,6 +193,8 @@ function OverviewCanvas({ data, onChange, palette, coverUrl, onCoverUrl }: {
           <ImageSlot label="cover" ratio="cover" enforceRatio sectionLabel="" onSectionLabel={() => {}} caption="" onCaption={() => {}} imageUrl={coverUrl} onImageUrl={onCoverUrl} />
         </div>
       </div>
+
+      <CoverFitControl url={coverUrl} fit={coverFit} onChange={onCoverFit} palette={palette} />
 
       {/* Summary */}
       <div style={{ marginBottom: 28 }}>
@@ -543,6 +548,9 @@ export default function EditorPage() {
   const [sections, setSections] = useState<CaseSection[]>([])
   const [overviewData, setOverviewData] = useState<OverviewData>({ summary: '', role: '', timeline: '', team: '', metrics: [{ label: '', value: '' }, { label: '', value: '' }, { label: '', value: '' }] })
   const [coverUrl, setCoverUrl] = useState<string | undefined>()
+  const [coverFit, setCoverFit] = useState<CoverFit>('fill')
+  // cover_fit is only sent once the owner changes it, so saves keep working even before the DB column exists
+  const [coverFitTouched, setCoverFitTouched] = useState(false)
   const [discipline, setDiscipline] = useState<string>('ux')
 
   const [activeIdx, setActiveIdx] = useState(0)
@@ -552,8 +560,8 @@ export default function EditorPage() {
   const [generatingSectionId, setGeneratingSectionId] = useState<string | null>(null)
 
   const saveTimer = useRef<ReturnType<typeof setTimeout>>()
-  const stateRef = useRef({ sections, overviewData, coverUrl, title, published, ndaEnabled, problem, whatIDid })
-  useEffect(() => { stateRef.current = { sections, overviewData, coverUrl, title, published, ndaEnabled, problem, whatIDid } })
+  const stateRef = useRef({ sections, overviewData, coverUrl, coverFit, coverFitTouched, title, published, ndaEnabled, problem, whatIDid })
+  useEffect(() => { stateRef.current = { sections, overviewData, coverUrl, coverFit, coverFitTouched, title, published, ndaEnabled, problem, whatIDid } })
 
   const markDirty = useCallback(() => {
     setSaved(false)
@@ -565,7 +573,7 @@ export default function EditorPage() {
     const s = stateRef.current
     await fetch(`/api/case-studies/${id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sections: s.sections, overview_data: s.overviewData, cover_image_url: s.coverUrl || null, title: s.title, published: s.published, nda_enabled: s.ndaEnabled, problem: s.problem, what_i_did: s.whatIDid }),
+      body: JSON.stringify({ sections: s.sections, overview_data: s.overviewData, cover_image_url: s.coverUrl || null, ...(s.coverFitTouched ? { cover_fit: s.coverFit } : {}), title: s.title, published: s.published, nda_enabled: s.ndaEnabled, problem: s.problem, what_i_did: s.whatIDid }),
     })
     setSaved(true)
   }, [id])
@@ -578,6 +586,7 @@ export default function EditorPage() {
       setPublished(data.published)
       setNdaEnabled(data.nda_enabled)
       setCoverUrl(data.cover_image_url || undefined)
+      setCoverFit(resolveCoverFit(data.cover_fit))
       if (data.discipline) setDiscipline(data.discipline)
       setProblem(data.problem || '')
       setWhatIDid(data.what_i_did || '')
@@ -732,7 +741,7 @@ export default function EditorPage() {
 
             {/* Content */}
             {activeSection?.type === 'overview' ? (
-              <OverviewCanvas data={overviewData} onChange={d => { setOverviewData(d); markDirty() }} palette={palette} coverUrl={coverUrl} onCoverUrl={url => { setCoverUrl(url); markDirty() }} />
+              <OverviewCanvas data={overviewData} onChange={d => { setOverviewData(d); markDirty() }} palette={palette} coverUrl={coverUrl} onCoverUrl={url => { setCoverUrl(url); markDirty() }} coverFit={coverFit} onCoverFit={fit => { setCoverFit(fit); setCoverFitTouched(true); markDirty() }} />
             ) : activeSection ? (
               <SectionCanvas section={activeSection} onUpdate={updateSection} palette={palette}
                 generating={generatingSectionId === activeSection.id}

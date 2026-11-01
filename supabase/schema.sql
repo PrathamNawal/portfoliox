@@ -45,6 +45,7 @@ create table if not exists case_studies (
   what_i_did       text,
   outcome_notes    text,
   cover_image_url  text,
+  cover_fit        text not null default 'fill' check (cover_fit in ('fill','fit')),
   blocks           jsonb not null default '[]',
   section_labels   jsonb not null default '{}',
   metadata         jsonb not null default '{}',

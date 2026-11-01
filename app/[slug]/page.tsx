@@ -3,6 +3,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { CanvasLayout } from '@/components/published/CanvasLayout'
 import { SpotlightLayout } from '@/components/published/SpotlightLayout'
 import { resolveTheme } from '@/lib/themes'
+import { resolveCoverFit } from '@/lib/cover'
 import type { Metadata } from 'next'
 
 // Never cache portfolio pages — data changes in real time (RLS, publish toggles, layout switches)
@@ -79,6 +80,7 @@ export default async function PublishedPortfolio({ params }: Props) {
     { data: experience },
     { data: tools },
     themeRes,
+    fitRes,
   ] = await Promise.all([
     supabase
       .from('case_studies')
@@ -92,13 +94,17 @@ export default async function PublishedPortfolio({ params }: Props) {
     // Separate, error-tolerant query: before the profile_theme migration runs the column
     // does not exist, and that must fall back to the default theme, not take the page down.
     supabase.from('profiles').select('theme').eq('id', profile.id).maybeSingle(),
+    // Same idea for cover_fit: a missing column must not hide the case studies.
+    supabase.from('case_studies').select('id, cover_fit').eq('user_id', profile.id).eq('published', true),
   ])
 
   if (csError) console.error('[portfolio] case_studies error:', csError)
 
+  const fitById = new Map<string, string>((fitRes.data as { id: string; cover_fit: string }[] | null)?.map(r => [r.id, r.cover_fit]) ?? [])
+
   const props = {
     profile: { ...profile, theme: resolveTheme((themeRes.data as { theme?: string } | null)?.theme) },
-    caseStudies: caseStudies || [],
+    caseStudies: (caseStudies || []).map(cs => ({ ...cs, cover_fit: resolveCoverFit(fitById.get(cs.id)) })),
     testimonials: testimonials || [],
     experience: experience || [],
     tools: tools || [],

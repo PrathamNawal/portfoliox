@@ -6,6 +6,7 @@ import { BlockRenderer } from '@/components/published/BlockRenderer'
 import { NDAGate } from '@/components/published/NDAGate'
 import { AnalyticsTracker } from '@/components/published/AnalyticsTracker'
 import { ThemeScope } from '@/components/published/ThemeScope'
+import { CoverImage } from '@/components/published/CoverImage'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
 
@@ -234,7 +235,11 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
       ) : (
         <>
           {/* Hero */}
-          {cs.cover_image_url ? (
+          {cs.cover_image_url && cs.cover_fit === 'fit' ? (
+            <div style={{ position: 'relative', width: '100%', height: 'min(520px, 56vw)' }}>
+              <CoverImage url={cs.cover_image_url} fit="fit" label={cs.title} />
+            </div>
+          ) : cs.cover_image_url ? (
             <div style={{ width: '100%', maxHeight: 520, overflow: 'hidden' }}>
               <img src={cs.cover_image_url} alt={cs.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: 520 }} />
             </div>
