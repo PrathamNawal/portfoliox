@@ -28,6 +28,7 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials, exper
   const [motion, setMotion] = useState<MotionLevel>(resolveMotion(profile.motion))
   const [scene, setScene] = useState<boolean>(!!profile.scene)
   const [expStory, setExpStory] = useState<boolean>(!!profile.exp_story)
+  const [expYears, setExpYears] = useState<boolean>(!!profile.exp_years)
 
   const sharedProps = {
     profile: { ...profile, theme },
@@ -35,6 +36,7 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials, exper
     motion,
     scene,
     expStory,
+    expYears,
     caseStudies,
     tools,
     testimonials,
@@ -70,6 +72,9 @@ export function PreviewClient({ profile, caseStudies, tools, testimonials, exper
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)', cursor: 'pointer' }}>
             <input type="checkbox" checked={expStory} onChange={e => setExpStory(e.target.checked)} /> Story experience
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: 'var(--px-text-2)', cursor: 'pointer' }}>
+            <input type="checkbox" checked={expYears} onChange={e => setExpYears(e.target.checked)} /> Years
           </label>
           {profile.slug && (
             <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>/p/{profile.slug}</span>

@@ -23,7 +23,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const { userId, supabase } = await requireAuthContext()
     const body = await req.json()
-    const allowed = ['name','bio','avatar_url','discipline','skills','layout','theme','motion','scene','exp_story','social_links','resume_url']
+    const allowed = ['name','bio','avatar_url','discipline','skills','layout','theme','motion','scene','exp_story','exp_years','social_links','resume_url']
     if ('theme' in body && !isThemeId(body.theme)) {
       return NextResponse.json({ error: 'Unknown theme' }, { status: 400 })
     }
@@ -35,6 +35,9 @@ export async function PATCH(req: NextRequest) {
     }
     if ('exp_story' in body && typeof body.exp_story !== 'boolean') {
       return NextResponse.json({ error: 'exp_story must be true or false' }, { status: 400 })
+    }
+    if ('exp_years' in body && typeof body.exp_years !== 'boolean') {
+      return NextResponse.json({ error: 'exp_years must be true or false' }, { status: 400 })
     }
     const update: Record<string, unknown> = {}
     for (const key of allowed) {

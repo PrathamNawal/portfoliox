@@ -16,6 +16,7 @@ create table if not exists profiles (
   skills        text[] not null default '{}',
   scene         boolean not null default false,
   exp_story     boolean not null default false,
+  exp_years     boolean not null default false,
   motion        text not null default 'still' check (motion in ('still','subtle','expressive')),
   layout        text not null default 'canvas' check (layout in ('canvas','spotlight')),
   theme         text not null default 'light' check (theme in ('light','skeuomorphism','neumorphism','glass','papercut','chrome','inflated','steampunk','isometric','brutalism','minimal','clay','neon','holo','vector','handwritten')),

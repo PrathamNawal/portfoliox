@@ -15,10 +15,10 @@ export function PickerDemo({ value, motion, scene }: { value: ThemeId; motion: M
     <div style={{ position: 'fixed', zIndex: 99999, left: 12, bottom: 12, padding: 8, borderRadius: 12, background: '#16151a', color: '#fff', font: '600 11px system-ui, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
       <span>Editor pickers</span>
       <div style={{ ['--px-surface' as string]: '#1f1e24', ['--px-border' as string]: '#3a3942', ['--px-border-strong' as string]: '#55535f', ['--px-text' as string]: '#fff', ['--px-text-2' as string]: '#d6d4dc', ['--px-text-3' as string]: '#a9a7b2', ['--px-accent' as string]: '#ff6a4a', ['--px-accent-subtle' as string]: 'rgba(255,106,74,.14)' }}>
-        <ThemePicker value={value} onChange={id => router.push(`/dev/themes?theme=${id}&layout=${params.get('layout') ?? 'canvas'}&motion=${motion}&scene=${scene ? 1 : 0}&exp=${params.get('exp') ?? 'classic'}`)} />
+        <ThemePicker value={value} onChange={id => router.push(`/dev/themes?theme=${id}&layout=${params.get('layout') ?? 'canvas'}&motion=${motion}&scene=${scene ? 1 : 0}&exp=${params.get('exp') ?? 'classic'}&years=${params.get('years') ?? '0'}`)} />
       </div>
       <div style={{ ['--px-border' as string]: '#3a3942', ['--px-text-2' as string]: '#d6d4dc', ['--px-text-3' as string]: '#a9a7b2', ['--px-accent' as string]: '#ff6a4a', ['--px-accent-subtle' as string]: 'rgba(255,106,74,.14)' }}>
-        <MotionPicker value={motion} onChange={m => router.push(`/dev/themes?theme=${value}&layout=${params.get('layout') ?? 'canvas'}&motion=${m}&scene=${scene ? 1 : 0}&exp=${params.get('exp') ?? 'classic'}`)} />
+        <MotionPicker value={motion} onChange={m => router.push(`/dev/themes?theme=${value}&layout=${params.get('layout') ?? 'canvas'}&motion=${m}&scene=${scene ? 1 : 0}&exp=${params.get('exp') ?? 'classic'}&years=${params.get('years') ?? '0'}`)} />
       </div>
       <div style={{ ['--px-surface-3' as string]: '#3a3942', ['--px-accent' as string]: '#ff6a4a', ['--px-text-2' as string]: '#d6d4dc', ['--px-text-3' as string]: '#a9a7b2' }}>
         <SceneToggle value={scene} onChange={on => router.push(`/dev/themes?theme=${value}&layout=${params.get('layout') ?? 'canvas'}&motion=${motion}&scene=${on ? 1 : 0}`)} />
