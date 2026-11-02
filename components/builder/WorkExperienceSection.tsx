@@ -6,8 +6,11 @@ import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
 import { SectionHead, Toggle } from '@/components/ui/Misc'
-import type { WorkExperience } from '@/types'
+import type { WorkExperience, ExperienceScreen } from '@/types'
 import { sortExperience } from '@/lib/experience'
+import { SceneToggle } from '@/components/builder/SceneToggle'
+import { ScreensEditor } from '@/components/builder/ScreensEditor'
+import { MAX_HEADLINE, MAX_STAT_VALUE, MAX_STAT_LABEL } from '@/lib/experience-story'
 
 // ── Lightweight rich-text editor ─────────────────────────────────────────────
 function RichTextEditor({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
@@ -236,6 +239,11 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
   const [isCurrent, setIsCurrent] = useState(initial?.is_current || false)
   const [description, setDescription] = useState(initial?.description || '')
   const [tag, setTag] = useState(initial?.discipline_tag || '')
+  const [headline, setHeadline] = useState(initial?.headline || '')
+  const [statValue, setStatValue] = useState(initial?.stat_value || '')
+  const [statLabel, setStatLabel] = useState(initial?.stat_label || '')
+  const [screens, setScreens] = useState<ExperienceScreen[]>(initial?.screens || [])
+  const [screensBusy, setScreensBusy] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -246,12 +254,15 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
       setStartMonth(initial?.start_month || ''); setEndMonth(initial?.end_month || '')
       setIsCurrent(initial?.is_current || false); setDescription(initial?.description || '')
       setTag(initial?.discipline_tag || ''); setError('')
+      setHeadline(initial?.headline || ''); setStatValue(initial?.stat_value || ''); setStatLabel(initial?.stat_label || '')
+      setScreens(initial?.screens || []); setScreensBusy(false)
     }
   }, [open, initial])
 
   const save = async () => {
     if (!role.trim() || !company.trim() || !startMonth) { setError('Role, company and start month are required'); return }
     if (!isCurrent && !endMonth) { setError('Please set an end month or check "I currently work here"'); return }
+    if (screensBusy) { setError('Wait for the screens to finish uploading'); return }
     setError(''); setSaving(true)
     try {
       const url = initial ? `/api/experience/${initial.id}` : '/api/experience'
@@ -260,6 +271,7 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
         role: role.trim(), company: company.trim(), logo_url: logoUrl || null,
         start_month: startMonth, end_month: isCurrent ? null : endMonth || null,
         is_current: isCurrent, description: description.trim() || null, discipline_tag: tag || null,
+        headline: headline.trim() || null, stat_value: statValue.trim() || null, stat_label: statLabel.trim() || null, screens,
       }) })
       if (!res.ok) { const d = await res.json(); setError(d.error || 'Save failed'); return }
       onSaved(await res.json()); onClose()
@@ -267,7 +279,7 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={initial ? 'Edit role' : 'Add role'} width={480}>
+    <Modal open={open} onClose={onClose} title={initial ? 'Edit role' : 'Add role'} width={520}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <Input label="Role *" value={role} onChange={setRole} placeholder="Product Designer" />
         <Input label="Company *" value={company} onChange={setCompany} placeholder="Swiggy" />
@@ -287,10 +299,25 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
             ))}
           </div>
         </div>
-        {error && <p style={{ fontSize: 12, color: '#C94040', margin: 0 }}>{error}</p>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 14, border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', background: 'var(--px-surface-2)' }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>Story layout (optional)</div>
+            <p style={{ fontSize: 11, color: 'var(--px-text-3)', margin: '2px 0 0', lineHeight: 1.45 }}>Used when the Story layout switch is on. Everything here can stay empty.</p>
+          </div>
+          <div>
+            <Input label="Headline" value={headline} onChange={v => setHeadline(v.slice(0, MAX_HEADLINE))} placeholder="Shipped 8+ client products in nine months" />
+            <p style={{ fontSize: 11, color: 'var(--px-text-3)', margin: '5px 0 0', lineHeight: 1.4 }}>Shown big on your portfolio. Leave empty to use your first bullet.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: 10 }}>
+            <Input label="Stat value" value={statValue} onChange={v => setStatValue(v.slice(0, MAX_STAT_VALUE))} placeholder="30%" />
+            <Input label="Stat label" value={statLabel} onChange={v => setStatLabel(v.slice(0, MAX_STAT_LABEL))} placeholder="lower bounce rate" />
+          </div>
+          <ScreensEditor value={screens} onChange={setScreens} onBusyChange={setScreensBusy} />
+        </div>
+        {error && <p role="alert" style={{ fontSize: 12, color: '#C94040', margin: 0 }}>{error}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <Btn variant="secondary" onClick={onClose}>Cancel</Btn>
-          <Btn variant="primary" onClick={save} disabled={saving}>{saving ? 'Saving…' : initial ? 'Save changes' : 'Add role'}</Btn>
+          <Btn variant="primary" onClick={save} disabled={saving || screensBusy}>{saving ? 'Saving…' : initial ? 'Save changes' : 'Add role'}</Btn>
         </div>
       </div>
     </Modal>
@@ -300,9 +327,13 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
 interface Props {
   experience: WorkExperience[]
   onChange: (exp: WorkExperience[]) => void
+  /** Story layout switch (profiles.exp_story). */
+  story: boolean
+  onStoryChange: (on: boolean) => void
+  storyError?: string | null
 }
 
-export function WorkExperienceSection({ experience: unsorted, onChange }: Props) {
+export function WorkExperienceSection({ experience: unsorted, onChange, story, onStoryChange, storyError }: Props) {
   // Latest first, always: whatever order the parent holds, the list shows (and edits) this order.
   const experience = sortExperience(unsorted)
   const [modalOpen, setModalOpen] = useState(false)
@@ -323,6 +354,17 @@ export function WorkExperienceSection({ experience: unsorted, onChange }: Props)
   return (
     <div style={{ marginBottom: 24 }}>
       <SectionHead title="Work Experience" action={<Btn variant="ghost" size="sm" icon="plus" onClick={() => { setEditTarget(null); setModalOpen(true) }}>Add role</Btn>} />
+
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+        <SceneToggle
+          id="exp-story-toggle"
+          value={story}
+          onChange={onStoryChange}
+          label="Story layout"
+          description="Shows your experience as a story: a career timeline, a big headline per role and your screens. Off keeps the classic list."
+        />
+        {storyError && <span role="alert" style={{ fontSize: 11, color: '#C94040' }}>{storyError}</span>}
+      </div>
 
       {experience.length === 0 ? (
         <div style={{ background: 'var(--px-surface)', border: '1px dashed var(--px-border)', borderRadius: 'var(--px-r-lg)', padding: '20px 24px', fontSize: 13, color: 'var(--px-text-3)', cursor: 'pointer' }}

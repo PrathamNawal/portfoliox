@@ -551,6 +551,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
   const [themeError, setThemeError] = useState<string | null>(null)
   const [motionError, setMotionError] = useState<string | null>(null)
   const [sceneError, setSceneError] = useState<string | null>(null)
+  const [expStoryError, setExpStoryError] = useState<string | null>(null)
 
   // Optimistic update; roll back and say so if the save fails.
   const changeMotion = async (level: MotionLevel) => {
@@ -576,6 +577,19 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
     } catch {
       setProfile(p => p ? { ...p, scene: previous } : p)
       setSceneError('Could not save. Try again.')
+    }
+  }
+
+  const changeExpStory = async (on: boolean) => {
+    const previous = profile?.exp_story
+    setExpStoryError(null)
+    setProfile(p => p ? { ...p, exp_story: on } : p)
+    try {
+      const res = await fetch('/api/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ exp_story: on }) })
+      if (!res.ok) throw new Error(String(res.status))
+    } catch {
+      setProfile(p => p ? { ...p, exp_story: previous } : p)
+      setExpStoryError('Could not save. Try again.')
     }
   }
 
@@ -884,7 +898,7 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
           {/* Remaining sections */}
           <TestimonialsSection testimonials={testimonials} onChange={setTestimonials} />
           <ToolStackSection tools={tools} onChange={setTools} />
-          <WorkExperienceSection experience={experience} onChange={setExperience} />
+          <WorkExperienceSection experience={experience} onChange={setExperience} story={!!profile?.exp_story} onStoryChange={changeExpStory} storyError={expStoryError} />
 
           {/* Footer CTA */}
           <div style={{ background: 'var(--px-text)', borderRadius: 'var(--px-r-xl)', padding: isMobile ? '24px 20px' : '36px 32px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', gap: isMobile ? 16 : 24 }}>
