@@ -263,7 +263,7 @@ function Torso() {
   )
 }
 
-function Character() {
+export function Character() {
   return (
     <g transform="translate(0 352)">
       <g className="r-x">

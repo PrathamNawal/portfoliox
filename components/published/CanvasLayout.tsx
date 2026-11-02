@@ -14,6 +14,7 @@ import type { MotionLevel } from '@/lib/motion'
 // Moment of the loop shown when Motion is Still: seated at the desk, board filled, screen built.
 const STILL_FRAME = 0.7
 const DesignerScene = dynamic(() => import('@/components/scene/DesignerScene').then(m => m.DesignerScene))
+const ContactScene = dynamic(() => import('@/components/scene/ContactScene').then(m => m.ContactScene))
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
 const TOOL_COLORS: Record<string, string> = {
@@ -206,6 +207,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
 
         <section className="pxp-cta" aria-labelledby="pxp-contact">
           <h2 id="pxp-contact" className="pxp-h2 pxp-h2--cta">Let&apos;s work together</h2>
+          {scene && <ContactScene animate={motion !== 'still'} />}
           <div className="pxp-cta__stack">
             {profile.resume_url && (
               <a href={profile.resume_url} target="_blank" rel="noreferrer" className="pxp-surface pxp-linkcard pxp-linkcard--between">
