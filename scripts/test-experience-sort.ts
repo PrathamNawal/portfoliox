@@ -71,4 +71,14 @@ eq('arc: oldest to newest, newest role per company', careerArc([
 ]), [{ company: 'C', id: 'c1', current: false }, { company: 'B', id: 'b1', current: false }, { company: 'A', id: 'a2', current: true }])
 eq('arc: empty', careerArc([]), [])
 
+// ── capture-from-URL helpers ──
+import { checkCaptureUrl, isProviderImageHost, pngSize } from '../lib/screenshot'
+const ok = (u: string) => { const r = checkCaptureUrl(u); return 'url' in r ? r.url : null }
+eq('capture: public pages ok', [ok('https://figma.com/proto/abc?x=1'), ok('example-site.in/work'), ok('http://my.site.co')], ['https://figma.com/proto/abc?x=1', 'https://example-site.in/work', 'http://my.site.co/'])
+eq('capture: bad targets rejected', ['http://localhost:3000', 'https://127.0.0.1', 'https://192.168.1.1/x', 'http://[::1]/', 'https://intranet', 'https://a.local', 'https://x.internal', 'ftp://a.com', 'javascript:alert(1)', 'https://u:p@a.com', 'https://a.com:8080', '', '   '].map(ok), Array(13).fill(null))
+eq('capture: non-string', ok(undefined as any), null)
+eq('provider hosts', [isProviderImageHost('https://image.thum.io/x.png'), isProviderImageHost('https://iad.microlink.io/a.png'), isProviderImageHost('https://evil.com/a.png'), isProviderImageHost('http://image.thum.io/x'), isProviderImageHost('https://microlink.io.evil.com/a')], [true, true, false, false, false])
+const png = new Uint8Array(33); png.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]); new DataView(png.buffer).setUint32(16, 1280); new DataView(png.buffer).setUint32(20, 800)
+eq('pngSize', [pngSize(png), pngSize(new Uint8Array(40)), pngSize(new Uint8Array(3))], [{ w: 1280, h: 800 }, null, null])
+
 process.exit(fail ? 1 : 0)
