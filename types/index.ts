@@ -49,6 +49,8 @@ export interface Profile {
   motion?: MotionLevel
   /** Show the designer illustration (Canvas layout). Optional until the profile_scene migration is applied. */
   scene?: boolean
+  /** Story layout for Work Experience. Optional until the experience_story migration is applied. */
+  exp_story?: boolean
   slug: string | null
   plan: Plan
   role: Role
@@ -141,6 +143,14 @@ export interface Testimonial {
   created_at: string
 }
 
+/** One screenshot on a role's exhibit stage. w/h are the natural pixel size (they set the layout ratio). */
+export interface ExperienceScreen {
+  url: string
+  w: number
+  h: number
+  caption?: string
+}
+
 export interface WorkExperience {
   id: string
   user_id: string
@@ -152,6 +162,11 @@ export interface WorkExperience {
   is_current: boolean
   description: string | null
   discipline_tag: string | null
+  /** Story layout fields. Optional until the experience_story migration is applied. */
+  headline?: string | null
+  stat_value?: string | null
+  stat_label?: string | null
+  screens?: ExperienceScreen[] | null
   display_order: number
   created_at: string
 }

@@ -1,5 +1,6 @@
 // Run: npm run test:experience   (ordering rules for lib/experience.ts)
 import { sortExperience, monthIndex, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '../lib/experience'
+import { cleanScreens, pickStoryFields, plainText, storyHeadline, hueOf, startYear, screenRatio, isPortrait, visibleScreens, careerArc } from '../lib/experience-story'
 const r = (id: string, start: string, end: string | null, cur = false, created = '2026-01-01') => ({ id, start_month: start, end_month: end, is_current: cur, created_at: created }) as any
 let fail = 0
 const check = (name: string, got: string[], want: string[]) => { const ok = got.join() === want.join(); if (!ok) fail++; console.log(ok ? 'ok  ' : 'FAIL', name, ok ? '' : `got ${got} want ${want}`) }
@@ -33,5 +34,41 @@ const li = (n: number) => Array.from({ length: n }, (_, i) => `<li>Bullet ${i + 
 eq('split: 5 bullets -> 3 + 2', (() => { const r = splitBullets(`<ul>${li(5)}</ul>`); return r && [r.restCount, (r.head.match(/<li/g) || []).length, (r.rest.match(/<li/g) || []).length] })(), [2, 3, 2])
 eq('split: 3 or fewer bullets -> null', splitBullets(`<ul>${li(3)}</ul>`), null)
 eq('split: not a plain list -> null', [splitBullets(`Intro<ul>${li(6)}</ul>`), splitBullets(`<ul>${li(6)}<ul><li>x</li></ul></ul>`), splitBullets('plain text')], [null, null, null])
+
+// ── story layout helpers ──
+const PFX = 'https://x.supabase.co/storage/v1/object/public/'
+const sc = (o: any = {}) => ({ url: `${PFX}case-study-images/u/1.webp`, w: 1600, h: 900, ...o })
+eq('screens: valid + caption trimmed', cleanScreens([sc({ caption: '  Home  ' })], PFX), [{ ...sc(), caption: 'Home' }])
+eq('screens: null/empty ok', [cleanScreens(null, PFX), cleanScreens([], PFX)], [[], []])
+eq('screens: http rejected', cleanScreens([sc({ url: 'http://x.supabase.co/storage/v1/object/public/a.webp' })], null), null)
+eq('screens: foreign host rejected when prefix set', cleanScreens([sc({ url: 'https://evil.com/a.webp' })], PFX), null)
+eq('screens: any https ok without prefix', cleanScreens([sc({ url: 'https://evil.com/a.webp' })], null)?.length, 1)
+eq('screens: bad dims rejected', [0, -1, 1.5, 10001, '9'].map(w => cleanScreens([sc({ w })], PFX)), [null, null, null, null, null])
+eq('screens: more than 12 rejected', cleanScreens(Array.from({ length: 13 }, () => sc()), PFX), null)
+eq('screens: 12 ok', cleanScreens(Array.from({ length: 12 }, () => sc()), PFX)?.length, 12)
+eq('screens: caption cut to 90', cleanScreens([sc({ caption: 'a'.repeat(120) })], PFX)?.[0].caption?.length, 90)
+eq('screens: not an array rejected', cleanScreens({}, PFX), null)
+eq('pick: only keys present', pickStoryFields({ role: 'x', headline: ' Big ' }), { update: { headline: 'Big' } })
+eq('pick: nothing present -> empty update', pickStoryFields({ role: 'x' }), { update: {} })
+eq('pick: empty text becomes null', pickStoryFields({ headline: '  ', stat_value: '', stat_label: null }), { update: { headline: null, stat_value: null, stat_label: null } })
+eq('pick: headline too long', 'error' in pickStoryFields({ headline: 'a'.repeat(141) }), true)
+eq('pick: stat limits', [pickStoryFields({ stat_value: 'a'.repeat(13) }), pickStoryFields({ stat_label: 'a'.repeat(41) })].map(r => 'error' in r), [true, true])
+eq('pick: non-string rejected', 'error' in pickStoryFields({ headline: 5 }), true)
+eq('pick: bad screens rejected', 'error' in pickStoryFields({ screens: 'nope' }), true)
+eq('plainText', plainText('<ul><li>Cut <b>bounce</b> by 30%</li><li>R&amp;D &#39;ok&#39;</li></ul>'), "Cut bounce by 30% R&D 'ok'")
+eq('headline: own wins', storyHeadline({ headline: ' Mine ', description: '<ul><li>First</li></ul>' }), 'Mine')
+eq('headline: first li', storyHeadline({ headline: null, description: '<ul><li>First <b>one</b></li><li>Second</li></ul>' }), 'First one')
+eq('headline: plain text', storyHeadline({ description: '<p>Just text</p>' }), 'Just text')
+eq('headline: none', storyHeadline({ headline: undefined, description: null }), '')
+eq('headline: cut at word boundary <= 140', (() => { const h = storyHeadline({ description: `<ul><li>${'word '.repeat(60)}</li></ul>` }); return [h.length <= 140, h.endsWith('…'), /word…$/.test(h)] })(), [true, true, true])
+eq('hue: stable, in range, case-insensitive', [hueOf('Hiver') === hueOf(' hiver '), hueOf('Soccal') >= 0 && hueOf('Soccal') < 360, hueOf('A') !== hueOf('B')], [true, true, true])
+eq('startYear', [startYear('Jul 2025'), startYear('soon'), startYear(null)], [2025, null, null])
+eq('ratio clamps', [screenRatio({ w: 1600, h: 900 }), screenRatio({ w: 100, h: 1000 }), screenRatio({ w: 5000, h: 100 })], [1600 / 900, 0.4, 2.4])
+eq('portrait', [isPortrait({ w: 390, h: 844 }), isPortrait({ w: 1000, h: 1200 }), isPortrait({ w: 1000, h: 1201 })], [true, false, true])
+eq('visible', [visibleScreens(true), visibleScreens(false)], [5, 4])
+eq('arc: oldest to newest, newest role per company', careerArc([
+  { id: 'a2', company: 'A', is_current: true }, { id: 'b1', company: 'B', is_current: false }, { id: 'a1', company: 'A', is_current: false }, { id: 'c1', company: 'C', is_current: false },
+]), [{ company: 'C', id: 'c1', current: false }, { company: 'B', id: 'b1', current: false }, { company: 'A', id: 'a2', current: true }])
+eq('arc: empty', careerArc([]), [])
 
 process.exit(fail ? 1 : 0)

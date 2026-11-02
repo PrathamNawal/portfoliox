@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
+import { pickStoryFields } from '@/lib/experience-story'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -12,6 +13,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const update: Record<string, unknown> = {}
     for (const k of allowed) if (k in body) update[k] = body[k]
     if (update.is_current) update.end_month = null
+    const story = pickStoryFields(body)
+    if ('error' in story) return NextResponse.json({ error: story.error }, { status: 400 })
+    Object.assign(update, story.update)
     if (typeof update.description === 'string' && update.description.length > 4000) {
       return NextResponse.json({ error: 'Description is too long. Please shorten it.' }, { status: 400 })
     }

@@ -15,6 +15,7 @@ create table if not exists profiles (
   discipline    text check (discipline in ('ux','graphic','motion','illustration')),
   skills        text[] not null default '{}',
   scene         boolean not null default false,
+  exp_story     boolean not null default false,
   motion        text not null default 'still' check (motion in ('still','subtle','expressive')),
   layout        text not null default 'canvas' check (layout in ('canvas','spotlight')),
   theme         text not null default 'light' check (theme in ('light','skeuomorphism','neumorphism','glass','papercut','chrome','inflated','steampunk','isometric','brutalism','minimal','clay','neon','holo','vector','handwritten')),
@@ -90,6 +91,10 @@ create table if not exists work_experience (
   is_current       boolean not null default false,
   description      text check (char_length(description) <= 4000),
   discipline_tag   text,
+  headline         text check (char_length(headline) <= 140),
+  stat_value       text check (char_length(stat_value) <= 12),
+  stat_label       text check (char_length(stat_label) <= 40),
+  screens          jsonb not null default '[]' check (jsonb_typeof(screens) = 'array' and jsonb_array_length(screens) <= 12),
   display_order    integer not null default 0,
   created_at       timestamptz not null default now()
 );

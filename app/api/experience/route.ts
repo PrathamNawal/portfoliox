@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthContext } from '@/lib/supabase/with-auth'
 import { sortExperience } from '@/lib/experience'
+import { pickStoryFields } from '@/lib/experience-story'
 
 export async function GET() {
   try {
@@ -14,18 +15,23 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const { userId, supabase } = await requireAuthContext()
-    const { role, company, logo_url, start_month, end_month, is_current, description, discipline_tag, display_order } = await req.json()
+    const body = await req.json()
+    const { role, company, logo_url, start_month, end_month, is_current, description, discipline_tag, display_order } = body
     if (!role || !company || !start_month) return NextResponse.json({ error: 'Role, company and start month are required' }, { status: 400 })
 
     if (description && description.length > 4000) {
       return NextResponse.json({ error: 'Description is too long. Please shorten it.' }, { status: 400 })
     }
 
+    const story = pickStoryFields(body)
+    if ('error' in story) return NextResponse.json({ error: story.error }, { status: 400 })
+
     const { data, error } = await supabase.from('work_experience').insert({
       user_id: userId, role, company, logo_url: logo_url || null,
       start_month, end_month: is_current ? null : end_month || null,
       is_current: !!is_current, description: description || null,
       discipline_tag: discipline_tag || null, display_order: display_order || 0,
+      ...story.update,
     }).select().single()
     if (error) {
       const message = error.message.includes('work_experience_description_check')
