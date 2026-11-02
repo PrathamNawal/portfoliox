@@ -65,9 +65,11 @@ interface Props {
   scene?: boolean
   /** Work Experience as a story (career arc, big chapters, screenshots). Off keeps the classic list. */
   expStory?: boolean
+  /** Show "~N years" next to the Experience kicker. Off by default. */
+  expYears?: boolean
 }
 
-export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true, motion = 'still', scene = false, expStory = false }: Props) {
+export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true, motion = 'still', scene = false, expStory = false, expYears = false }: Props) {
   const wallCovers = caseStudies
     .filter(cs => cs.cover_image_url && !cs.nda_enabled)
     .map(cs => ({ id: cs.id!, title: cs.title || '', url: cs.cover_image_url!, fit: cs.cover_fit }))
@@ -168,7 +170,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           <ScrollReveal delay={100}>
             <section className="pxp-section" aria-labelledby="pxp-work">
               <div style={{ marginBottom: 32 }}>
-                <p className="pxp-kicker">Experience {calcTotalExperience(experience)}</p>
+                <p className="pxp-kicker">Experience{expYears && ` ${calcTotalExperience(experience)}`}</p>
                 <h2 id="pxp-work" className="pxp-h2">Work Experience</h2>
               </div>
               {expStory ? <ExperienceStory experience={experience} /> : (

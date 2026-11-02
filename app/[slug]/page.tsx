@@ -86,6 +86,7 @@ export default async function PublishedPortfolio({ params }: Props) {
     motionRes,
     sceneRes,
     storyRes,
+    yearsRes,
   ] = await Promise.all([
     supabase
       .from('case_studies')
@@ -107,6 +108,8 @@ export default async function PublishedPortfolio({ params }: Props) {
     supabase.from('profiles').select('scene').eq('id', profile.id).maybeSingle(),
     // And for the story experience layout: a missing column means off (the classic look).
     supabase.from('profiles').select('exp_story').eq('id', profile.id).maybeSingle(),
+    // Same for the years count in the experience heading: a missing column means hidden.
+    supabase.from('profiles').select('exp_years').eq('id', profile.id).maybeSingle(),
   ])
 
   if (csError) console.error('[portfolio] case_studies error:', csError)
@@ -120,10 +123,13 @@ export default async function PublishedPortfolio({ params }: Props) {
 
   const expStory = (storyRes.data as { exp_story?: boolean } | null)?.exp_story === true
 
+  const expYears = (yearsRes.data as { exp_years?: boolean } | null)?.exp_years === true
+
   const props = {
     motion,
     scene,
     expStory,
+    expYears,
     profile: { ...profile, theme: resolveTheme((themeRes.data as { theme?: string } | null)?.theme) },
     caseStudies: (caseStudies || []).map(cs => ({ ...cs, cover_fit: resolveCoverFit(fitById.get(cs.id)) })),
     testimonials: testimonials || [],

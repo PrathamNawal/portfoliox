@@ -51,6 +51,8 @@ export interface Profile {
   scene?: boolean
   /** Story layout for Work Experience. Optional until the experience_story migration is applied. */
   exp_story?: boolean
+  /** Show "~N years" in the Work Experience heading. Optional until the experience_years migration is applied. */
+  exp_years?: boolean
   slug: string | null
   plan: Plan
   role: Role

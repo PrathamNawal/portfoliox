@@ -331,9 +331,13 @@ interface Props {
   story: boolean
   onStoryChange: (on: boolean) => void
   storyError?: string | null
+  /** Show "~N years" in the heading (profiles.exp_years). */
+  showYears: boolean
+  onYearsChange: (on: boolean) => void
+  yearsError?: string | null
 }
 
-export function WorkExperienceSection({ experience: unsorted, onChange, story, onStoryChange, storyError }: Props) {
+export function WorkExperienceSection({ experience: unsorted, onChange, story, onStoryChange, storyError, showYears, onYearsChange, yearsError }: Props) {
   // Latest first, always: whatever order the parent holds, the list shows (and edits) this order.
   const experience = sortExperience(unsorted)
   const [modalOpen, setModalOpen] = useState(false)
@@ -364,6 +368,16 @@ export function WorkExperienceSection({ experience: unsorted, onChange, story, o
           description="Shows your experience as a story: a career timeline, a big headline per role and your screens. Off keeps the classic list."
         />
         {storyError && <span role="alert" style={{ fontSize: 11, color: '#C94040' }}>{storyError}</span>}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+        <SceneToggle
+          id="exp-years-toggle"
+          value={showYears}
+          onChange={onYearsChange}
+          label="Show years of experience"
+          description="Adds the total, like “~3 years”, next to the Experience heading on your portfolio. Off by default."
+        />
+        {yearsError && <span role="alert" style={{ fontSize: 11, color: '#C94040' }}>{yearsError}</span>}
       </div>
 
       {experience.length === 0 ? (
