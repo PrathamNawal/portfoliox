@@ -65,3 +65,14 @@ A 20 second looping illustration sits under the hero buttons when the owner turn
 - Dev only: `/dev/scene?theme=<id>&freeze=0..1` pins a moment of the loop; add `&clean` for just the scene.
 - The scene adds about 400px to the hero, so with it on the work starts lower on the page.
 
+
+## Story experience (own on/off switch)
+
+The owner can turn on **Story layout** in the dashboard (switch under the Work Experience heading; Canvas layout only; stored in `profiles.exp_story`, default off = the classic list, unchanged). Published pages read `exp_story` in a tolerant query: a missing column means off.
+
+- A career arc strip (companies oldest to newest), then one chapter per role, latest first: big start year, company chip (stored logo, else initial on a tint from the name), role, a big headline, an optional dark stat chip, an optional "exhibit" of screens, and the bullets in a `<details>` (open for the newest role).
+- Per role, optional fields (all in `work_experience`): `headline` (140), `stat_value` (12), `stat_label` (40), `screens` (jsonb, up to 12 `{url,w,h,caption?}`). With none of them set the chapter still reads well: the headline falls back to the first bullet.
+- Screens are uploaded from the role modal (compressed to webp, max 1600px, bucket `case-study-images`). The API only accepts https URLs under this project's public storage path. Tall images get a phone frame, wide ones a browser-style frame, laid out in justified rows; past 5 (newest role) or 4 (others) a "+N" tile opens the lightbox.
+- Component `components/published/ExperienceStory.tsx`, styles `.pxs-*` at the end of `app/globals.css` (only theme tokens, so all themes work). Pure helpers and validation: `lib/experience-story.ts` (`npm run test:experience`).
+- Dev: `/dev/themes?theme=<id>&exp=story` (default `exp=classic`); two fixture roles carry a headline, a stat and generated screens. `/preview` has a local "Story experience" checkbox.
+- Deploy order: apply `supabase/migrations/20261102120000_experience_story.sql` first, then deploy (saving a role writes the new columns).

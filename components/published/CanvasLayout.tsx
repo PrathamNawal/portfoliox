@@ -6,6 +6,7 @@ import { Marquee } from './Marquee'
 import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
 import { HeroMotion } from './HeroMotion'
+import { ExperienceStory } from './ExperienceStory'
 import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
 
@@ -62,9 +63,11 @@ interface Props {
   motion?: MotionLevel
   /** Show the designer illustration under the hero buttons. At motion 'still' it is one still frame. */
   scene?: boolean
+  /** Work Experience as a story (career arc, big chapters, screenshots). Off keeps the classic list. */
+  expStory?: boolean
 }
 
-export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true, motion = 'still', scene = false }: Props) {
+export function CanvasLayout({ profile, caseStudies, testimonials, experience, tools, trackViews = true, motion = 'still', scene = false, expStory = false }: Props) {
   const wallCovers = caseStudies
     .filter(cs => cs.cover_image_url && !cs.nda_enabled)
     .map(cs => ({ id: cs.id!, title: cs.title || '', url: cs.cover_image_url!, fit: cs.cover_fit }))
@@ -168,20 +171,22 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
                 <p className="pxp-kicker">Experience {calcTotalExperience(experience)}</p>
                 <h2 id="pxp-work" className="pxp-h2">Work Experience</h2>
               </div>
-              <div className="pxp-exp-list">
-                {groupByCompany(experience).map(({ company, entries }, gi) => (
-                  <div key={company}>
-                    <div className="pxp-exp-company">
-                      <CompanyLogo company={company} logoUrl={entries[0]?.logo_url} />
-                      <span className="pxp-exp-company__name">{company}</span>
-                      <span className="pxp-exp-company__tenure">{formatDuration(entries.reduce((n, e) => n + durationMonths(e), 0))}</span>
+              {expStory ? <ExperienceStory experience={experience} /> : (
+                <div className="pxp-exp-list">
+                  {groupByCompany(experience).map(({ company, entries }, gi) => (
+                    <div key={company}>
+                      <div className="pxp-exp-company">
+                        <CompanyLogo company={company} logoUrl={entries[0]?.logo_url} />
+                        <span className="pxp-exp-company__name">{company}</span>
+                        <span className="pxp-exp-company__tenure">{formatDuration(entries.reduce((n, e) => n + durationMonths(e), 0))}</span>
+                      </div>
+                      <div className="pxp-exp-roles">
+                        {entries.map((exp, ri) => <ExperienceRole key={exp.id} exp={exp} open={gi === 0 && ri === 0} />)}
+                      </div>
                     </div>
-                    <div className="pxp-exp-roles">
-                      {entries.map((exp, ri) => <ExperienceRole key={exp.id} exp={exp} open={gi === 0 && ri === 0} />)}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </section>
           </ScrollReveal>
         )}
