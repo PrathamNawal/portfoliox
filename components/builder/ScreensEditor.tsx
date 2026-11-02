@@ -49,6 +49,7 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
   const [busy, setBusy] = useState(0) // files in flight
   const [error, setError] = useState('')
   const [dragging, setDragging] = useState(false)
+  const [pageUrl, setPageUrl] = useState('')
 
   const setBusyCount = (n: number) => { setBusy(n); onBusyChange?.(n > 0) }
 
@@ -75,6 +76,24 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
       finally { pending--; setBusyCount(pending) }
     }))
     if (failed) setError(e => `${failed} image${failed > 1 ? 's' : ''} could not be uploaded. Check your connection and try again.${e ? ' ' + e : ''}`)
+  }
+
+  // Capture a screen from a page URL: the server takes the screenshot and stores it like an upload.
+  const capture = async () => {
+    if (!pageUrl.trim() || busy > 0 || latest.current.length >= MAX_SCREENS) return
+    setError('')
+    setBusyCount(1)
+    try {
+      const res = await fetch('/api/screenshot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: pageUrl.trim() }) })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) { setError(d.error || 'Could not capture that page.'); return }
+      const s: ExperienceScreen = { url: d.url, w: d.w, h: d.h }
+      latest.current = [...latest.current, s]
+      onChange(latest.current)
+      setPageUrl('')
+    } catch {
+      setError('Could not capture that page. Check your connection and try again.')
+    } finally { setBusyCount(0) }
   }
 
   const move = (i: number, d: number) => {
@@ -109,8 +128,14 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
       >
         <button type="button" disabled={full || busy > 0} onClick={() => inputRef.current?.click()}
           style={{ ...btn, width: '100%', height: 38, fontWeight: 600, color: 'var(--px-text-2)', cursor: full || busy > 0 ? 'default' : 'pointer' }}>
-          {busy > 0 ? `Uploading ${busy} image${busy > 1 ? 's' : ''}…` : full ? 'Screen limit reached' : '+ Add screens (or drop images here)'}
+          {busy > 0 ? `Working on ${busy} image${busy > 1 ? 's' : ''}… (page captures can take up to 30 seconds)` : full ? 'Screen limit reached' : '+ Add screens (or drop images here)'}
         </button>
+        <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+          <input value={pageUrl} onChange={e => setPageUrl(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); capture() } }}
+            placeholder="Or paste a page URL to capture it" aria-label="Page URL to capture" disabled={full || busy > 0} inputMode="url"
+            style={{ flex: 1, minWidth: 0, height: 34, padding: '0 10px', fontSize: 13, color: 'var(--px-text)', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 'var(--px-r)', outline: 'none', fontFamily: 'var(--px-font)' }} />
+          <button type="button" onClick={capture} disabled={!pageUrl.trim() || full || busy > 0} style={{ ...btn, height: 34, padding: '0 12px', fontWeight: 600, cursor: !pageUrl.trim() || full || busy > 0 ? 'default' : 'pointer' }}>Capture</button>
+        </div>
         <input ref={inputRef} type="file" accept={ACCEPT} multiple style={{ display: 'none' }}
           onChange={e => { if (e.target.files) addFiles(e.target.files); e.target.value = '' }} />
 
@@ -135,7 +160,7 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
         )}
       </div>
       <p style={{ fontSize: 11, color: 'var(--px-text-3)', margin: '6px 0 0', lineHeight: 1.4 }}>
-        Export from Figma as PNG, JPG or WebP. Images are resized to 1600px and shown in order; tall ones get a phone frame.
+        Export from Figma as PNG, JPG or WebP, or paste a public page URL. Images are resized to 1600px and shown in order; tall ones get a phone frame. Page captures use free services and can fail when they are busy.
       </p>
       {error && <p role="alert" style={{ fontSize: 12, color: '#C94040', margin: '6px 0 0' }}>{error}</p>}
     </div>
