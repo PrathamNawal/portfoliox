@@ -7,6 +7,8 @@ import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
 import { HeroMotion } from './HeroMotion'
 import { ExperienceStory } from './ExperienceStory'
+import { CaseCardLink } from './CaseCardLink'
+import { ViewTransitionGate } from './ViewTransitionGate'
 import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
 
@@ -101,6 +103,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         </nav>
       </header>
 
+      <ViewTransitionGate mode="card" />
       <section className="pxp-hero">
         {motion !== 'still' && <HeroMotion covers={wallCovers} slug={profile.slug!} level={motion} />}
         {profile.avatar_url
@@ -250,8 +253,8 @@ function CanvasCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; slu
   const summary = (cs.overview_data as { summary?: string } | null)?.summary
 
   return (
-    <Link href={`/${slug}/case/${cs.id}`} className="pxp-card" data-i={index % 4}>
-      <div className="pxp-card__media">
+    <CaseCardLink href={`/${slug}/case/${cs.id}`} className="pxp-card" index={index % 4} caseId={cs.id} morph={!cs.nda_enabled}>
+      <div className="pxp-card__media" data-vt-cover={cs.id}>
         {cs.cover_image_url ? (
           <CoverImage url={cs.cover_image_url} fit={cs.cover_fit} label={`${cs.title} cover`} />
         ) : (
@@ -280,7 +283,7 @@ function CanvasCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; slu
           <div className="pxp-card__cta"><span>View project</span><span aria-hidden="true">→</span></div>
         )}
       </div>
-    </Link>
+    </CaseCardLink>
   )
 }
 

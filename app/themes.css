@@ -1175,3 +1175,21 @@
 }
 .pxp-wall__tile .px-cover { inset: calc(var(--t-media-inset) * 0.5); border-radius: var(--t-media-r); }
 .pxp-wall__slot:hover .pxp-wall__tile { animation-play-state: paused; scale: 1.08; z-index: 2; }
+
+/* ── View transitions (lib/view-transition.ts, ViewTransitionGate) ──────────────────────────────────────────
+   A case-study card cover morphs into the case-study hero and back. The names exist only during a transition.
+   Case page extras (scroll-driven, no JS): a progress bar and sections that rise in as they enter the viewport.
+   Both are progressive enhancement: browsers without animation-timeline just show the page as it was. */
+::view-transition-group(case-cover) { animation-duration: .5s; animation-timing-function: cubic-bezier(.2, .8, .3, 1); }
+::view-transition-old(case-cover), ::view-transition-new(case-cover) { width: 100%; height: 100%; object-fit: cover; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation-duration: 0s !important; } }
+
+.px-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .px-progress { display: block; position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 3px; background: var(--px-accent); transform-origin: 0 50%; transform: scaleX(0); animation: px-progress linear both; animation-timeline: scroll(root); }
+  @keyframes px-progress { to { transform: scaleX(1); } }
+  @media (prefers-reduced-motion: no-preference) {
+    .px-rise { animation: px-rise linear both; animation-timeline: view(); animation-range: entry 0px entry 260px; }
+    @keyframes px-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+  }
+}
