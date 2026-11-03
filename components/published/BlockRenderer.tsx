@@ -58,6 +58,15 @@ function VideoEmbed({ url }: { url: string }) {
       </div>
     )
   }
+  // YouTube Shorts: a portrait player, not a 16:9 one
+  const shortMatch = url.match(/youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/)
+  if (shortMatch) {
+    return (
+      <div style={{ position: 'relative', width: 'min(100%, 340px)', aspectRatio: '9/16', borderRadius: 12, overflow: 'hidden', background: '#000' }}>
+        <iframe src={`https://www.youtube.com/embed/${shortMatch[1]}?autoplay=0&rel=0`} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+      </div>
+    )
+  }
   // Loom
   const loomMatch = url.match(/loom\.com\/share\/([a-f0-9]+)/)
   if (loomMatch) {
@@ -83,10 +92,13 @@ function VideoEmbed({ url }: { url: string }) {
         style={{ width: '100%', borderRadius: 8, display: 'block', maxHeight: 540, objectFit: 'contain', background: '#000' }} />
     )
   }
-  // Fallback — link
+  // Fallback: a card that opens the video in a new tab (never a bare text link)
+  let host = url
+  try { host = new URL(url).hostname.replace(/^www\./, '') } catch { /* keep the raw text */ }
   return (
-    <a href={url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#E53416', fontWeight: 600 }}>
-      ▶ Watch video ↗
+    <a href={url} target="_blank" rel="noreferrer" className="px-videocard">
+      <span className="px-videocard__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="8,5 19,12 8,19" /></svg></span>
+      <span className="px-videocard__text"><b>Watch the video</b><i>{host} ↗</i></span>
     </a>
   )
 }

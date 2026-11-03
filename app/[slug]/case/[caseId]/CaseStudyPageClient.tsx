@@ -14,7 +14,8 @@ import { mergeImageBlocks } from '@/lib/image-shape'
 import { CaseRail } from '@/components/published/CaseRail'
 import { CountUp } from '@/components/published/CountUp'
 import { resolveMotion } from '@/lib/motion'
-import { asLabel, asStep, skimOf, stageOf, type Band } from '@/lib/case-copy'
+import { skimOf, stageOf, type Band } from '@/lib/case-copy'
+import { structure } from '@/lib/case-structure'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
 
@@ -26,81 +27,32 @@ interface Props {
 }
 
 // ── Narrative renderer ────────────────────────────────────────────────────────
-// Narrative is plain text with paragraphs, **bold**/*italic* markers, and
-// "- " / "1. " list lines — which can appear right after a bold label line
-// with no blank line in between, so we parse line-by-line rather than by
-// blank-line-separated paragraph, and group consecutive list lines together.
-const BODY_TEXT_STYLE: React.CSSProperties = { fontSize: 16, lineHeight: 1.75, color: 'var(--px-text-2)', fontFamily: 'var(--px-font-body)' }
-
-const BULLET_RE = /^[-*•]\s+/
-const NUMBERED_RE = /^\d+\.\s+/
-
-type NarrativeBlock = { kind: 'ul' | 'ol' | 'p'; lines: string[] }
-
-function parseNarrativeBlocks(text: string): NarrativeBlock[] {
-  const lines = text.split('\n')
-  const blocks: NarrativeBlock[] = []
-  let i = 0
-  while (i < lines.length) {
-    if (lines[i].trim() === '') { i++; continue }
-    if (BULLET_RE.test(lines[i].trim())) {
-      const items: string[] = []
-      while (i < lines.length && BULLET_RE.test(lines[i].trim())) {
-        items.push(lines[i].trim().replace(BULLET_RE, ''))
-        i++
-      }
-      blocks.push({ kind: 'ul', lines: items })
-      continue
-    }
-    if (NUMBERED_RE.test(lines[i].trim())) {
-      const items: string[] = []
-      while (i < lines.length && NUMBERED_RE.test(lines[i].trim())) {
-        items.push(lines[i].trim().replace(NUMBERED_RE, ''))
-        i++
-      }
-      blocks.push({ kind: 'ol', lines: items })
-      continue
-    }
-    const paraLines: string[] = []
-    while (i < lines.length && lines[i].trim() !== '' && !BULLET_RE.test(lines[i].trim()) && !NUMBERED_RE.test(lines[i].trim())) {
-      paraLines.push(lines[i])
-      i++
-    }
-    blocks.push({ kind: 'p', lines: paraLines })
-  }
-  return blocks
-}
-
+// The narrative is plain text with paragraphs and **bold**/*italic* markers. lib/case-structure.ts reads its
+// patterns (numbered titles, term - description runs, label: text runs, short titles, one-line lists) into typed
+// nodes, so they render as steps, cards, sub-headings and lists instead of a run of paragraphs.
 function renderNarrative(text: string): React.ReactNode {
   if (!text?.trim()) return null
-  return parseNarrativeBlocks(text).map((block, bi) => {
-    if (block.kind === 'ul') {
-      return (
-        <ul key={bi} className="px-ul">
-          {block.lines.map((l, li) => <li key={li}><InlineMarkdown text={l} /></li>)}
-        </ul>
-      )
+  return structure(text).map((node, i) => {
+    switch (node.k) {
+      case 'ul': return <ul key={i} className="px-ul">{node.items.map((l, li) => <li key={li}><InlineMarkdown text={l} /></li>)}</ul>
+      case 'ol': return <ol key={i} className="px-ol">{node.items.map((l, li) => <li key={li}><InlineMarkdown text={l} /></li>)}</ol>
+      case 'step': return <h3 key={i} className="px-step"><span>{node.n}</span>{node.title}</h3>
+      case 'h3': return <h3 key={i} className="px-h3">{node.text}</h3>
+      case 'label': return <p key={i} className="px-label">{node.text}</p>
+      case 'defs':
+        return (
+          <div key={i} className="px-defs">
+            {node.items.map((d, di) => (
+              <div key={di} className="px-def">
+                {d.n && <span className="px-def__n" aria-hidden="true">{d.n}</span>}
+                <h4>{d.term}</h4>
+                <p><InlineMarkdown text={d.text} /></p>
+              </div>
+            ))}
+          </div>
+        )
+      default: return <p key={i} className={node.lead ? 'px-p px-p--lead' : 'px-p'}><InlineMarkdown text={node.text} /></p>
     }
-    if (block.kind === 'ol') {
-      return (
-        <ol key={bi} className="px-ol">
-          {block.lines.map((l, li) => <li key={li}><InlineMarkdown text={l} /></li>)}
-        </ol>
-      )
-    }
-    if (block.lines.length === 1) {
-      const step = asStep(block.lines[0])
-      if (step) return <h3 key={bi} className="px-step"><span>{step.n}</span>{step.title}</h3>
-      const label = asLabel(block.lines[0])
-      if (label) return <p key={bi} className="px-label">{label}</p>
-    }
-    // a section that opens with a paragraph gets a lead; one that opens with a step or label does not
-    const isLead = bi === 0 && block.lines.join(' ').length >= 60
-    return (
-      <p key={bi} className={isLead ? 'px-p px-p--lead' : 'px-p'}>
-        <InlineMarkdown text={block.lines.join('\n')} />
-      </p>
-    )
   })
 }
 
