@@ -55,7 +55,7 @@ export function RecommendationStage({ testimonials, roles, linkRoles, animate }:
   }
 
   return (
-    <div className="pxp-rec" id="pxp-rec" data-motion={animate && !reduced ? 'on' : 'off'}>
+    <div className="pxp-rec" id="pxp-rec" data-motion={animate && !reduced ? 'on' : 'off'} data-pick={prefer && signals.some(s => s.id === prefer) ? '' : undefined}>
       {signals.length > 0 && (
         <div className="pxp-rec__signals" role="group" aria-label="What people say about working with her">
           <span className="pxp-rec__signals-label">What people say</span>
