@@ -1334,13 +1334,11 @@
 .px-band { margin-top: clamp(32px, 4vw, 56px); padding: clamp(28px, 4vw, 56px); border-radius: 24px; background: color-mix(in srgb, var(--px-accent) 8%, var(--px-surface)); }
 .px-band > span { display: block; margin-bottom: 14px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--px-accent); }
 .px-band p { margin: 0; max-width: 28em; font-size: clamp(22px, 2.6vw, 40px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.25; color: var(--px-text); font-family: var(--px-font-body); }
-.px-band--quote { border-left: 6px solid var(--px-accent); border-radius: 6px 24px 24px 6px; }
+.px-band--quote, .px-band--finale { border-left: 6px solid var(--px-accent); border-radius: 6px 24px 24px 6px; }
 .px-band--stats ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: clamp(20px, 3vw, 48px); margin: 0; padding: 0; list-style: none; }
 .px-band--stats b { display: block; font-size: clamp(48px, 7vw, 104px); font-weight: 800; letter-spacing: -0.05em; line-height: .95; color: var(--px-accent); }
 .px-band--stats span { display: block; margin-top: 10px; font-size: calc(var(--cs-body) * .95); line-height: 1.45; color: var(--px-text-2); }
-.px-band--finale { background: var(--px-text); }
-.px-band--finale > span { color: color-mix(in srgb, var(--px-accent) 70%, #fff); }
-.px-band--finale p { color: var(--px-surface); }
+
 
 /* ── Case study scroll motion (CaseStudyPageClient data-motion, CountUp, CaseRail) ──────────────────────────────
    Only when the portfolio's Motion is not Still (.px-cs[data-motion="on"]) and the reader has not asked for reduced
