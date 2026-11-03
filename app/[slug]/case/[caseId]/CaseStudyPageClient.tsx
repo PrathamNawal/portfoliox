@@ -2,11 +2,14 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { BlockRenderer } from '@/components/published/BlockRenderer'
 import { NDAGate } from '@/components/published/NDAGate'
 import { AnalyticsTracker } from '@/components/published/AnalyticsTracker'
 import { ThemeScope } from '@/components/published/ThemeScope'
 import { CoverImage } from '@/components/published/CoverImage'
+import { ViewTransitionGate } from '@/components/published/ViewTransitionGate'
+import { transitionClick } from '@/lib/view-transition'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
 
@@ -170,7 +173,7 @@ function ContentSection({ section }: { section: CaseSection }) {
   if (!hasNarrative && !hasBlocks) return null
 
   return (
-    <div style={{ marginBottom: 64 }}>
+    <div className="px-rise" style={{ marginBottom: 64 }}>
       {/* Section title — the actual heading */}
       <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.015em', color: 'var(--px-text)', lineHeight: 1.2, marginBottom: 20 }}>
         {section.title || def.title}
@@ -202,6 +205,9 @@ function ContentSection({ section }: { section: CaseSection }) {
 export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: initialLocked, slug }: Props) {
   const [locked, setLocked] = useState(initialLocked)
   const cs = initialCs
+  const router = useRouter()
+  // Going back shrinks the hero into this project's card on the portfolio.
+  const back = (e: React.MouseEvent) => transitionClick(e, router, `/${slug}`, document.querySelector<HTMLElement>('[data-vt-hero]'))
 
   const handleUnlock = () => window.location.reload()
 
@@ -212,11 +218,13 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
 
   return (
     <ThemeScope theme={profile.theme}>
+      <ViewTransitionGate mode="hero" />
+      <div className="px-progress" aria-hidden="true" />
       <AnalyticsTracker userId={profile.id} caseStudyId={cs.id} eventType="case_study_view" />
 
       {/* Sticky nav */}
       <nav style={{ background: 'var(--px-surface)', borderBottom: '1px solid var(--px-border)', padding: '0 clamp(16px, 4vw, 40px)', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
-        <Link href={`/${slug}`} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--px-text-3)', textDecoration: 'none', fontWeight: 500 }}>
+        <Link href={`/${slug}`} onClick={back} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--px-text-3)', textDecoration: 'none', fontWeight: 500 }}>
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
             <line x1="16" y1="10" x2="4" y2="10"/><polyline points="9 15 4 10 9 5"/>
           </svg>
@@ -236,15 +244,15 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
         <>
           {/* Hero */}
           {cs.cover_image_url && cs.cover_fit === 'fit' ? (
-            <div style={{ position: 'relative', width: '100%', height: 'min(520px, 56vw)' }}>
+            <div data-vt-hero style={{ position: 'relative', width: '100%', height: 'min(520px, 56vw)' }}>
               <CoverImage url={cs.cover_image_url} fit="fit" label={cs.title} />
             </div>
           ) : cs.cover_image_url ? (
-            <div style={{ width: '100%', maxHeight: 520, overflow: 'hidden' }}>
+            <div data-vt-hero style={{ width: '100%', maxHeight: 520, overflow: 'hidden' }}>
               <img src={cs.cover_image_url} alt={cs.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: 520 }} />
             </div>
           ) : (
-            <div style={{ width: '100%', height: 300, background: 'linear-gradient(135deg,#2A1B4A 0%,#5B3FA6 60%,#7B5EE0 100%)' }} />
+            <div data-vt-hero style={{ width: '100%', height: 300, background: 'linear-gradient(135deg,#2A1B4A 0%,#5B3FA6 60%,#7B5EE0 100%)' }} />
           )}
 
           {/* Content — wide canvas so visual blocks have room; prose stays narrow within it */}
@@ -272,7 +280,7 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
 
             {/* Footer */}
             <div style={{ marginTop: 32, paddingTop: 32, borderTop: '1px solid var(--px-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-              <Link href={`/${slug}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: 'var(--px-text-2)', textDecoration: 'none' }}>
+              <Link href={`/${slug}`} onClick={back} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: 'var(--px-text-2)', textDecoration: 'none' }}>
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
                   <line x1="16" y1="10" x2="4" y2="10"/><polyline points="9 15 4 10 9 5"/>
                 </svg>
