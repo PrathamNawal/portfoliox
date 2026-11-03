@@ -392,6 +392,29 @@
 .pxp-card__note { margin: 0; font-size: 12px; font-style: italic; color: var(--t-on-surface-3); }
 .pxp-card__cta { display: flex; align-items: center; gap: 4px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--t-link); }
 
+/* case grid: 2-up, featured and leftover cards span full width */
+.pxp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1181px) {
+  .pxp-section--cases { width: min(1240px, calc(100vw - 80px)); margin-left: calc(50% - min(1240px, calc(100vw - 80px)) / 2); }
+}
+.pxp-card--wide { grid-column: 1 / -1; display: grid; grid-template-columns: 1.5fr 1fr; align-items: stretch; transform: none; }
+.pxp-card--wide .pxp-card__media { aspect-ratio: auto; min-height: 340px; margin: var(--t-media-inset); }
+.pxp-card--wide .pxp-card__body { display: flex; flex-direction: column; justify-content: center; padding: 28px 36px; }
+.pxp-card--wide .pxp-card__title { font-size: 26px; line-height: 1.2; letter-spacing: -0.03em; margin-bottom: 12px; }
+.pxp-card--wide .pxp-card__title--flush { margin-bottom: 0; }
+.pxp-card--wide .pxp-card__summary { font-size: 15px; -webkit-line-clamp: 4; }
+.pxp-card--wide .pxp-card__cta { font-size: 14px; margin-top: 20px; }
+.pxp-card--flip .pxp-card__media { order: 2; }
+@media (max-width: 760px) {
+  .pxp-grid { grid-template-columns: 1fr; }
+  .pxp-card--wide { display: block; }
+  .pxp-card--wide .pxp-card__media { aspect-ratio: var(--t-media-ratio); min-height: 0; }
+  .pxp-card--wide .pxp-card__body { display: block; padding: var(--t-card-body-pad); }
+  .pxp-card--wide .pxp-card__title { font-size: 15px; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .pxp-card--wide .pxp-card__summary { font-size: 13px; -webkit-line-clamp: 2; }
+  .pxp-card--wide .pxp-card__cta { font-size: 12px; margin-top: 12px; }
+}
+
 /* testimonials */
 .pxp-quote { flex-shrink: 0; width: 340px; padding: 32px 32px 28px; display: flex; flex-direction: column; justify-content: space-between; }
 .pxp-quote[data-i="0"] { background: var(--t-quote-bg-0); transform: rotate(var(--t-quote-rot-0)); }
