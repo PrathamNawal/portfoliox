@@ -1,0 +1,120 @@
+/* TimelineWalker (components/scene/TimelineWalker.tsx). Hand-written; it reuses the rig and classes of
+   designer-scene.css, so every timeline animation from that file is switched off here first.
+   Resting pose = standing, arms down. Walking runs while data-walking="true" (set by scroll), the job-dot hop
+   while data-hop is "a" or "b" (alternating names restart the animation). Motion runs only under
+   prefers-reduced-motion: no-preference and only while the timeline is on screen (--sc-state). */
+
+/* room above the first dot for her to stand in, and the rail starts below it; the fill line ends at her feet (--wy) */
+.pxs-timeline[data-walker] { padding-top: 112px; --wy: 130px; }
+.pxs-timeline[data-walker]::before, .pxs-timeline[data-walker]::after { top: 130px; }
+.pxs-timeline[data-walker]::before { bottom: 14px; }
+.pxs-timeline[data-walker]::after { height: calc(var(--wy) - 130px); }
+
+.pxs-timeline[data-walker] .pxs-when { padding-right: 16px; }
+.pxs-timeline > .sc-root.wk-root { position: absolute; top: 0; left: calc(var(--rail) + var(--gap) / 2 - 28px); z-index: 2; width: 56px; max-width: none; margin: 0; list-style: none; pointer-events: none; will-change: transform; }
+.wk-root::before, .wk-root::after { content: none !important; }
+@media (max-width: 640px) {
+  .pxs-timeline > .sc-root.wk-root { left: -22px; }
+  .pxs-timeline[data-walker] .pxs-when { padding-right: 0; }
+  .pxs-timeline[data-walker] .pxs-chapter { padding-left: 40px; }
+}
+
+.wk-root :is(.r-x, .r-bob, .j-hipL, .j-hipR, .j-kneeL, .j-kneeR, .j-shL, .j-shR, .j-torso, .j-head, .j-look, .j-pigL, .j-pigR, .f-normal, .f-happy, .f-mouth, .f-marker, .sc-bubble) { animation: none; }
+.wk-root .r-x { transform: none; }
+.wk-root :is(.j-hipL, .j-hipR, .j-kneeL, .j-kneeR, .j-torso, .j-head, .j-look) { transform: none; }
+.wk-root .j-shL { transform: rotate(8deg); }
+.wk-root .j-shR { transform: rotate(-8deg); }
+.wk-root .sc-steam { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .wk-root * { animation-play-state: var(--sc-state) !important; }
+
+  /* idle: breathing and swaying pigtails */
+  .wk-root .r-bob { animation: wk-breathe 3.2s ease-in-out 0s infinite none; }
+  .wk-root .j-pigL { animation: wk-sway 3.2s ease-in-out 0s infinite none; }
+  .wk-root .j-pigR { animation: wk-sway 3.2s ease-in-out -1.1s infinite reverse none; }
+  @keyframes wk-breathe { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-1.5px) scale(.992, 1.012); } }
+  @keyframes wk-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+  /* walking in place: one full gait (two steps) every .6s; the world scrolls past her */
+  .wk-root[data-walking="true"] .r-bob { animation: wk-bob .3s linear 0s infinite none; }
+  .wk-root[data-walking="true"] .j-hipL { animation: wk-hipL .6s ease-in-out 0s infinite none; }
+  .wk-root[data-walking="true"] .j-hipR { animation: wk-hipL .6s ease-in-out -.3s infinite none; }
+  .wk-root[data-walking="true"] .j-kneeL { animation: wk-knee .6s ease-in-out 0s infinite none; }
+  .wk-root[data-walking="true"] .j-kneeR { animation: wk-knee .6s ease-in-out -.3s infinite none; }
+  .wk-root[data-walking="true"] .j-shL { animation: wk-arm .6s ease-in-out -.3s infinite none; }
+  .wk-root[data-walking="true"] .j-shR { animation: wk-arm .6s ease-in-out 0s infinite none; }
+  .wk-root[data-walking="true"] .j-pigL { animation: wk-sway .6s ease-in-out 0s infinite none; }
+  .wk-root[data-walking="true"] .j-pigR { animation: wk-sway .6s ease-in-out -.1s infinite reverse none; }
+  @keyframes wk-bob { 0%, 100% { transform: translateY(0) scale(1.03, .97); animation-timing-function: var(--e-out); } 50% { transform: translateY(-4px) scale(.98, 1.03); animation-timing-function: var(--e-in); } }
+  @keyframes wk-hipL { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
+  @keyframes wk-knee { 0% { transform: rotate(0); } 25% { transform: rotate(0); } 50% { transform: rotate(0); } 75% { transform: rotate(26deg); } 100% { transform: rotate(0); } }
+  @keyframes wk-arm { 0%, 100% { transform: rotate(22deg); } 50% { transform: rotate(-22deg); } }
+
+  /* hop at a job dot: crouch, jump with arms up, "!" pops, happy face, land */
+  .wk-root:is([data-hop="a"], [data-hop="b"]) :is(.j-hipL, .j-hipR, .j-kneeL, .j-kneeR) { animation: none; }
+  .wk-root[data-hop="a"] .r-bob { animation: wk-hop .95s linear 0s 1 none; }
+  .wk-root[data-hop="b"] .r-bob { animation: wk-hop-b .95s linear 0s 1 none; }
+  .wk-root[data-hop="a"] .j-shL { animation: wk-armL .95s linear 0s 1 none; }
+  .wk-root[data-hop="b"] .j-shL { animation: wk-armL-b .95s linear 0s 1 none; }
+  .wk-root[data-hop="a"] .j-shR { animation: wk-armR .95s linear 0s 1 none; }
+  .wk-root[data-hop="b"] .j-shR { animation: wk-armR-b .95s linear 0s 1 none; }
+  .wk-root[data-hop="a"] .j-head { animation: wk-tilt .95s ease-in-out 0s 1 none; }
+  .wk-root[data-hop="b"] .j-head { animation: wk-tilt-b .95s ease-in-out 0s 1 none; }
+  .wk-root[data-hop="a"] .f-happy { animation: wk-face-on .95s steps(1, end) 0s 1 none; }
+  .wk-root[data-hop="b"] .f-happy { animation: wk-face-on-b .95s steps(1, end) 0s 1 none; }
+  .wk-root[data-hop="a"] .f-normal { animation: wk-face-off .95s steps(1, end) 0s 1 none; }
+  .wk-root[data-hop="b"] .f-normal { animation: wk-face-off-b .95s steps(1, end) 0s 1 none; }
+  .wk-root[data-hop="a"] .sc-bubble { animation: wk-pop 1.9s linear 0s 1 none; }
+  .wk-root[data-hop="b"] .sc-bubble { animation: wk-pop-b 1.9s linear 0s 1 none; }
+  @keyframes wk-hop {
+    0% { transform: translateY(0) scale(1, 1); animation-timing-function: var(--e-io); }
+    16% { transform: translateY(5px) scale(1.07, .9); animation-timing-function: var(--e-out); }
+    44% { transform: translateY(-34px) scale(.95, 1.06); animation-timing-function: var(--e-in); }
+    70% { transform: translateY(0) scale(1.06, .92); animation-timing-function: var(--e-out); }
+    100% { transform: translateY(0) scale(1, 1); }
+  }
+  @keyframes wk-hop-b {
+    0% { transform: translateY(0) scale(1, 1); animation-timing-function: var(--e-io); }
+    16% { transform: translateY(5px) scale(1.07, .9); animation-timing-function: var(--e-out); }
+    44% { transform: translateY(-34px) scale(.95, 1.06); animation-timing-function: var(--e-in); }
+    70% { transform: translateY(0) scale(1.06, .92); animation-timing-function: var(--e-out); }
+    100% { transform: translateY(0) scale(1, 1); }
+  }
+  @keyframes wk-armL {
+    0% { transform: rotate(8deg); animation-timing-function: var(--e-io); }
+    16% { transform: rotate(-14deg); animation-timing-function: var(--e-out); }
+    44% { transform: rotate(168deg); animation-timing-function: ease-in-out; }
+    70% { transform: rotate(150deg); animation-timing-function: var(--e-io); }
+    100% { transform: rotate(8deg); }
+  }
+  @keyframes wk-armL-b {
+    0% { transform: rotate(8deg); animation-timing-function: var(--e-io); }
+    16% { transform: rotate(-14deg); animation-timing-function: var(--e-out); }
+    44% { transform: rotate(168deg); animation-timing-function: ease-in-out; }
+    70% { transform: rotate(150deg); animation-timing-function: var(--e-io); }
+    100% { transform: rotate(8deg); }
+  }
+  @keyframes wk-armR {
+    0% { transform: rotate(-8deg); animation-timing-function: var(--e-io); }
+    16% { transform: rotate(14deg); animation-timing-function: var(--e-out); }
+    44% { transform: rotate(-168deg); animation-timing-function: ease-in-out; }
+    70% { transform: rotate(-150deg); animation-timing-function: var(--e-io); }
+    100% { transform: rotate(-8deg); }
+  }
+  @keyframes wk-armR-b {
+    0% { transform: rotate(-8deg); animation-timing-function: var(--e-io); }
+    16% { transform: rotate(14deg); animation-timing-function: var(--e-out); }
+    44% { transform: rotate(-168deg); animation-timing-function: ease-in-out; }
+    70% { transform: rotate(-150deg); animation-timing-function: var(--e-io); }
+    100% { transform: rotate(-8deg); }
+  }
+  @keyframes wk-tilt { 0%, 100% { transform: rotate(0); } 44% { transform: rotate(-6deg); } 70% { transform: rotate(4deg); } }
+  @keyframes wk-tilt-b { 0%, 100% { transform: rotate(0); } 44% { transform: rotate(-6deg); } 70% { transform: rotate(4deg); } }
+  @keyframes wk-face-on { 0%, 15.9% { opacity: 0; } 16%, 84.9% { opacity: 1; } 85%, 100% { opacity: 0; } }
+  @keyframes wk-face-on-b { 0%, 15.9% { opacity: 0; } 16%, 84.9% { opacity: 1; } 85%, 100% { opacity: 0; } }
+  @keyframes wk-face-off { 0%, 15.9% { opacity: 1; } 16%, 84.9% { opacity: 0; } 85%, 100% { opacity: 1; } }
+  @keyframes wk-face-off-b { 0%, 15.9% { opacity: 1; } 16%, 84.9% { opacity: 0; } 85%, 100% { opacity: 1; } }
+  @keyframes wk-pop { 0%, 12% { transform: scale(0); animation-timing-function: var(--e-out); } 26% { transform: scale(1.2); } 34%, 78% { transform: scale(1); animation-timing-function: var(--e-in); } 92%, 100% { transform: scale(0); } }
+  @keyframes wk-pop-b { 0%, 12% { transform: scale(0); animation-timing-function: var(--e-out); } 26% { transform: scale(1.2); } 34%, 78% { transform: scale(1); animation-timing-function: var(--e-in); } 92%, 100% { transform: scale(0); } }
+}
