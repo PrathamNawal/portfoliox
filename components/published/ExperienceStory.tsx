@@ -2,9 +2,13 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
+import dynamic from 'next/dynamic'
 import { sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics } from '@/lib/experience'
 import { careerArc, hueOf, isPortrait, screenRatio, startYear, storyHeadline, visibleScreens } from '@/lib/experience-story'
 import type { ExperienceScreen, WorkExperience } from '@/types'
+
+// The walking designer is only loaded when the portfolio has the scene on and Motion is not Still.
+const TimelineWalker = dynamic(() => import('@/components/scene/TimelineWalker').then(m => m.TimelineWalker))
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>
 
@@ -24,7 +28,7 @@ function Chip({ company, logoUrl, small }: { company: string; logoUrl?: string |
 
 interface Open { roleId: string; index: number }
 
-export function ExperienceStory({ experience }: { experience: WorkExperience[] }) {
+export function ExperienceStory({ experience, walker = false }: { experience: WorkExperience[]; walker?: boolean }) {
   const roles = useMemo(() => sortExperience(experience), [experience])
   const arc = useMemo(() => careerArc(roles), [roles])
   const byId = useMemo(() => new Map(roles.map(r => [r.id, r])), [roles])
@@ -90,6 +94,7 @@ export function ExperienceStory({ experience }: { experience: WorkExperience[] }
       )}
 
       <ol className="pxs-timeline" ref={timelineRef}>
+        {walker && <TimelineWalker timeline={timelineRef} />}
         {roles.map(exp => {
           const featured = exp.id === featuredId
           const compact = exp.id === compactId
