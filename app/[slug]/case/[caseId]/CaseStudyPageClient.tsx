@@ -12,6 +12,8 @@ import { ViewTransitionGate } from '@/components/published/ViewTransitionGate'
 import { transitionClick } from '@/lib/view-transition'
 import { mergeImageBlocks } from '@/lib/image-shape'
 import { CaseRail } from '@/components/published/CaseRail'
+import { CountUp } from '@/components/published/CountUp'
+import { resolveMotion } from '@/lib/motion'
 import { asLabel, asStep, skimOf, stageOf, type Band } from '@/lib/case-copy'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
@@ -121,7 +123,7 @@ function InlineMarkdown({ text }: { text: string }) {
 }
 
 // ── Overview: lead statement, meta strip, big metrics ─────────────────────────
-function OverviewSection({ data, summary }: { data: OverviewData; summary?: string }) {
+function OverviewSection({ data, summary, animate }: { data: OverviewData; summary?: string; animate: boolean }) {
   // a metric needs a figure to be a metric: a label alone is not shown
   const metrics = data.metrics?.filter(m => m.value?.trim()) || []
   const meta = [['Role', data.role], ['Timeline', data.timeline], ['Team', data.team]].filter(([, v]) => v?.trim())
@@ -136,7 +138,7 @@ function OverviewSection({ data, summary }: { data: OverviewData; summary?: stri
       )}
       {metrics.length > 0 && (
         <ul className="px-metrics">
-          {metrics.map((m, i) => <li key={i}><b>{m.value}</b><span>{m.label}</span></li>)}
+          {metrics.map((m, i) => <li key={i}><b><CountUp value={m.value} animate={animate} /></b><span>{m.label}</span></li>)}
         </ul>
       )}
     </div>
@@ -148,11 +150,11 @@ function hasContent(section: CaseSection) {
   return section.narrative?.trim().length > 0 || section.blocks?.length > 0
 }
 
-function BandView({ band }: { band: Band }) {
+function BandView({ band, animate }: { band: Band; animate: boolean }) {
   if (band.kind === 'stats') {
     return (
       <aside className="px-band px-band--stats" aria-label={band.label}>
-        <ul>{band.stats?.map((st, i) => <li key={i}><b>{st.value}</b><span>{st.text}</span></li>)}</ul>
+        <ul>{band.stats?.map((st, i) => <li key={i}><b><CountUp value={st.value} animate={animate} /></b><span>{st.text}</span></li>)}</ul>
       </aside>
     )
   }
@@ -164,7 +166,7 @@ function BandView({ band }: { band: Band }) {
   )
 }
 
-function ContentSection({ section, n }: { section: CaseSection; n: number }) {
+function ContentSection({ section, n, animate }: { section: CaseSection; n: number; animate: boolean }) {
   const def = SECTION_DEFS[section.type] || SECTION_DEFS.custom
   const hasNarrative = section.narrative?.trim().length > 0
   const hasBlocks = section.blocks?.length > 0
@@ -197,7 +199,7 @@ function ContentSection({ section, n }: { section: CaseSection; n: number }) {
         {visuals}
       </div>
 
-      {band && <BandView band={band} />}
+      {band && <BandView band={band} animate={animate} />}
     </section>
   )
 }
@@ -217,6 +219,8 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
   const contentSections = sections.filter(s => s.type !== 'overview')
   const chapters = contentSections.filter(hasContent).map(s => ({ id: s.id, title: s.title || (SECTION_DEFS[s.type] || SECTION_DEFS.custom).title }))
   const skim = skimOf(contentSections)
+  // scroll motion follows the portfolio's Motion setting (Still is the default); reduced motion is handled per effect and in CSS
+  const motionOn = resolveMotion((profile as { motion?: string }).motion) !== 'still'
   const overviewData = cs.overview_data
 
   return (
@@ -255,14 +259,14 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
           )}
 
           {/* Content: a header (title, skim cards, overview) over a grid of chapter rail + chapters */}
-          <div className="px-cs">
+          <div className="px-cs" data-motion={motionOn ? 'on' : 'off'}>
 
             {/* Title */}
             <h1 className="px-cs__title">{cs.title}</h1>
 
             {/* Overview: metrics + meta */}
             {overviewData && (overviewData.summary || overviewData.role || overviewData.metrics?.some(m => m.value)) && (
-              <OverviewSection data={overviewData} summary={overviewSection?.narrative || overviewData.summary} />
+              <OverviewSection data={overviewData} summary={overviewSection?.narrative || overviewData.summary} animate={motionOn} />
             )}
 
             {/* Skim: problem / approach / outcome in a few seconds */}
@@ -278,12 +282,12 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
             )}
 
             <div className="px-cs__grid" data-rail={chapters.length > 1 || undefined}>
-              <CaseRail chapters={chapters} />
+              <CaseRail chapters={chapters} animate={motionOn} />
               <div className="px-cs__main">
 
                 {/* Content sections */}
                 {contentSections.filter(hasContent).map((section, i) => (
-                  <ContentSection key={section.id} section={section} n={i + 1} />
+                  <ContentSection key={section.id} section={section} n={i + 1} animate={motionOn} />
                 ))}
 
             {/* Footer */}
