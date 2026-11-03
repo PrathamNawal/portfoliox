@@ -21,7 +21,6 @@ const STILL_FRAME = 0.7
 // Up to this many recommendations are shown one at a time (RecommendationStage); more stay a marquee.
 const STAGE_MAX = 7
 const DesignerScene = dynamic(() => import('@/components/scene/DesignerScene').then(m => m.DesignerScene))
-const HeroFlanks = dynamic(() => import('@/components/scene/HeroFlanks').then(m => m.HeroFlanks))
 const ContactScene = dynamic(() => import('@/components/scene/ContactScene').then(m => m.ContactScene))
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
@@ -125,8 +124,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
         </div>
         {scene && (
           <div className="pxp-scene-wrap">
-            <DesignerScene freeze={motion === 'still' ? STILL_FRAME : undefined} />
-            {motion === 'expressive' && <HeroFlanks />}
+            <DesignerScene freeze={motion === 'still' ? STILL_FRAME : undefined} story={motion === 'expressive'} />
           </div>
         )}
       </section>

@@ -347,3 +347,237 @@ css = HEAD + '\n'.join(anim) + '\n\n' + '\n'.join(parts) + '\n\n' + '\n'.join(ex
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'components', 'scene', 'designer-scene.css')
 open(out, 'w').write(css)
 print('wrote', os.path.normpath(out), len(css), 'bytes,', sum(len(v) for v in tracks.values()), 'keyframes in', len(tracks), 'tracks')
+
+
+# ══════════════════════════════════════════════════════════════════════════════════════════════════════════
+# STORY LOOP (components/scene/hero-story.css). Expressive motion at >= 1360px wide: ONE character does the whole job.
+# She walks out to the left stage (01 Research: a lost user, she writes a sticky note), carries the note back and
+# pins it on the whiteboard, then runs the existing design beats (whiteboard flow, desk, laptop UI), lifts the
+# finished screen off the laptop, walks out to the right stage (03 Ship: a phone), hands it over, the phone goes
+# live, she cheers, and walks home. Everything (her, the carried note and screen, the user, the phone) runs on this
+# one clock, so the beats line up. The existing 0-70% of the 20s design timeline is reused unchanged (re-timed).
+# ══════════════════════════════════════════════════════════════════════════════════════════════════════════
+XL, XR, V = -125, 765, 110     # left stage x, right stage x, walking speed (scene px / s)
+USER_X = -235                  # the user on the left stage, left of her so she never walks through them
+EO = 16.0                      # story time at which the reused design timeline starts
+HAND = (35, -92)               # where the note / screen sits in her hands, relative to her body x (scene px, y from the floor)
+PIN = (200, 172)               # where the note is pinned on the whiteboard
+PHONE = (890, 248)             # centre of the phone screen (scene coords)
+LAPTOP = (536, 215)            # centre of the laptop screen
+
+t_walkL0, t_walkL1 = 0.6, 0.6 + (X0 - XL) / V
+t_arrive, t_pad, t_write_end = 4.3, 4.9, 9.7
+t_lift, t_carry0 = 10.5, 11.0
+t_carry1 = t_carry0 + (X0 - XL) / V
+t_ship = EO + 14.0
+t_card, t_stand = 30.2, 31.0
+t_walkR0 = 32.6
+t_walkR1 = t_walkR0 + (XR - SIT_X) / V
+t_ui, t_cheer = 37.2, 37.4
+t_back0 = 41.4
+t_back1 = t_back0 + (XR - X0) / V
+T = round(t_back1 + 1.3, 1)
+SEC = T / 100
+P = lambda t: t / T * 100
+def sa(name, t, v, e=E_IO): add(name, P(t), v, e)
+
+base_tracks = tracks
+S0 = {n: d[0][0] for n, d in base_tracks.items()}
+tracks = {}
+
+cur = dict(x=X0, bob=(0, 1, 1), torso=-2, head=-4, look=-5, shL=PEN_UP, shR=-6, hipL=0, hipR=0, kneeL=0, kneeR=0)
+def full(t, ease=E_IO, **kw):
+    """Write the whole pose at time t (so no joint drifts between far-apart keyframes)."""
+    cur.update(kw)
+    sa('x', t, tx(cur['x']), E_LIN if ease == E_LIN else ease); sa('bob', t, bob(*cur['bob']), ease)
+    for n in ('torso', 'head', 'shL', 'shR', 'hipL', 'hipR', 'kneeL', 'kneeR'): sa(n, t, rot(cur[n]), ease)
+    sa('look', t, tx(cur['look']), ease)
+
+# 0: at the board, ready (the loop's first and last frame)
+full(0); full(t_walkL0)
+
+# ── 01 RESEARCH ─────────────────────────────────────────────────────────────
+walk(P(t_walkL0), P(t_walkL1), X0, XL, -1, arms=True)
+full(t_walkL1, x=XL, shL=8, shR=-8, hipL=0, hipR=0, kneeL=0, kneeR=0, bob=(0, 1, 1))
+full(t_arrive, look=-6, head=0, torso=0)                                  # she turns her attention to the user
+full(t_pad, E_OUT, shL=-62, shR=-40, torso=-2, head=3)                   # raises the sticky note in both hands
+for i in range(8):                                                       # writing: pen hand scribbles, head nods
+    full(t_pad + 0.6 * (i + .5), shL=-62 + (6 if i % 2 else -5), head=5 if i % 2 else 3)
+full(t_write_end, shL=-62, head=2)
+full(t_lift, E_OUT, shL=-44, shR=-44, head=0, bob=(0, 1, 1))              # lifts the finished note
+full(t_carry0 - .1, shL=-62, shR=-40, torso=-3, look=5)
+full(t_carry0, bob=(0, 1.05, .93), look=5)
+walk(P(t_carry0), P(t_carry1), XL, X0, +1, arms=False)
+full(t_carry1, x=X0, hipL=0, hipR=0, kneeL=0, kneeR=0, bob=(0, 1, 1), shL=-62, shR=-40)
+# pin it: reach up, toss it on the board, relax, get the pen ready
+full(t_carry1 + .5, E_OUT, shL=-98, shR=-112, torso=-5, head=-3, look=5)
+full(t_carry1 + 1.2, shL=-70, shR=-30, torso=-2)
+full(EO - .2, shL=PEN_UP, shR=-6, torso=-2, head=-4, look=-5)
+
+# ── 02 DESIGN: the existing 0-70% of the design timeline (board flow, idea, walk to desk, typing) ────
+for name, d in base_tracks.items():
+    if name in ('cam', 'pigL', 'pigR') or name.startswith('cf'): continue
+    for p, (v, e) in d.items():
+        if 0 <= p <= 70: sa(name, EO + p * 0.2, v, e)
+cur.update(x=SIT_X, bob=(0, 1, 1), torso=4, head=3, look=5, shL=-82, shR=-74, hipL=-90, hipR=-90, kneeL=90, kneeR=90)
+
+# ── 03 SHIP ─────────────────────────────────────────────────────────────────
+full(t_ship)
+full(t_card, shL=-70, shR=-66)                                           # hands leave the keyboard: the screen lifts off
+full(t_stand, E_IN, bob=(0, 1.05, .93), torso=6, head=0, look=5)         # crouch to get up
+full(t_stand + .5, E_OUT, bob=(-14, .97, 1.05), hipL=-30, hipR=-30, kneeL=30, kneeR=20, shL=-62, shR=-40, torso=0)
+full(t_stand + 1.2, E_IN, bob=(0, 1.06, .9), hipL=0, hipR=0, kneeL=0, kneeR=0)
+full(t_walkR0, E_OUT, bob=(0, 1, 1))
+walk(P(t_walkR0), P(t_walkR1), SIT_X, XR, +1, arms=False)
+full(t_walkR1, x=XR, hipL=0, hipR=0, kneeL=0, kneeR=0, bob=(0, 1, 1), shL=-62, shR=-40)
+full(t_walkR1 + .5, E_OUT, shL=-80, shR=-88, torso=-2, head=0)           # holds the screen out to the phone
+full(t_ui, shL=20, shR=14, torso=0)                                      # lets go
+# cheer: crouch, jump, arms up, a second small hop
+c = t_cheer
+full(c, E_IN, bob=(0, 1.05, .92), shL=-20, shR=20, kneeL=10, kneeR=10)
+full(c + .5, E_OUT, bob=(-26, .95, 1.07), shL=165, shR=-165, kneeL=22, kneeR=22, hipL=10, hipR=-10, torso=0, head=-8)
+full(c + 1.0, E_IN, bob=(0, 1.06, .9), shL=150, shR=-150, hipL=0, hipR=0, kneeL=0, kneeR=0, head=5)
+full(c + 1.4, E_OUT, bob=(0, 1, 1), shL=168, shR=-168, head=-5)
+full(c + 1.9, E_OUT, bob=(-6, .99, 1.02), shL=150, shR=-150)
+full(c + 2.4, E_IN, bob=(0, 1, 1), shL=166, shR=-166, head=0)
+full(c + 3.0, E_IO, shL=166, shR=-166)
+full(t_back0 - .8, E_IN, shL=8, shR=-8, bob=(0, 1.05, .93), torso=4, head=-3, look=-5)
+full(t_back0, E_OUT, bob=(0, 1, 1), torso=-8)
+walk(P(t_back0), P(t_back1), XR, X0, -1, arms=True)
+full(t_back1, x=X0, hipL=0, hipR=0, kneeL=0, kneeR=0, shL=0, shR=-8, torso=-2, bob=(0, 1, 1))
+full(t_back1 + .5, E_IO, bob=(0, 1.05, .93))
+full(T - .1, E_OUT, bob=(0, 1, 1), shL=PEN_UP, shR=-6, torso=-2, head=-4, look=-5)
+
+# faces, pen, idea bubble: existing windows (<= 70%) were copied above; add the cheer
+for n, on, off in [('happy', '1', '0'), ('normal', '0', '1')]:
+    sa(n, c + .29, off, E_LIN); sa(n, c + .3, on, E_LIN); sa(n, c + 3.0, on, E_LIN); sa(n, c + 3.01, off, E_LIN)
+sa('mouth', c + .49, '0', E_LIN); sa('mouth', c + .5, '1', E_LIN); sa('mouth', c + 2.2, '1', E_LIN); sa('mouth', c + 2.21, '0', E_LIN)
+sa('marker', T - .51, '0', E_LIN); sa('marker', T - .5, '1', E_LIN)
+for n, v in S0.items():
+    if n in tracks: sa(n, 0, v, E_IO); sa(n, T, v, E_IO)
+
+# pigtails lag the body
+bob_y = {p: float(v.split('translateY(')[1].split('px')[0]) for p, (v, _) in tracks['bob'].items()}
+prev = 0
+add('pigL', 0, rot(0), E_IO); add('pigR', 0, rot(0), E_IO)
+for p in sorted(bob_y):
+    dy = bob_y[p] - prev
+    if abs(dy) >= 4:
+        a = max(-26, min(26, -dy * 1.1)); dt = 0.2 / SEC * 5  # same real-time lag as the 20s loop
+        add('pigL', p + dt * .1, rot(a), E_OUT); add('pigR', p + dt * .1, rot(-a), E_OUT)
+        add('pigL', p + dt * .35, rot(-a * .4), E_IO); add('pigR', p + dt * .35, rot(a * .4), E_IO)
+        add('pigL', p + dt * .56, rot(0), E_IO); add('pigR', p + dt * .56, rot(0), E_IO)
+    prev = bob_y[p]
+add('pigL', 100, rot(0), E_IO); add('pigR', 100, rot(0), E_IO)
+
+story_tracks = tracks
+
+# ── props that travel with her, and the stages ──────────────────────────────
+def kf(name, pts, prop='transform'):
+    pts = sorted(((P(t), v, e) for t, v, e in pts), key=lambda q: q[0])
+    return block(name, pts, prop)
+
+def at(x, y, s=1, r=0, o=1): return f'translate({x:g}px, {y:g}px) rotate({r:g}deg) scale({s:g}); opacity: {o:g}'
+hx, hy = HAND[0], 352 + HAND[1]
+HIDE_C = at(XL + hx, hy, .5, 0, 0)
+carry = [(0, HIDE_C, E_LIN), (t_pad - .1, HIDE_C, E_OUT), (t_pad + .3, at(XL + hx, hy, 1, 0, 1), E_OUT), (t_write_end, at(XL + hx, hy, 1, 0, 1), E_IO),
+         (t_lift, at(XL + hx - 6, hy - 14, 1.12, -4, 1), E_IO), (t_carry0, at(XL + hx, hy, 1, 0, 1), E_IO), (t_carry1, at(X0 + hx, hy, 1, 0, 1), E_LIN),
+         (t_carry1 + .55, at(X0 + hx + 8, hy - 20, 1.05, -10, 1), E_OUT), (t_carry1 + 1.05, at(PIN[0] - 20, PIN[1] + 30, 1.0, 12, 1), E_IO),
+         (t_carry1 + 1.45, at(PIN[0], PIN[1], .96, 2, 1), E_OUT), (t_carry1 + 1.46, at(PIN[0], PIN[1], .96, 2, 0), E_LIN), (T, HIDE_C, E_LIN)]
+note3 = [(0, '0', E_LIN), (t_carry1 + 1.45, '0', E_LIN), (t_carry1 + 1.46, '1', E_LIN), (42.0, '1', E_LIN), (44.5, '0', E_LIN), (T, '0', E_LIN)]
+HIDE_K = at(LAPTOP[0], LAPTOP[1], 1.5, 0, 0)
+card = [(0, HIDE_K, E_LIN), (t_card - .01, HIDE_K, E_LIN), (t_card, at(LAPTOP[0], LAPTOP[1], 1.5, 0, 1), E_OUT),
+        (t_card + .8, at(LAPTOP[0] - 6, LAPTOP[1] - 22, 1.25, -6, 1), E_IO), (t_walkR0, at(SIT_X + hx, hy, 1, 0, 1), E_IO),
+        (t_walkR1, at(XR + hx, hy, 1, 0, 1), E_LIN), (t_walkR1 + .6, at(XR + hx + 6, hy - 6, 1.05, 0, 1), E_IO),
+        (t_ui, at(PHONE[0], PHONE[1], 1.65, 0, 1), E_IN), (t_ui + .25, at(PHONE[0], PHONE[1], 1.65, 0, 0), E_LIN), (T, HIDE_K, E_LIN)]
+scribble = lambda a, b: [(0, '1', E_LIN), (t_pad, '1', E_LIN), (a, '1', E_LIN), (b, '0', E_LIN), (T, '0', E_LIN)]
+
+extra_kf, extra_rules = [], []
+def emit(sel, name, pts, prop='transform', ease='linear'):
+    extra_kf.append(kf(f's-{name}', pts, prop))
+    extra_rules.append(f'  .sc-root--story {sel} {{ animation: sc-s-{name} {T}s {ease} infinite; }}')
+
+emit('.sc-carry', 'carry', carry)
+emit('.sc-note3', 'note3', note3, 'opacity')
+emit('.sc-card', 'card', card)
+# scribbles on the carried note: three lines written one after another
+for i, (a, b) in enumerate([(t_pad + .9, t_pad + 1.8), (t_pad + 2.0, t_pad + 2.9), (t_pad + 3.1, t_pad + 4.2)]):
+    pts = [(0, '1', E_LIN), (a, '1', E_LIN), (b, '0', E_LIN), (T, '0', E_LIN)]
+    emit(f'.sc-cs{i + 1}', f'cs{i + 1}', pts, 'stroke-dashoffset')
+
+# the existing board strokes, laptop UI pops, cursor: same shapes, re-timed
+for n, s, e in board:
+    emit(f'.sc-{n}', f'draw-{n}', [(0, '1.02', E_LIN), (EO + s * .2, '1.02', E_LIN), (EO + e * .2, '0', E_LIN), (T, '0', E_LIN)], 'stroke-dashoffset')
+for n, s, e in ui:
+    grow = 'scaleX(.1)' if n in ('u1', 'u3', 'u4') else 'scale(.6)'
+    emit(f'.sc-{n}', f'pop-{n}', [(0, f'{grow}; opacity: 0', E_LIN), (EO + s * .2, f'{grow}; opacity: 0', E_OUT), (EO + e * .2, 'none; opacity: 1', E_LIN), (T, 'none; opacity: 1', E_LIN)])
+emit('.sc-board', 'board', [(0, '1', E_LIN), (42.0, '1', E_LIN), (44.5, '0', E_LIN), (T, '0', E_LIN)], 'opacity')
+emit('.sc-ui', 'ui', [(0, '0', E_LIN), (EO + 9.5, '0', E_LIN), (EO + 9.6, '1', E_LIN), (t_card - .01, '1', E_LIN), (t_card, '0', E_LIN), (T, '0', E_LIN)], 'opacity')
+cursor = [(0, 'translate(0px, 0px); opacity: 0'), (EO + 9.79, 'translate(0px, 0px); opacity: 0'), (EO + 9.8, 'translate(0px, 0px); opacity: 1'), (EO + 10.6, 'translate(40px, -8px); opacity: 1'),
+          (EO + 11.4, 'translate(44px, 22px); opacity: 1'), (EO + 12.2, 'translate(-6px, 36px); opacity: 1'), (EO + 13.2, 'translate(40px, 36px); opacity: 1'),
+          (EO + 14.0, 'translate(70px, 14px); opacity: 1'), (t_card - .01, 'translate(70px, 14px); opacity: 1'), (t_card, 'translate(70px, 14px); opacity: 0'), (T, 'translate(70px, 14px); opacity: 0')]
+emit('.sc-cursor', 'cursor', [(t, v, E_LIN) for t, v in cursor])
+
+# ── the stages (HeroFlanks.tsx): the user on the left, the phone on the right ──
+def stage(cls, name, pts, prop='transform', ease=E_IO):
+    emit(cls, name, [(t, v, ease) for t, v in pts], prop)
+
+stage('.fl-bubbleQ', 'bq', [(0, 'scale(0)'), (t_walkL1, 'scale(0)'), (t_walkL1 + .4, 'scale(1.18)'), (t_walkL1 + .7, 'scale(1)'), (t_write_end + .3, 'scale(1)'), (t_lift - .1, 'scale(0)'), (T, 'scale(0)')])
+stage('.fl-bubbleOk', 'bok', [(0, 'scale(0)'), (t_lift - .1, 'scale(0)'), (t_lift + .4, 'scale(1.2)'), (t_lift + .7, 'scale(1)'), (t_carry0 + 1.8, 'scale(1)'), (t_carry0 + 2.3, 'scale(0)'), (T, 'scale(0)')])
+stage('.fl-faceLost', 'lost', [(0, '1'), (t_lift - .11, '1'), (t_lift - .1, '0'), (40.99, '0'), (41.0, '1'), (T, '1')], 'opacity', E_LIN)
+stage('.fl-faceHappy', 'glad', [(0, '0'), (t_lift - .11, '0'), (t_lift - .1, '1'), (40.99, '1'), (41.0, '0'), (T, '0')], 'opacity', E_LIN)
+scr = [(0, 'rotate(-6deg)'), (1.0, 'rotate(-6deg)'), (1.8, 'rotate(125deg)')]
+for i, tt in enumerate([2.6, 3.4, 4.2, 5.0, 5.8, 6.6, 7.4, 8.2]): scr.append((tt, f'rotate({112 if i % 2 == 0 else 125}deg)'))
+scr += [(t_lift - .3, 'rotate(125deg)'), (t_lift + .4, 'rotate(-6deg)'), (T, 'rotate(-6deg)')]
+stage('.fl-pArmR', 'scratch', scr)
+stage('.fl-pHead', 'phead', [(0, 'rotate(0deg)'), (1.0, 'rotate(0deg)'), (1.6, 'rotate(-6deg)'), (t_lift - .1, 'rotate(-6deg)'), (t_lift + .5, 'rotate(0deg)'), (T, 'rotate(0deg)')])
+stage('.fl-ui', 'fui', [(0, '0'), (t_ui - .3, '0'), (t_ui + .1, '1'), (T - 1.0, '1'), (T - .5, '0'), (T, '0')], 'opacity', E_LIN)
+stage('.fl-skeleton', 'fskel', [(0, '1'), (t_ui - .3, '1'), (t_ui + .1, '0'), (T - 1.0, '0'), (T - .5, '1'), (T, '1')], 'opacity', E_LIN)
+stage('.fl-live', 'flive', [(0, 'scale(0)'), (t_ui, 'scale(0)'), (t_ui + .4, 'scale(1.25)'), (t_ui + .7, 'scale(1)'), (t_back0 + 3.0, 'scale(1)'), (t_back0 + 3.6, 'scale(0)'), (T, 'scale(0)')])
+HEARTS = [(-14, -92, -18), (6, -104, 8), (16, -88, 20)]
+for i, (dx, up, dx2) in enumerate(HEARTS):
+    s0 = t_ui + .3 + .4 * i
+    hide = 'translate(0px, 0px) scale(.4); opacity: 0'
+    stage(f'.fl-heart{i}', f'heart{i}', [(0, hide), (s0, hide), (s0 + .4, 'translate(0px, -8px) scale(1); opacity: 1'), (s0 + 2.0, f'translate({dx}px, {up}px) scale(1); opacity: 1'),
+                                          (s0 + 2.6, f'translate({dx2}px, {up - 20}px) scale(1); opacity: 0'), (T, hide)], 'transform', E_OUT)
+CF = [(-70, -70, 130, 300), (-40, -96, 150, -260), (-12, -110, 160, 220), (16, -104, 158, -320), (44, -92, 150, 260), (72, -66, 128, -280), (-54, -50, 112, 200), (58, -48, 110, -220)]
+for i, (dx, up, dy, rt) in enumerate(CF):
+    s0 = t_ui + .3 + i * .03
+    hide = 'translate(0px, 0px) rotate(0deg); opacity: 0'
+    stage(f'.fl-cf{i}', f'cf{i}', [(0, hide), (s0, hide), (s0 + .02, 'translate(0px, 0px) rotate(0deg); opacity: 1'),
+                                    (s0 + 0.9, f'translate({dx * .6:g}px, {up}px) rotate({rt * .4:g}deg); opacity: 1'), (s0 + 2.5, f'translate({dx}px, {dy}px) rotate({rt}deg); opacity: 1'),
+                                    (s0 + 3.0, f'translate({dx}px, {dy}px) rotate({rt}deg); opacity: 0'), (T, hide)], 'transform', E_OUT)
+for i, off in enumerate([0, .5]):
+    stage(f'.fl-sp{i + 1}', f'sp{i + 1}', [(0, 'scale(.4); opacity: 0'), (t_ui + off, 'scale(.4); opacity: 0'), (t_ui + off + 1.0, 'scale(1.1) rotate(25deg); opacity: 1'), (t_ui + off + 2.6, 'scale(.4); opacity: 0'), (T, 'scale(.4); opacity: 0')])
+
+# ── write hero-story.css ────────────────────────────────────────────────────
+story_kf, story_rules = [], []
+for name, d in story_tracks.items():
+    pts = sorted(((p, v, e) for p, (v, e) in d.items() if 0 <= p <= 100), key=lambda t: t[0])
+    assert pts[0][1] == pts[-1][1], (name, pts[0], pts[-1])
+    story_kf.append(block(f's-{name}', pts, PROPS[name]))
+    story_rules.append(f'  .sc-root--story {SEL[name]} {{ animation: sc-s-{name} {T}s linear infinite; }}')
+
+HEAD2 = f'''/* Hero story loop (components/scene/DesignerScene.tsx with story, HeroFlanks.tsx). GENERATED by scripts/gen-designer-scene-css.py: edit the script, not this file.
+   Expressive motion at >= 1360px wide: ONE character does the whole job in a {T:g}s loop. She walks out to the left stage
+   (01 Research), carries a sticky note back and pins it on the whiteboard, runs the design beats at the board and the desk,
+   walks the finished screen out to the right stage (03 Ship), cheers when the phone goes live, and walks home.
+   Her, the carried note and screen, the user and the phone all run on this one clock. Below 1360px the 20s loop of
+   designer-scene.css plays as before. Only under prefers-reduced-motion: no-preference, only while on screen. */
+
+/* the story-only props are hidden everywhere else */
+.sc-carry, .sc-card, .sc-note3 {{ display: none; }}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 1360px) {{
+  .sc-root--story .sc-carry, .sc-root--story .sc-card, .sc-root--story .sc-note3 {{ display: inline; }}
+  .sc-root--story .sc-cam, .sc-root--story .sc-sparkles, .sc-root--story [class*="sc-cf"] {{ animation: none; }}
+  .sc-root--story .sc-carry, .sc-root--story .sc-card {{ opacity: 0; }}
+  .sc-root--story .sc-note3 {{ opacity: 0; }}
+  .sc-root--story .sc-carry path, .sc-root--story .sc-note3 path {{ stroke-dasharray: 1 1; }}
+  .sc-root--story .sc-cs1, .sc-root--story .sc-cs2, .sc-root--story .sc-cs3 {{ stroke-dashoffset: 1; }}
+  .sc-root--story * {{ animation-play-state: var(--sc-state) !important; }}
+'''
+body = '\n'.join(story_rules + extra_rules) + '\n\n' + '\n'.join(story_kf + extra_kf)
+out2 = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'components', 'scene', 'hero-story.css')
+open(out2, 'w').write(HEAD2 + body + '\n}\n')
+print('wrote', os.path.normpath(out2), f'loop {T}s')
