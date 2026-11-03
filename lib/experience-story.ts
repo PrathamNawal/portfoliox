@@ -1,7 +1,7 @@
 // Pure helpers for the "story" Work Experience layout (no React).
 // Used by the API routes (validation), the published page and the editor.
 
-import type { ExperienceScreen, WorkExperience } from '@/types'
+import type { ExperienceAward, ExperienceScreen, WorkExperience } from '@/types'
 import { monthIndex } from '@/lib/experience'
 
 export const MAX_SCREENS = 12
@@ -9,6 +9,8 @@ export const MAX_HEADLINE = 140
 export const MAX_STAT_VALUE = 12
 export const MAX_STAT_LABEL = 40
 export const MAX_CAPTION = 90
+export const MAX_AWARD_TITLE = 80
+export const MAX_AWARD_NOTE = 40
 const MAX_DIM = 10000
 
 /** Only images in our own public storage are accepted when NEXT_PUBLIC_SUPABASE_URL is set. */
@@ -36,7 +38,22 @@ export function cleanScreens(input: unknown, prefix: string | null = storagePref
   return out
 }
 
-const STORY_KEYS = ['headline', 'stat_value', 'stat_label', 'screens'] as const
+/** Validates an award. Returns the cleaned award, null for none, or undefined if anything is invalid. */
+export function cleanAward(input: unknown, prefix: string | null = storagePrefix()): ExperienceAward | null | undefined {
+  if (input == null) return null
+  if (typeof input !== 'object' || Array.isArray(input)) return undefined
+  const { title, note, image } = input as Record<string, unknown>
+  if (typeof title !== 'string' || (note != null && typeof note !== 'string')) return undefined
+  const t = title.trim()
+  if (!t) return null
+  if (t.length > MAX_AWARD_TITLE) return undefined
+  const n = typeof note === 'string' ? note.trim().slice(0, MAX_AWARD_NOTE) : ''
+  const shot = image == null ? [] : cleanScreens([image], prefix)
+  if (!shot) return undefined
+  return { title: t, ...(n ? { note: n } : {}), ...(shot[0] ? { image: shot[0] } : {}) }
+}
+
+const STORY_KEYS = ['headline', 'stat_value', 'stat_label', 'screens', 'award'] as const
 
 /** Reads the story fields from a request body. Only keys present in the body are returned. */
 export function pickStoryFields(body: Record<string, unknown>): { update: Record<string, unknown> } | { error: string } {
@@ -55,7 +72,11 @@ export function pickStoryFields(body: Record<string, unknown>): { update: Record
       if (key === 'headline') update.headline = text('headline', MAX_HEADLINE, 'Headline')
       else if (key === 'stat_value') update.stat_value = text('stat_value', MAX_STAT_VALUE, 'Stat value')
       else if (key === 'stat_label') update.stat_label = text('stat_label', MAX_STAT_LABEL, 'Stat label')
-      else {
+      else if (key === 'award') {
+        const award = cleanAward(body.award)
+        if (award === undefined) return { error: `Award needs a title (max ${MAX_AWARD_TITLE} characters) and an image from your portfolio uploads` }
+        update.award = award
+      } else {
         const screens = cleanScreens(body.screens)
         if (!screens) return { error: `Screens must be up to ${MAX_SCREENS} images from your portfolio uploads` }
         update.screens = screens

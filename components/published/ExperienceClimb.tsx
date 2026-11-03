@@ -10,7 +10,7 @@ import { beatOf, bulletsOf, inOrder, skillsAdded, stopAt } from '@/lib/climb'
 import { proofsByRole } from '@/lib/recs'
 import { Chip } from './StoryChip'
 import { Exhibit, Lightbox, Proof } from './ExperienceParts'
-import type { ExperienceScreen, Testimonial, WorkExperience } from '@/types'
+import type { ExperienceAward, ExperienceScreen, Testimonial, WorkExperience } from '@/types'
 import './experience-climb.css'
 
 // Work Experience as a climb. On a wide screen with motion on, the section pins and the reader scrolls along a path:
@@ -28,6 +28,19 @@ const HOP_MS = 950
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>
 
+// A gold badge for an award earned in the role; a button that opens the certificate when there is one.
+function Award({ award, onOpen }: { award: ExperienceAward; onOpen: (el: HTMLElement) => void }) {
+  const body = (
+    <>
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="6" /><path d="M8.5 14.5 7 22l5-3 5 3-1.5-7.5" /></svg>
+      <b>{award.title}</b>{award.note && <span>{award.note}</span>}
+    </>
+  )
+  return award.image
+    ? <button type="button" className="pxc-award" onClick={e => onOpen(e.currentTarget)} aria-label={`${award.title}${award.note ? `, ${award.note}` : ''}: view certificate`}>{body}</button>
+    : <p className="pxc-award">{body}</p>
+}
+
 export function ExperienceClimb({ experience, walker = false, animate = false, testimonials = [] }: { experience: WorkExperience[]; walker?: boolean; animate?: boolean; testimonials?: Testimonial[] }) {
   // Newest first: the page opens on the current role and the walk rewinds to the first one. Skills are worked out
   // oldest first (where each one first showed up), then laid out in the same newest-first order as the roles.
@@ -42,7 +55,7 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
   const track = useRef<HTMLDivElement>(null)
   const [pin, setPin] = useState(false)
   const [active, setActive] = useState(0)
-  const [lightbox, setLightbox] = useState<{ index: number; start: number } | null>(null)
+  const [lightbox, setLightbox] = useState<{ screens: ExperienceScreen[]; start: number } | null>(null)
   const openerRef = useRef<HTMLElement | null>(null)
 
   // pinned only while the screen and the reader's settings allow it
@@ -144,9 +157,9 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
     return () => document.removeEventListener('click', onClick)
   }, [pin, roles, jump])
 
-  const show = (roleIndex: number, start: number, opener: HTMLElement) => {
+  const show = (screens: ExperienceScreen[], start: number, opener: HTMLElement) => {
     openerRef.current = opener
-    setLightbox({ index: roleIndex, start })
+    setLightbox({ screens, start })
   }
   const close = useCallback(() => {
     setLightbox(null)
@@ -204,6 +217,7 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
                 <div className="pxc-id">
                   <p className="pxc-company">{r.company}{r.is_current && <em>Now</em>}</p>
                   <p className="pxc-role">{r.role}</p>
+                  {r.award && <Award award={r.award} onOpen={el => r.award?.image && show([r.award.image], 0, el)} />}
                 </div>
                 <p className="pxc-when"><b>{formatRange(r)}</b><span>{formatDuration(durationMonths(r))}</span></p>
               </div>
@@ -221,7 +235,7 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
               {(bullets.length > 0 || screens.length > 0) && (
                 <div className="pxc-more" data-two={bullets.length > 0 && screens.length > 0 ? '' : undefined}>
                   {bullets.length > 0 && <div className="pxc-detail pxp-exp-desc" dangerouslySetInnerHTML={{ __html: highlightMetrics(r.description ?? '') }} />}
-                  {screens.length > 0 && <Exhibit screens={screens} featured={false} role={r.role} onOpen={(k, el) => show(i, k, el)} />}
+                  {screens.length > 0 && <Exhibit screens={screens} featured={false} role={r.role} onOpen={(k, el) => show(screens, k, el)} />}
                 </div>
               )}
 
@@ -255,7 +269,7 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
           <div className="pxc-stage">{stage}</div>
         </div>
       ) : stage}
-      {lightbox && <Lightbox screens={(roles[lightbox.index]?.screens ?? []) as ExperienceScreen[]} start={lightbox.start} onClose={close} />}
+      {lightbox && <Lightbox screens={lightbox.screens} start={lightbox.start} onClose={close} />}
     </div>
   )
 }

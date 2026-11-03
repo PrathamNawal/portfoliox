@@ -153,6 +153,13 @@ export interface ExperienceScreen {
   caption?: string
 }
 
+export interface ExperienceAward {
+  title: string
+  /** Short detail such as the month, e.g. "Sep 2024". */
+  note?: string
+  image?: ExperienceScreen
+}
+
 export interface WorkExperience {
   id: string
   user_id: string
@@ -169,6 +176,8 @@ export interface WorkExperience {
   stat_value?: string | null
   stat_label?: string | null
   screens?: ExperienceScreen[] | null
+  /** An award earned in this role. Optional until the experience_award migration is applied. */
+  award?: ExperienceAward | null
   display_order: number
   created_at: string
 }
