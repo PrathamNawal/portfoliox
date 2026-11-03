@@ -1341,3 +1341,33 @@
 .px-band--finale { background: var(--px-text); }
 .px-band--finale > span { color: color-mix(in srgb, var(--px-accent) 70%, #fff); }
 .px-band--finale p { color: var(--px-surface); }
+
+/* ── Case study scroll motion (CaseStudyPageClient data-motion, CountUp, CaseRail) ──────────────────────────────
+   Only when the portfolio's Motion is not Still (.px-cs[data-motion="on"]) and the reader has not asked for reduced
+   motion. Reveals are scroll-driven (animation-timeline: view(), no JS) and fall back to a static page where it is
+   unsupported: images ease in and settle, chapter numerals and titles rise from a mask, bands and metrics lift in.
+   Figures count up (CountUp), and the rail's line fills with progress through the chapters (--p, set by CaseRail). */
+@media (prefers-reduced-motion: no-preference) {
+  .px-cs[data-motion="on"] .px-cs__rail ol { position: relative; }
+  .px-cs[data-motion="on"] .px-cs__rail a { border-left-color: transparent; }
+  .px-cs[data-motion="on"] .px-cs__rail a[data-on] { border-left-color: var(--px-accent); }
+  .px-cs[data-motion="on"] .px-cs__rail ol::before, .px-cs[data-motion="on"] .px-cs__rail ol::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; }
+  .px-cs[data-motion="on"] .px-cs__rail ol::before { background: var(--px-border); }
+  .px-cs[data-motion="on"] .px-cs__rail ol::after { background: var(--px-accent); transform-origin: 0 0; transform: scaleY(var(--p, 0)); transition: transform .15s linear; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* the chapter as a whole no longer fades (its parts do) */
+    .px-cs[data-motion="on"] .px-ch.px-rise { animation: none; }
+    .px-cs[data-motion="on"] .px-fig { animation: px-fig-in linear both; animation-timeline: view(); animation-range: entry 0% entry 45%; }
+    .px-cs[data-motion="on"] .px-fig:not(.px-fig--tall) img { animation: px-img-settle linear both; animation-timeline: view(); animation-range: entry 0% cover 45%; }
+    .px-cs[data-motion="on"] .px-ch__head h2 { animation: px-title-in linear both; animation-timeline: view(); animation-range: entry 5% entry 55%; }
+    .px-cs[data-motion="on"] .px-ch__n { animation: px-num-in linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+    .px-cs[data-motion="on"] .px-band, .px-cs[data-motion="on"] .px-metrics li { animation: px-lift-in linear both; animation-timeline: view(); animation-range: entry 0% entry 50%; }
+    @keyframes px-fig-in { from { opacity: 0; transform: translateY(32px) scale(.965); } to { opacity: 1; transform: none; } }
+    @keyframes px-img-settle { from { transform: scale(1.07); } to { transform: none; } }
+    @keyframes px-title-in { from { opacity: 0; transform: translateY(.5em); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(-0.1em -0.1em -0.25em -0.1em); } }
+    @keyframes px-num-in { from { opacity: 0; transform: translateX(-.3em); } to { opacity: 1; transform: none; } }
+    @keyframes px-lift-in { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+  }
+}
