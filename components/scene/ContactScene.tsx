@@ -50,10 +50,10 @@ export function ContactScene({ animate = true, perched = false }: { animate?: bo
               </filter>
             </defs>
             <ellipse cx="0" cy="288" rx="30" ry="3.6" fill="#1b1538" opacity=".22" />
-            <g className="cta-cast" filter={`url(#${shadowId})`} opacity=".26" transform="translate(9 6)"><Character /></g>
+            <g className="cta-cast" filter={`url(#${shadowId})`} opacity=".26" transform="translate(9 6)"><Character seated /></g>
           </>
         )}
-        <Character />
+        <Character seated={perched} />
         <g className="cta-sparkles" fill="#ffd34d" stroke={OUT} strokeWidth="1.2" strokeLinejoin="round">
           <g transform="translate(-78 150)"><path className="sc-sp1" d={STAR} /></g>
           <g transform="translate(80 140) scale(.8)"><path className="sc-sp2" d={STAR} /></g>

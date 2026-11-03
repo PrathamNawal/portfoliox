@@ -168,15 +168,17 @@ function Stub({ len, w, color, from = 0 }: { len: number; w: number; color: stri
   )
 }
 
-function Leg({ x, side }: { x: number; side: 'L' | 'R' }) {
+// seated: shorter legs, so a character perched on an edge reads as sitting rather than standing behind it
+function Leg({ x, side, seated = false }: { x: number; side: 'L' | 'R'; seated?: boolean }) {
+  const thigh = seated ? 15 : 28, shin = seated ? 14 : 26
   return (
     <g transform={`translate(${x} -60)`}>
       <g className={`j-hip${side}`}>
-        <Stub len={28} w={10} color={PANTS} />
-        <g transform="translate(0 28)">
+        <Stub len={thigh} w={10} color={PANTS} />
+        <g transform={`translate(0 ${thigh})`}>
           <g className={`j-knee${side}`}>
-            <Stub len={26} w={10} color={PANTS} from={-4} />
-            <g transform="translate(0 29)">
+            <Stub len={shin} w={10} color={PANTS} from={-4} />
+            <g transform={`translate(0 ${shin + 3})`}>
               <ellipse cx="5" cy="0" rx="13" ry="8" fill="#fff" stroke={OUT} strokeWidth="3" />
               <ellipse cx="11" cy="1" rx="6" ry="5" fill="var(--px-accent)" />
             </g>
@@ -263,15 +265,15 @@ function Torso() {
   )
 }
 
-export function Character() {
+export function Character({ seated = false }: { seated?: boolean }) {
   return (
     <g transform="translate(0 352)">
       <g className="r-x">
         <g transform="scale(1.2)">
-          <ellipse cx="0" cy="0" rx="34" ry="5" fill="var(--sc-shadow)" />
+          {!seated && <ellipse cx="0" cy="0" rx="34" ry="5" fill="var(--sc-shadow)" />}
           <g className="r-bob">
-            <Leg x={-10} side="L" />
-            <Leg x={10} side="R" />
+            <Leg x={-10} side="L" seated={seated} />
+            <Leg x={10} side="R" seated={seated} />
             <Torso />
           </g>
         </g>
