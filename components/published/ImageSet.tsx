@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { DEFAULT_RATIO, packRows, ROW_GAP, ROW_MAX_H } from '@/lib/image-shape'
+import { DEFAULT_RATIO, isDocument, packRows, ROW_GAP, ROW_MAX_H } from '@/lib/image-shape'
 import { SmartImage } from './SmartImage'
 import { useImageRatio } from './useImageRatio'
 
@@ -16,6 +16,7 @@ export function ImageSet({ items }: { items: SetItem[] }) {
   const root = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
   const [ratios, setRatios] = useState<number[]>([])
+  const [widths, setWidths] = useState<number[]>([])
 
   useEffect(() => {
     const el = root.current
@@ -26,14 +27,21 @@ export function ImageSet({ items }: { items: SetItem[] }) {
     return () => ro.disconnect()
   }, [])
 
-  const setRatio = (i: number, r: number) => setRatios(v => {
-    if (v[i] === r) return v
-    const next = [...v]
-    next[i] = r
-    return next
-  })
+  const setRatio = (i: number, r: number, w = 0) => {
+    setRatios(v => (v[i] === r ? v : Object.assign([...v], { [i]: r })))
+    if (w) setWidths(v => (v[i] === w ? v : Object.assign([...v], { [i]: w })))
+  }
   const rs = items.map((_, i) => ratios[i] ?? DEFAULT_RATIO)
-  const sizes = items.length === 1 ? [1] : packRows(rs, width || 1000)
+  // documents (exported slides and pages) always get a line of their own; the images between them are packed as usual
+  const doc = items.map((_, i) => isDocument(ratios[i], widths[i]))
+  const sizes: number[] = []
+  for (let i = 0; i < items.length;) {
+    if (doc[i]) { sizes.push(1); i++; continue }
+    let j = i
+    while (j < items.length && !doc[j]) j++
+    sizes.push(...(j - i === 1 ? [1] : packRows(rs.slice(i, j), width || 1000)))
+    i = j
+  }
 
   // a set that has rows keeps one row height: a leftover image takes that height instead of filling the column
   let refHeight = 0
@@ -54,32 +62,32 @@ export function ImageSet({ items }: { items: SetItem[] }) {
       {sizes.map(k => {
         const from = at
         at += k
-        if (k === 1 && !refHeight) {
+        if (k === 1 && (!refHeight || doc[from])) {
           const it = items[from]
           return (
             <figure key={from} className="px-set__one">
-              <SmartImage src={it.url} alt={it.caption} initialRatio={ratios[from]} onRatio={r => setRatio(from, r)} />
+              <SmartImage src={it.url} alt={it.caption} initialRatio={ratios[from]} onRatio={(r, w) => setRatio(from, r, w)} />
               {it.caption && <figcaption>{it.caption}</figcaption>}
             </figure>
           )
         }
         const maxW = k === 1 ? refHeight * rs[from] : undefined
-        return <Row key={from} items={items.slice(from, from + k)} ratios={rs.slice(from, from + k)} maxW={maxW} onRatio={(i, r) => setRatio(from + i, r)} />
+        return <Row key={from} items={items.slice(from, from + k)} ratios={rs.slice(from, from + k)} maxW={maxW} onRatio={(i, r, w) => setRatio(from + i, r, w)} />
       })}
     </div>
   )
 }
 
-function Row({ items, ratios, maxW, onRatio }: { items: SetItem[]; ratios: number[]; maxW?: number; onRatio: (i: number, r: number) => void }) {
+function Row({ items, ratios, maxW, onRatio }: { items: SetItem[]; ratios: number[]; maxW?: number; onRatio: (i: number, r: number, w: number) => void }) {
   const sum = ratios.reduce((a, b) => a + b, 0)
   return (
     <div className="px-row" style={{ '--max': `${(maxW ?? sum * ROW_MAX_H).toFixed(0)}px` } as React.CSSProperties}>
-      {items.map((it, i) => <RowItem key={i} item={it} ratio={ratios[i]} onRatio={r => onRatio(i, r)} />)}
+      {items.map((it, i) => <RowItem key={i} item={it} ratio={ratios[i]} onRatio={(r, w) => onRatio(i, r, w)} />)}
     </div>
   )
 }
 
-function RowItem({ item, ratio, onRatio }: { item: SetItem; ratio: number; onRatio: (r: number) => void }) {
+function RowItem({ item, ratio, onRatio }: { item: SetItem; ratio: number; onRatio: (r: number, w: number) => void }) {
   const img = useImageRatio(onRatio)
   return (
     <figure className="px-row__item" style={{ flexGrow: ratio }}>

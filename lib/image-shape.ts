@@ -21,6 +21,15 @@ export function ratioOf(w: number, h: number): number {
   return w > 0 && h > 0 ? w / h : DEFAULT_RATIO
 }
 
+/**
+ * A document, not a picture: an exported slide or page (at least 2400px wide, roughly 16:9 or 16:10). Its text is only
+ * readable at full width, so it is never packed into a row or a narrow column, and it can be opened full screen.
+ */
+export const DOCUMENT_MIN_WIDTH = 2400
+export function isDocument(ratio: number | undefined, naturalWidth: number | undefined): boolean {
+  return !!ratio && !!naturalWidth && naturalWidth >= DOCUMENT_MIN_WIDTH && ratio >= 1.5 && ratio <= 2.1
+}
+
 export function shapeOf(ratio: number): ImageShape {
   if (ratio >= 1.2) return 'wide'
   if (ratio >= 0.45) return 'poster'

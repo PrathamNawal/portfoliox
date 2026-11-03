@@ -1384,3 +1384,13 @@
 .px-videocard__text { display: flex; flex-direction: column; gap: 2px; }
 .px-videocard__text b { font-size: 15px; font-weight: 700; color: var(--px-text); }
 .px-videocard__text i { font-size: 12px; font-style: normal; color: var(--px-text-3); }
+
+/* Documents (lib/image-shape.ts isDocument): exported slides and pages open full screen on click */
+.px-fig[data-doc] { cursor: zoom-in; }
+.px-zoom { position: absolute; inset: 0; z-index: 1; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+.px-zoom:focus-visible { outline: 3px solid var(--px-accent); outline-offset: -3px; }
+.px-zoom__box { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: clamp(12px, 3vw, 32px); background: rgba(12, 10, 24, .92); }
+.px-zoom__box img { max-width: 100%; max-height: calc(100vh - 110px); width: auto; height: auto; border-radius: 8px; box-shadow: 0 10px 40px rgba(0, 0, 0, .5); }
+.px-zoom__box p { margin: 0; max-width: 70ch; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, .8); text-align: center; }
+.px-zoom__x { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .14); color: #fff; font-size: 18px; cursor: pointer; }
+.px-zoom__x:hover, .px-zoom__x:focus-visible { background: rgba(255, 255, 255, .26); }

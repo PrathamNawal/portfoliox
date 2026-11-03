@@ -48,7 +48,7 @@ export function lead(narrative: string, max = 190): string {
 
 // ── Chapter stages ───────────────────────────────────────────────────────────
 // Each chapter is given a layout and, at most, one band from its own content, so owners choose nothing:
-//   split   text stays sticky beside the images (a short chapter with at least one image)
+//   split   text stays sticky beside the images (a chapter of 240-1800 characters with one or two images)
 //   visual  no text, only images: wider frames
 //   stack   text, then visuals (everything else)
 //   band    stats (a list with figures) > finale (the outcome chapter) > quote (a sentence stating a decision or insight)
@@ -103,7 +103,8 @@ export function stageOf(section: CaseSection): Stage {
   const text = (section.narrative ?? '').trim()
   const imageCount = (section.blocks ?? []).reduce((n, b) => n + (b.type === 'image' ? (b.imageUrl ? 1 : 0) : b.type === 'gallery' ? (b.images ?? []).filter(i => i.url).length : b.type === 'compare' ? 2 : 0), 0)
   // beside-the-text only fits a couple of images; a chapter with more gets the full column
-  const layout: Stage['layout'] = !text ? 'visual' : imageCount > 0 && imageCount <= 2 && text.length <= 1800 ? 'split' : 'stack'
+  // (a line or two of text is not worth a sticky column: it gets the stacked layout and its images the full width)
+  const layout: Stage['layout'] = !text ? 'visual' : imageCount > 0 && imageCount <= 2 && text.length >= 240 && text.length <= 1800 ? 'split' : 'stack'
   let band: Band | null = null
   if (text.length >= 200) {
     const stats = statsOf(text)
