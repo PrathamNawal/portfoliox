@@ -12,7 +12,7 @@ import { ViewTransitionGate } from '@/components/published/ViewTransitionGate'
 import { transitionClick } from '@/lib/view-transition'
 import { mergeImageBlocks } from '@/lib/image-shape'
 import { CaseRail } from '@/components/published/CaseRail'
-import { asLabel, asStat, asStep, skimOf } from '@/lib/case-copy'
+import { asLabel, asStep, skimOf, stageOf, type Band } from '@/lib/case-copy'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
 
@@ -75,14 +75,7 @@ function renderNarrative(text: string): React.ReactNode {
     if (block.kind === 'ul') {
       return (
         <ul key={bi} className="px-ul">
-          {block.lines.map((l, li) => {
-            const stat = asStat(l)
-            return stat ? (
-              <li key={li} className="px-ul__stat"><b>{stat.value}</b><span><InlineMarkdown text={stat.text} /></span></li>
-            ) : (
-              <li key={li}><InlineMarkdown text={l} /></li>
-            )
-          })}
+          {block.lines.map((l, li) => <li key={li}><InlineMarkdown text={l} /></li>)}
         </ul>
       )
     }
@@ -127,49 +120,25 @@ function InlineMarkdown({ text }: { text: string }) {
   )
 }
 
-// ── Overview section ──────────────────────────────────────────────────────────
+// ── Overview: lead statement, meta strip, big metrics ─────────────────────────
 function OverviewSection({ data, summary }: { data: OverviewData; summary?: string }) {
-  const filledMetrics = data.metrics?.filter(m => m.label || m.value) || []
-  const hasMeta = data.role || data.timeline || data.team
+  // a metric needs a figure to be a metric: a label alone is not shown
+  const metrics = data.metrics?.filter(m => m.value?.trim()) || []
+  const meta = [['Role', data.role], ['Timeline', data.timeline], ['Team', data.team]].filter(([, v]) => v?.trim())
 
   return (
-    <div style={{ marginBottom: 56 }}>
-      {/* Summary */}
-      {(summary || data.summary) && (
-        <p style={{ fontSize: 20, lineHeight: 1.65, color: 'var(--px-text)', fontWeight: 500, letterSpacing: '-0.01em', marginBottom: 36, maxWidth: 620, fontFamily: 'var(--px-font-body)' }}>
-          {summary || data.summary}
-        </p>
+    <div className="px-ov">
+      {(summary || data.summary) && <p className="px-ov__lead">{summary || data.summary}</p>}
+      {meta.length > 0 && (
+        <dl className="px-meta">
+          {meta.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
       )}
-
-      {/* Metrics */}
-      {filledMetrics.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(filledMetrics.length, 3)}, 1fr)`, gap: 12, marginBottom: hasMeta ? 24 : 0 }}>
-          {filledMetrics.map((m, i) => (
-            <div key={i} style={{ padding: '18px 20px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 12 }}>
-              <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.04em', color: '#E53416', marginBottom: 4 }}>{m.value}</div>
-              <div style={{ fontSize: 12, color: 'var(--px-text-3)', fontWeight: 500 }}>{m.label}</div>
-            </div>
-          ))}
-        </div>
+      {metrics.length > 0 && (
+        <ul className="px-metrics">
+          {metrics.map((m, i) => <li key={i}><b>{m.value}</b><span>{m.label}</span></li>)}
+        </ul>
       )}
-
-      {/* Role / Timeline / Team */}
-      {hasMeta && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          {data.role && <MetaPill label="Role" value={data.role} />}
-          {data.timeline && <MetaPill label="Timeline" value={data.timeline} />}
-          {data.team && <MetaPill label="Team" value={data.team} />}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function MetaPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, padding: '10px 16px', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 10 }}>
-      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--px-text-3)' }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--px-text)' }}>{value}</span>
     </div>
   )
 }
@@ -179,39 +148,56 @@ function hasContent(section: CaseSection) {
   return section.narrative?.trim().length > 0 || section.blocks?.length > 0
 }
 
+function BandView({ band }: { band: Band }) {
+  if (band.kind === 'stats') {
+    return (
+      <aside className="px-band px-band--stats" aria-label={band.label}>
+        <ul>{band.stats?.map((st, i) => <li key={i}><b>{st.value}</b><span>{st.text}</span></li>)}</ul>
+      </aside>
+    )
+  }
+  return (
+    <aside className={`px-band px-band--${band.kind}`}>
+      <span>{band.label}</span>
+      <p>{band.text}</p>
+    </aside>
+  )
+}
+
 function ContentSection({ section, n }: { section: CaseSection; n: number }) {
   const def = SECTION_DEFS[section.type] || SECTION_DEFS.custom
   const hasNarrative = section.narrative?.trim().length > 0
   const hasBlocks = section.blocks?.length > 0
 
   if (!hasNarrative && !hasBlocks) return null
+  const { layout, band } = stageOf(section)
+
+  const visuals = hasBlocks && (
+    <div className="px-ch__visuals">
+      {mergeImageBlocks(section.blocks).map((block, i) => {
+        if (block.type === 'image' && !block.imageUrl) return null
+        if (block.type === 'compare' && (!block.beforeUrl || !block.afterUrl)) return null
+        if (block.type === 'figma' && !block.figmaUrl) return null
+        return <BlockRenderer key={block.id || i} block={block} accent="var(--px-text-3)" />
+      })}
+    </div>
+  )
 
   return (
-    <section className="px-ch px-rise" aria-labelledby={`cs-${section.id}`}>
-      {/* Chapter header: number, title, hairline */}
+    <section className={`px-ch px-ch--${layout} px-rise`} aria-labelledby={`cs-${section.id}`}>
+      {/* Chapter header: a large numeral, the title */}
       <header className="px-ch__head">
         <span className="px-ch__n" aria-hidden="true">{String(n).padStart(2, '0')}</span>
         <h2 id={`cs-${section.id}`}>{section.title || def.title}</h2>
       </header>
 
-      {/* Narrative: a readable line length even though the canvas is wide */}
-      {hasNarrative && (
-        <div className="px-prose-col" style={{ marginBottom: hasBlocks ? 32 : 0 }}>
-          {renderNarrative(section.narrative)}
-        </div>
-      )}
+      {/* Split: the text stays in view beside the images. Otherwise: text, then visuals. */}
+      <div className="px-ch__body">
+        {hasNarrative && <div className="px-prose-col">{renderNarrative(section.narrative)}</div>}
+        {visuals}
+      </div>
 
-      {/* Visual blocks */}
-      {hasBlocks && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {mergeImageBlocks(section.blocks).map((block, i) => {
-            if (block.type === 'image' && !block.imageUrl) return null
-            if (block.type === 'compare' && (!block.beforeUrl || !block.afterUrl)) return null
-            if (block.type === 'figma' && !block.figmaUrl) return null
-            return <BlockRenderer key={block.id || i} block={block} accent="var(--px-text-3)" />
-          })}
-        </div>
-      )}
+      {band && <BandView band={band} />}
     </section>
   )
 }
@@ -274,6 +260,11 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
             {/* Title */}
             <h1 className="px-cs__title">{cs.title}</h1>
 
+            {/* Overview: metrics + meta */}
+            {overviewData && (overviewData.summary || overviewData.role || overviewData.metrics?.some(m => m.value)) && (
+              <OverviewSection data={overviewData} summary={overviewSection?.narrative || overviewData.summary} />
+            )}
+
             {/* Skim: problem / approach / outcome in a few seconds */}
             {skim.length > 0 && (
               <div className="px-skim" role="group" aria-label="At a glance">
@@ -284,11 +275,6 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
                   </a>
                 ))}
               </div>
-            )}
-
-            {/* Overview: metrics + meta */}
-            {overviewData && (overviewData.summary || overviewData.role || overviewData.metrics?.some(m => m.value)) && (
-              <OverviewSection data={overviewData} summary={overviewSection?.narrative || overviewData.summary} />
             )}
 
             <div className="px-cs__grid" data-rail={chapters.length > 1 || undefined}>
