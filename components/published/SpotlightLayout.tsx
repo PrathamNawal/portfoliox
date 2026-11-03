@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AnalyticsTracker } from './AnalyticsTracker'
 import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
+import { linkedinUrl } from '@/lib/utils'
 import type { MotionLevel } from '@/lib/motion'
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
@@ -46,7 +47,7 @@ export function SpotlightLayout({ profile, caseStudies, testimonials, tools, tra
           </ul>
         )}
         <div className="pxp-actions">
-          {social.linkedin && <OutlineBtn href={`https://linkedin.com/in/${social.linkedin}`}>LinkedIn</OutlineBtn>}
+          {social.linkedin && <OutlineBtn href={linkedinUrl(social.linkedin)}>LinkedIn</OutlineBtn>}
           {social.dribbble && <OutlineBtn href={`https://dribbble.com/${social.dribbble}`}>Dribbble</OutlineBtn>}
           {social.behance && <OutlineBtn href={`https://behance.net/${social.behance}`}>Behance</OutlineBtn>}
           {social.website && <OutlineBtn href={social.website}>Website</OutlineBtn>}
