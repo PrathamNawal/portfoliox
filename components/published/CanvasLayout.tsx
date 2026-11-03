@@ -143,13 +143,13 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
 
         {caseStudies.length > 0 && (
           <ScrollReveal delay={60} className="pxp-first">
-            <section className="pxp-section" aria-labelledby="pxp-cases">
+            <section className="pxp-section pxp-section--cases" aria-labelledby="pxp-cases">
               <div className="pxp-heading-row">
                 <h2 id="pxp-cases" className="pxp-h2 pxp-h2--lg">Case Studies</h2>
                 <span className="pxp-count">{caseStudies.length} project{caseStudies.length !== 1 ? 's' : ''}</span>
               </div>
               <div className="pxp-grid">
-                {caseStudies.map((cs, i) => <CanvasCaseCard key={cs.id} cs={cs as CaseStudy} index={i} slug={profile.slug!} loops={motion !== 'still'} />)}
+                {caseGridOrder(caseStudies).map(({ cs, index, wide, flip }) => <CanvasCaseCard key={cs.id} cs={cs as CaseStudy} index={index} slug={profile.slug!} loops={motion !== 'still'} wide={wide} flip={flip} />)}
               </div>
             </section>
           </ScrollReveal>
@@ -264,14 +264,32 @@ function LinkCard({ href, icon, label }: { href: string; icon: string; label: st
 }
 
 // ── Case study card ───────────────────────────────────────────────────────────
-function CanvasCaseCard({ cs, index, slug, loops }: { cs: CaseStudy; index: number; slug: string; loops: boolean }) {
+// 2-up grid. The first open case is featured full width, and an odd leftover
+// spans full width too, so no row ends half empty. NDA cases stay regular size.
+function caseGridOrder(list: Partial<CaseStudy>[]) {
+  const items = list.map((cs, index) => ({ cs, index, wide: false, flip: false }))
+  if (items.length === 1) { items[0].wide = true; return items }
+  if (items.length === 2) return items
+  const open = (c: { cs: Partial<CaseStudy> }) => !c.cs.nda_enabled
+  const hero = items.find(open)
+  if (!hero) return items
+  hero.wide = true
+  const rest = items.filter(c => c !== hero)
+  if (rest.length % 2 === 1) {
+    const tail = [...rest].reverse().find(open)
+    if (tail) { tail.wide = true; tail.flip = true }
+  }
+  return [hero, ...rest]
+}
+
+function CanvasCaseCard({ cs, index, slug, loops, wide = false, flip = false }: { cs: CaseStudy; index: number; slug: string; loops: boolean; wide?: boolean; flip?: boolean }) {
   const loop = loops ? cardLoop(cs) : null
   const grad = GRAD[index % GRAD.length]
   const disciplineLabel = cs.discipline ? CASE_DISCIPLINE_LABELS[cs.discipline] : null
   const summary = (cs.overview_data as { summary?: string } | null)?.summary
 
   return (
-    <CaseCardLink href={`/${slug}/case/${cs.id}`} className="pxp-card" index={index % 4} caseId={cs.id} morph={!cs.nda_enabled}>
+    <CaseCardLink href={`/${slug}/case/${cs.id}`} className={`pxp-card${wide ? ' pxp-card--wide' : ''}${flip ? ' pxp-card--flip' : ''}`} index={index % 4} caseId={cs.id} morph={!cs.nda_enabled}>
       <div className="pxp-card__media" data-vt-cover={cs.id}>
         {cs.cover_image_url ? (
           <CoverImage url={cs.cover_image_url} fit={cs.cover_fit} label={`${cs.title} cover`} />
