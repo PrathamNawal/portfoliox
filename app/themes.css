@@ -1231,36 +1231,33 @@
   @keyframes pp-ripple-4 { 0.000%, 9.000% { opacity: 0; transform: scale(.3); } 9.500% { opacity: .6; transform: scale(.4); animation-timing-function: var(--e-out); } 14.000% { opacity: 0; transform: scale(1.6); } 25.000%, 34.000% { opacity: 0; transform: scale(.3); } 34.500% { opacity: .6; transform: scale(.4); animation-timing-function: var(--e-out); } 39.000% { opacity: 0; transform: scale(1.6); } 50.000%, 59.000% { opacity: 0; transform: scale(.3); } 59.500% { opacity: .6; transform: scale(.4); animation-timing-function: var(--e-out); } 64.000% { opacity: 0; transform: scale(1.6); } 75.000%, 84.000% { opacity: 0; transform: scale(.3); } 84.500% { opacity: .6; transform: scale(.4); animation-timing-function: var(--e-out); } 89.000% { opacity: 0; transform: scale(1.6); } 100% { opacity: 0; } }
 }
 
-/* ── Smart image (components/published/SmartImage.tsx, BlockRenderer gallery, lib/image-shape.ts) ───────────────
-   Case-study images are never cropped. SmartImage reads each image's shape and frames it:
-   wide = natural height; square / portrait = natural size on a stage with a blurred copy behind; tall = a browser
-   frame that pans as the page scrolls (scrollable instead where animation-timeline is unsupported or motion is reduced).
-   Gallery = justified rows: flex-grow / flex-basis follow each image's ratio so a row shares one height. */
-.px-si { position: relative; border-radius: 8px; }
-.px-si img { display: block; }
-.px-si--wide img { width: 100%; height: auto; border-radius: 8px; }
-.px-si--stage { display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 12px; padding: clamp(14px, 3vw, 32px); background: var(--px-surface-2, rgba(0, 0, 0, .04)); }
-.px-si__blur { position: absolute; inset: -30px; background-size: cover; background-position: center; filter: blur(28px) saturate(1.2) brightness(.95); opacity: .6; }
-.px-si--stage img { position: relative; width: auto; height: auto; max-width: 100%; border-radius: 8px; box-shadow: 0 10px 34px rgba(0, 0, 0, .22); }
-.px-si--square img { max-height: 640px; }
-.px-si--portrait img { max-height: 760px; }
-.px-si--tall { width: min(100%, 760px); margin: 0 auto; overflow: hidden; border: 1px solid var(--px-border-strong, rgba(0, 0, 0, .15)); border-radius: 12px; background: var(--px-surface, #fff); box-shadow: 0 10px 34px rgba(0, 0, 0, .14); }
-.px-si__chrome { display: flex; gap: 6px; align-items: center; height: 28px; padding: 0 12px; background: var(--px-surface-2, #f1f0ee); border-bottom: 1px solid var(--px-border, rgba(0, 0, 0, .1)); }
-.px-si__chrome i { width: 9px; height: 9px; border-radius: 50%; background: var(--px-border-strong, #c8c5be); }
-.px-si__view { height: min(560px, 78vh); overflow-y: auto; overscroll-behavior: auto; }
-.px-si--tall img { width: 100%; height: auto; }
+/* ── Images (components/published/SmartImage.tsx, ImageSet.tsx, lib/image-shape.ts) ──────────────────────────
+   Case-study images are never cropped and all follow one set of rules so mixed sizes read as one system:
+   wide = column width at natural height; poster (square / portrait) = one fixed width, height capped, left-aligned
+   with the text; tall = a browser frame that pans as the page scrolls (scrollable where animation-timeline is
+   unsupported or motion is reduced). Neighbouring images become justified rows (equal height, own shapes).
+   Every frame shares one hairline border, radius and shadow so white-background graphics never melt into the page. */
+.px-fig { position: relative; overflow: hidden; border: 1px solid var(--px-border-strong, rgba(0, 0, 0, .14)); border-radius: 10px; background: var(--px-surface, #fff); box-shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .08); }
+.px-fig img { display: block; width: 100%; height: auto; }
+.px-fig--poster { width: min(100%, 600px, calc(720px * var(--r, 1))); }
+.px-fig--tall { width: min(100%, 760px); }
+.px-fig__chrome { display: flex; gap: 6px; align-items: center; height: 28px; padding: 0 12px; background: var(--px-surface-2, #f1f0ee); border-bottom: 1px solid var(--px-border, rgba(0, 0, 0, .1)); }
+.px-fig__chrome i { width: 9px; height: 9px; border-radius: 50%; background: var(--px-border-strong, #c8c5be); }
+.px-fig__view { height: min(560px, 78vh); overflow-y: auto; overscroll-behavior: auto; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     /* the timeline is named on the outer frame: an overflow:hidden ancestor of the image would count as its scroller */
-    .px-si--tall { view-timeline: --px-si block; }
-    .px-si__view { overflow: hidden; }
-    .px-si--tall img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; animation: px-si-pan linear both; animation-timeline: --px-si; animation-range: cover 15% cover 85%; }
-    @keyframes px-si-pan { from { object-position: 50% 0%; } to { object-position: 50% 100%; } }
+    .px-fig--tall { view-timeline: --px-fig block; }
+    .px-fig__view { overflow: hidden; }
+    .px-fig--tall img { height: 100%; object-fit: cover; object-position: 50% 0%; animation: px-fig-pan linear both; animation-timeline: --px-fig; animation-range: cover 15% cover 85%; }
+    @keyframes px-fig-pan { from { object-position: 50% 0%; } to { object-position: 50% 100%; } }
   }
 }
-.px-gal { display: flex; flex-wrap: wrap; gap: 10px; }
-.px-gal::after { content: ''; flex-grow: 1000000; }
-.px-gal__item { margin: 0; min-width: 0; }
-.px-gal__frame { position: relative; width: 100%; overflow: hidden; border-radius: 6px; background: var(--px-surface-2, rgba(0, 0, 0, .05)); }
-.px-gal__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-.px-gal__item figcaption { margin-top: 6px; font-size: 13px; line-height: 1.5; color: var(--px-text-2); }
+.px-set { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.px-set--one { gap: 8px; }
+.px-set figcaption { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--px-text-2); }
+.px-set--one figcaption { font-size: 14px; line-height: 1.6; }
+/* a row: widths follow each image's ratio, so every image in it ends up the same height; never taller than ROW_MAX_H */
+.px-row { display: flex; gap: 10px; width: min(100%, var(--max, 100%)); align-items: flex-start; }
+.px-row__item { flex: 1 1 0; min-width: 0; margin: 0; }
+@media (max-width: 640px) { .px-row { flex-direction: column; width: 100%; } .px-row__item { flex-grow: 0 !important; width: 100%; } }

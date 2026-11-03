@@ -10,6 +10,7 @@ import { ThemeScope } from '@/components/published/ThemeScope'
 import { CoverImage } from '@/components/published/CoverImage'
 import { ViewTransitionGate } from '@/components/published/ViewTransitionGate'
 import { transitionClick } from '@/lib/view-transition'
+import { mergeImageBlocks } from '@/lib/image-shape'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
 
@@ -189,7 +190,7 @@ function ContentSection({ section }: { section: CaseSection }) {
       {/* Visual blocks */}
       {hasBlocks && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {section.blocks.map((block, i) => {
+          {mergeImageBlocks(section.blocks).map((block, i) => {
             if (block.type === 'image' && !block.imageUrl) return null
             if (block.type === 'compare' && (!block.beforeUrl || !block.afterUrl)) return null
             if (block.type === 'figma' && !block.figmaUrl) return null

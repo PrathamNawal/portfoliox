@@ -2,9 +2,8 @@
 
 import React, { useState, useRef, useCallback } from 'react'
 import type { Block } from '@/types'
-import { SmartImage } from './SmartImage'
+import { ImageSet } from './ImageSet'
 import { useImageRatio } from './useImageRatio'
-import { DEFAULT_RATIO } from '@/lib/image-shape'
 
 // ── Before/After slider (client-side interactive) ─────────────────────────────
 function CompareSlider({ beforeUrl, afterUrl }: { beforeUrl: string; afterUrl: string }) {
@@ -117,30 +116,6 @@ function FigmaEmbed({ url }: { url: string }) {
   )
 }
 
-// ── Gallery: justified rows ───────────────────────────────────────────────────
-// Every image keeps its own shape; each row is sized so the images in it share one height (4/3 until a shape is known).
-function Gallery({ images }: { images: { url: string; caption: string }[] }) {
-  return (
-    <div className="px-gal">
-      {images.map((img, idx) => <GalleryItem key={idx} url={img.url} caption={img.caption} />)}
-    </div>
-  )
-}
-
-function GalleryItem({ url, caption }: { url: string; caption: string }) {
-  const [r, setR] = useState(DEFAULT_RATIO)
-  const img = useImageRatio(setR)
-  return (
-    <figure className="px-gal__item" style={{ flexGrow: r * 100, flexBasis: `${r * 220}px` }}>
-      <div className="px-gal__frame" style={{ aspectRatio: String(r) }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={caption || ''} loading="lazy" decoding="async" ref={img.ref} onLoad={img.onLoad} />
-      </div>
-      {caption && <figcaption>{caption}</figcaption>}
-    </figure>
-  )
-}
-
 // ── Main block renderer ───────────────────────────────────────────────────────
 interface Props {
   block: Block
@@ -166,17 +141,12 @@ export function BlockRenderer({ block, accent = '#E53416' }: Props) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       <span style={labelStyle}>{block.sectionLabel}</span>
 
-      {/* Image */}
+      {/* Image and gallery: one framing system, see ImageSet */}
       {block.type === 'image' && block.imageUrl && (
-        <div>
-          <SmartImage src={block.imageUrl} alt={block.caption || block.sectionLabel} />
-          {block.caption && <p style={{ fontSize: 14, color: 'var(--px-text-2)', marginTop: 8, lineHeight: 1.6 }}>{block.caption}</p>}
-        </div>
+        <ImageSet items={[{ url: block.imageUrl, caption: block.caption ?? '' }]} />
       )}
-
-      {/* Gallery */}
       {block.type === 'gallery' && block.images && block.images.some(i => i.url) && (
-        <Gallery images={block.images.filter(i => i.url)} />
+        <ImageSet items={block.images.filter(i => i.url)} />
       )}
 
       {/* Figma */}
