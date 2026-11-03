@@ -56,3 +56,11 @@ export function hasFillOpener(text: string): boolean {
   const lower = text.toLowerCase().trimStart()
   return FILLER_OPENERS.some((f) => lower.startsWith(f))
 }
+
+/** Accepts a LinkedIn handle ("muskan"), a path ("in/muskan"), or a full URL and returns a working https URL. */
+export function linkedinUrl(value: string): string {
+  const v = value.trim()
+  if (/^https?:\/\//i.test(v)) return v
+  const bare = v.replace(/^\/+/, '').replace(/^(www\.)?linkedin\.com\//i, '')
+  return `https://www.linkedin.com/${/^(in|company|pub)\//i.test(bare) ? bare : `in/${bare}`}`
+}

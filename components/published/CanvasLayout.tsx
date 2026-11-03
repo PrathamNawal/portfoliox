@@ -11,6 +11,7 @@ import { CaseCardLink } from './CaseCardLink'
 import { ViewTransitionGate } from './ViewTransitionGate'
 import { PrototypeLoop } from './PrototypeLoop'
 import { RecommendationStage } from './RecommendationStage'
+import { linkedinUrl } from '@/lib/utils'
 import { cardLoop } from '@/lib/case-screens'
 import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
@@ -85,7 +86,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
   const heroTitle = (profile.discipline ? HERO_DISCIPLINE[profile.discipline] : null) || 'Designer'
   const skills = profile.skills || []
   const links: { href: string; label: string }[] = []
-  if (social.linkedin) links.push({ href: `https://linkedin.com/in/${social.linkedin}`, label: 'LinkedIn' })
+  if (social.linkedin) links.push({ href: linkedinUrl(social.linkedin), label: 'LinkedIn' })
   if (social.dribbble) links.push({ href: `https://dribbble.com/${social.dribbble}`, label: 'Dribbble' })
   if (social.behance) links.push({ href: `https://behance.net/${social.behance}`, label: 'Behance' })
   if (social.website) links.push({ href: social.website, label: 'Website' })
@@ -239,7 +240,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
               </div>
             )}
             <div className="pxp-cta__grid">
-              {social.linkedin && <LinkCard href={`https://linkedin.com/in/${social.linkedin}`} icon="💼" label="LinkedIn" />}
+              {social.linkedin && <LinkCard href={linkedinUrl(social.linkedin)} icon="💼" label="LinkedIn" />}
               {social.dribbble && <LinkCard href={`https://dribbble.com/${social.dribbble}`} icon="🎯" label="Dribbble" />}
               {social.website && <LinkCard href={social.website} icon="🔗" label="Website" />}
               <a href={`mailto:${(profile as unknown as { email?: string }).email || ''}`} className="pxp-linkcard pxp-linkcard--accent">
