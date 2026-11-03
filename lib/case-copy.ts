@@ -23,18 +23,85 @@ export function asStat(item: string): { value: string; text: string } | null {
   return m ? { value: m[1].replace(/\s+/g, ''), text: m[2] } : null
 }
 
-// Step headings ("01 — ...") and labels ("Key findings:") are structure, not sentences, so the skim text skips them.
-const prose = (s: string) => s.split('\n').filter(l => !asStep(l) && !asLabel(l)).join('\n')
-const plain = (s: string) => prose(s).replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').replace(/^[-*•]\s+|^\d+\.\s+/gm, '').replace(/\s+/g, ' ').trim()
+// Step headings ("01 — ...") and labels ("Key findings:") are structure, not sentences, so text extraction skips them.
+const strip = (s: string) => s.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').replace(/\s+/g, ' ').trim()
+const BULLET = /^\s*(?:[-*•]|\d+\.)\s+/
 
-/** First sentence or two of a section's narrative, for the skim cards (about 190 characters at most). */
+/** The narrative's running paragraphs: no steps, labels or lists, and nothing that is only a short fragment. */
+export function paragraphs(narrative: string): string[] {
+  return (narrative ?? '').split(/\n\s*\n/).map(blk => blk.split('\n').map(l => l.trim()).filter(Boolean))
+    .filter(lines => lines.length && !lines.some(l => asStep(l) || asLabel(l) || BULLET.test(l)))
+    .map(lines => strip(lines.join(' ')))
+    .filter(t => t.length >= 50 && /[.!?]/.test(t))
+}
+
+const sentencesOf = (t: string) => t.match(/[^.!?]+[.!?]+(?=\s|$)/g)?.map(x => x.trim()) ?? [t]
+
+/** First sentence or two of a section's first running paragraph, for the skim cards (about 190 characters at most); '' if it has none. */
 export function lead(narrative: string, max = 190): string {
-  const t = plain(narrative)
-  const sentences = t.match(/[^.!?]+[.!?]+(\s|$)/g)
-  if (!sentences) return t.length > max ? `${t.slice(0, max - 1).trimEnd()}…` : t
+  const first = paragraphs(narrative)[0] // a section with no running prose has no lead
+  if (!first) return ''
   let out = ''
-  for (const s of sentences) { if ((out + s).length > max && out) break; out += s }
-  return out.trim().length > max ? `${out.trim().slice(0, max - 1).trimEnd()}…` : out.trim()
+  for (const s of sentencesOf(first)) { if ((out + ' ' + s).length > max && out) break; out = out ? `${out} ${s}` : s }
+  return out.length > max ? `${out.slice(0, max - 1).trimEnd()}…` : out
+}
+
+// ── Chapter stages ───────────────────────────────────────────────────────────
+// Each chapter is given a layout and, at most, one band from its own content, so owners choose nothing:
+//   split   text stays sticky beside the images (a short chapter with at least one image)
+//   visual  no text, only images: wider frames
+//   stack   text, then visuals (everything else)
+//   band    stats (a list with figures) > finale (the outcome chapter) > quote (a sentence stating a decision or insight)
+
+export interface Band { kind: 'stats' | 'quote' | 'finale'; label: string; text?: string; stats?: { value: string; text: string }[] }
+export interface Stage { layout: 'split' | 'visual' | 'stack'; band: Band | null }
+
+const DECISION = /\b(decision|decided|insight|finding|findings|learned|key (?:design )?consideration|goal was|aim was|strategic|realised|realized|turned out)\b/i
+const LABEL_OF: [RegExp, string][] = [[/decision|decided|strategic/i, 'The decision'], [/insight|finding|learned|realis|turned out/i, 'The insight'], [/goal|aim/i, 'The aim'], [/consideration/i, 'The key call']]
+
+/** A sentence from a later paragraph that states a decision or insight (not the lead, which is already large). */
+export function decisionOf(narrative: string): { text: string; label: string } | null {
+  const ps = paragraphs(narrative)
+  for (const p of ps.length > 1 ? ps.slice(1) : ps) {
+    for (const sent of sentencesOf(p)) {
+      if (sent.length >= 50 && sent.length <= 230 && DECISION.test(sent)) return { text: sent, label: (LABEL_OF.find(([re]) => re.test(sent)) ?? [0, 'Takeaway'])[1] }
+    }
+  }
+  return null
+}
+
+/** Up to three list items that start with a figure, as big numbers. */
+export function statsOf(narrative: string): { value: string; text: string }[] {
+  const out: { value: string; text: string }[] = []
+  for (const line of (narrative ?? '').split('\n')) {
+    if (!BULLET.test(line)) continue
+    const st = asStat(strip(line.replace(BULLET, '')))
+    if (st) out.push(st)
+  }
+  return out.slice(0, 3)
+}
+
+const IMAGE_BLOCKS = new Set(['image', 'gallery', 'compare'])
+
+export function stageOf(section: CaseSection): Stage {
+  const text = (section.narrative ?? '').trim()
+  const hasImage = (section.blocks ?? []).some(b => IMAGE_BLOCKS.has(b.type))
+  const layout: Stage['layout'] = !text ? 'visual' : hasImage && text.length <= 1800 ? 'split' : 'stack'
+  let band: Band | null = null
+  if (text.length >= 200) {
+    const stats = statsOf(text)
+    const d = decisionOf(text)
+    if (section.type === 'impact' || /impact|outcome|result/i.test(section.title ?? '')) {
+      // the closing statement comes from the last paragraph, so it does not repeat the lead printed just above
+      const ps = paragraphs(text)
+      const last = ps.length > 1 ? sentencesOf(ps[ps.length - 1])[0] : ps[0] ? lead(text, 230) : undefined
+      band = { kind: 'finale', label: 'The outcome', text: d?.text ?? last }
+    }
+    else if (stats.length) band = { kind: 'stats', label: 'By the numbers', stats }
+    else if (d) band = { kind: 'quote', label: d.label, text: d.text }
+    if (band && band.kind !== 'stats' && !band.text) band = null
+  }
+  return { layout, band }
 }
 
 export interface Skim { label: string; text: string; id: string }
