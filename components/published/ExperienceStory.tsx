@@ -4,7 +4,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import dynamic from 'next/dynamic'
 import { sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics } from '@/lib/experience'
-import { careerArc, hueOf, isPortrait, screenRatio, startYear, storyHeadline, visibleScreens } from '@/lib/experience-story'
+import { isPortrait, screenRatio, startYear, storyHeadline, visibleScreens } from '@/lib/experience-story'
+import { CareerRibbon } from './CareerRibbon'
+import { Chip } from './StoryChip'
 import type { ExperienceScreen, WorkExperience } from '@/types'
 
 // The walking designer is only loaded when the portfolio has the scene on and Motion is not Still.
@@ -12,25 +14,10 @@ const TimelineWalker = dynamic(() => import('@/components/scene/TimelineWalker')
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>
 
-const tintOf = (company: string): Vars => ({ '--pxs-hue': hueOf(company) })
-
-/** Company mark: the stored logo when it loads, else the initial on a tint taken from the name. */
-function Chip({ company, logoUrl, small }: { company: string; logoUrl?: string | null; small?: boolean }) {
-  const [broken, setBroken] = useState(false)
-  return (
-    <span className={`pxs-chip${small ? ' pxs-chip--sm' : ''}`} style={tintOf(company)} aria-hidden="true">
-      <span className="pxs-chip__initial">{company.trim()[0]?.toUpperCase() ?? '?'}</span>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      {logoUrl && !broken && <img className="pxs-chip__img" src={logoUrl} alt="" onError={() => setBroken(true)} />}
-    </span>
-  )
-}
-
 interface Open { roleId: string; index: number }
 
-export function ExperienceStory({ experience, walker = false }: { experience: WorkExperience[]; walker?: boolean }) {
+export function ExperienceStory({ experience, walker = false, animate = false }: { experience: WorkExperience[]; walker?: boolean; animate?: boolean }) {
   const roles = useMemo(() => sortExperience(experience), [experience])
-  const arc = useMemo(() => careerArc(roles), [roles])
   const byId = useMemo(() => new Map(roles.map(r => [r.id, r])), [roles])
 
   const timelineRef = useRef<HTMLOListElement>(null)
@@ -73,25 +60,7 @@ export function ExperienceStory({ experience, walker = false }: { experience: Wo
 
   return (
     <div className="pxs">
-      {arc.length > 1 && (
-        <nav className="pxs-arc" aria-label="Career arc">
-          <ol className="pxs-arc__track">
-            {arc.map(stop => {
-              const r = byId.get(stop.id)!
-              return (
-                <li key={stop.company} className="pxs-arc__item">
-                  <a className="pxs-arc__node" href={`#pxs-${stop.id}`} data-current={stop.current ? 'true' : undefined} aria-current={stop.current ? 'true' : undefined}>
-                    <Chip company={stop.company} logoUrl={r.logo_url} />
-                    <span className="pxs-arc__name">{stop.company}</span>
-                    <span className="pxs-arc__role">{r.role}</span>
-                    <span className="pxs-arc__yr">{startYear(r.start_month) ?? ''}</span>
-                  </a>
-                </li>
-              )
-            })}
-          </ol>
-        </nav>
-      )}
+      <CareerRibbon roles={roles} animate={animate} />
 
       <ol className="pxs-timeline" ref={timelineRef}>
         {walker && <TimelineWalker timeline={timelineRef} />}
