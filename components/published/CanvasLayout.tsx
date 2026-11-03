@@ -6,7 +6,7 @@ import { Marquee } from './Marquee'
 import { ThemeScope } from './ThemeScope'
 import { CoverImage } from './CoverImage'
 import { HeroMotion } from './HeroMotion'
-import { ExperienceStory } from './ExperienceStory'
+import { ExperienceClimb } from './ExperienceClimb'
 import { CaseCardLink } from './CaseCardLink'
 import { ViewTransitionGate } from './ViewTransitionGate'
 import { PrototypeLoop } from './PrototypeLoop'
@@ -187,7 +187,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
                 <p className="pxp-kicker">Experience{expYears && ` ${calcTotalExperience(experience)}`}</p>
                 <h2 id="pxp-work" className="pxp-h2">Work Experience</h2>
               </div>
-              {expStory ? <ExperienceStory experience={experience} walker={scene && motion !== 'still'} animate={motion !== 'still'} testimonials={testimonials} /> : (
+              {expStory ? <ExperienceClimb experience={experience} walker={scene && motion !== 'still'} animate={motion !== 'still'} testimonials={testimonials} /> : (
                 <div className="pxp-exp-list">
                   {groupByCompany(experience).map(({ company, entries }, gi) => (
                     <div key={company}>
