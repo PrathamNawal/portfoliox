@@ -14,12 +14,12 @@
 .pxs-timeline > .sc-root.wk-root { position: absolute; top: 0; left: calc(var(--rail) + var(--gap) / 2 - 56px); z-index: 2; width: 112px; max-width: none; margin: 0; list-style: none; pointer-events: none; will-change: transform; }
 @media (max-width: 640px) {
   /* narrow: a smaller walker (84px) and the rail moves in from the edge to make room for her */
-  .pxs-timeline[data-walker] { --rail: 0px; --gap: 0px; --wpad: 165px; }
-  .pxs-timeline[data-walker]::before, .pxs-timeline[data-walker]::after { left: 43px; }
-  .pxs-timeline[data-walker] .pxs-chapter { padding-left: 92px; }
-  .pxs-timeline[data-walker] .pxs-chapter::before { left: 36px; }
+  .pxs-timeline[data-walker] { --rail: 0px; --gap: 0px; --wpad: 112px; }
+  .pxs-timeline[data-walker]::before, .pxs-timeline[data-walker]::after { left: 30px; }
+  .pxs-timeline[data-walker] .pxs-chapter { padding-left: 68px; }
+  .pxs-timeline[data-walker] .pxs-chapter::before { left: 23px; }
   .pxs-timeline[data-walker] .pxs-when { padding-right: 0; }
-  .pxs-timeline > .sc-root.wk-root { left: 2px; width: 84px; }
+  .pxs-timeline > .sc-root.wk-root { left: 0; width: 60px; }
 }
 .wk-root::before, .wk-root::after { content: none !important; }
 

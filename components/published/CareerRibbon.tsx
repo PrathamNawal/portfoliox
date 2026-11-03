@@ -20,6 +20,7 @@ export function CareerRibbon({ roles, animate, proofs }: { roles: WorkExperience
   const [active, setActive] = useState<string | null>(null)
   const [shown, setShown] = useState(!animate)
   const root = useRef<HTMLElement>(null)
+  const scroller = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const chapters = Array.from(document.querySelectorAll<HTMLElement>('.pxs-chapter'))
@@ -41,6 +42,14 @@ export function CareerRibbon({ roles, animate, proofs }: { roles: WorkExperience
     return () => io.disconnect()
   }, [animate])
 
+  useEffect(() => {
+    const sc = scroller.current
+    const bar = active ? sc?.querySelector<HTMLElement>(`[data-on]`) : null
+    if (!sc || !bar || sc.scrollWidth <= sc.clientWidth) return
+    const left = bar.offsetLeft - (sc.clientWidth - bar.offsetWidth) / 2
+    sc.scrollTo({ left: Math.max(0, left), behavior: 'smooth' })
+  }, [active])
+
   if (ribbon.bars.length < 2) return null
   const present = (['brand', 'ux', 'product'] as Discipline[]).filter(d => ribbon.bars.some(b => b.discipline === d))
 
@@ -55,13 +64,14 @@ export function CareerRibbon({ roles, animate, proofs }: { roles: WorkExperience
           </ul>
         )}
       </div>
+      <div className="pxs-rb__scroll" ref={scroller}>
       <ol className="pxs-rb__track" style={{ ['--lanes' as string]: ribbon.lanes, ['--lane' as string]: `${LANE}px` }}>
         {ribbon.bars.map((b, i) => {
           const role = byId.get(b.id)
           const say = proofs?.get(b.id)?.[0]
           const align = b.left < 14 ? 'start' : b.left + b.width > 86 ? 'end' : 'mid'
           return (
-            <li key={b.id} className="pxs-rb__bar" data-d={b.discipline} data-current={b.current || undefined} data-proof={say ? '' : undefined} data-on={active === b.id || undefined} data-align={align}
+            <li key={b.id} className="pxs-rb__bar" data-d={b.discipline} data-current={b.current || undefined} data-proof={say ? '' : undefined} data-on={active === b.id || undefined} data-align={align} data-w={b.width < 9 ? 's' : undefined}
               style={{ left: `${b.left}%`, width: `${b.width}%`, top: b.lane * LANE, ['--i' as string]: i }}>
               <a href={`#pxs-${b.id}`} aria-label={`${b.company}, ${b.role}, ${b.range}, ${b.duration}`}>
                 <Chip company={b.company} logoUrl={role?.logo_url} small />
@@ -81,6 +91,7 @@ export function CareerRibbon({ roles, animate, proofs }: { roles: WorkExperience
         {ribbon.breaks.map((x, i) => <li key={`b${i}`} className="pxs-rb__break" aria-hidden="true" style={{ left: `${x}%` }}>//</li>)}
         {ribbon.ticks.map(t => <li key={t.year} className="pxs-rb__tick" aria-hidden="true" style={{ left: `${t.left}%` }}>{t.year}</li>)}
       </ol>
+      </div>
     </nav>
   )
 }
