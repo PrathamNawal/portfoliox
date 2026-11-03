@@ -9,6 +9,8 @@ import { HeroMotion } from './HeroMotion'
 import { ExperienceStory } from './ExperienceStory'
 import { CaseCardLink } from './CaseCardLink'
 import { ViewTransitionGate } from './ViewTransitionGate'
+import { PrototypeLoop } from './PrototypeLoop'
+import { cardLoop } from '@/lib/case-screens'
 import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
 
@@ -140,7 +142,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
                 <span className="pxp-count">{caseStudies.length} project{caseStudies.length !== 1 ? 's' : ''}</span>
               </div>
               <div className="pxp-grid">
-                {caseStudies.map((cs, i) => <CanvasCaseCard key={cs.id} cs={cs as CaseStudy} index={i} slug={profile.slug!} />)}
+                {caseStudies.map((cs, i) => <CanvasCaseCard key={cs.id} cs={cs as CaseStudy} index={i} slug={profile.slug!} loops={motion !== 'still'} />)}
               </div>
             </section>
           </ScrollReveal>
@@ -247,7 +249,8 @@ function LinkCard({ href, icon, label }: { href: string; icon: string; label: st
 }
 
 // ── Case study card ───────────────────────────────────────────────────────────
-function CanvasCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; slug: string }) {
+function CanvasCaseCard({ cs, index, slug, loops }: { cs: CaseStudy; index: number; slug: string; loops: boolean }) {
+  const loop = loops ? cardLoop(cs) : null
   const grad = GRAD[index % GRAD.length]
   const disciplineLabel = cs.discipline ? CASE_DISCIPLINE_LABELS[cs.discipline] : null
   const summary = (cs.overview_data as { summary?: string } | null)?.summary
@@ -264,6 +267,7 @@ function CanvasCaseCard({ cs, index, slug }: { cs: CaseStudy; index: number; slu
             <p className="pxp-card__ph-title">{cs.title}</p>
           </div>
         )}
+        {loop && <PrototypeLoop loop={loop} label={cs.title} />}
         {cs.nda_enabled && (
           <div className="pxp-card__nda">
             <div className="pxp-card__nda-icon">

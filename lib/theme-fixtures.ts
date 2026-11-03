@@ -7,6 +7,10 @@ const svgCover = (a: string, b: string, label: string, w = 800, h = 480) =>
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="${w}" height="${h}" fill="url(#g)"/><circle cx="${w * .75}" cy="${h * .3}" r="${h * .19}" fill="rgba(255,255,255,.28)"/><rect x="${w * .09}" y="${h * .52}" width="${w * .45}" height="26" rx="13" fill="rgba(255,255,255,.55)"/><rect x="${w * .09}" y="${h * .62}" width="${w * .3}" height="26" rx="13" fill="rgba(255,255,255,.35)"/><text x="${w * .09}" y="${h * .42}" font-family="sans-serif" font-size="46" font-weight="800" fill="#fff">${label}</text></svg>`,
   ).replace(/[()']/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())}`
 
+// A tall app-screen placeholder for the card prototype loop.
+const screen = (a: string, b: string, label: string) => svgCover(a, b, label, 390, 844)
+const imageBlock = (n: number, imageUrl: string) => ({ id: `b-${n}`, type: 'image' as const, sectionLabel: 'screens', imageUrl })
+
 const base = { user_id: 'fixture', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }
 
 export const FIXTURE_PROFILE: Profile = {
@@ -40,10 +44,10 @@ const cs = (n: number, title: string, cover: string | null, extra: Partial<CaseS
 })
 
 export const FIXTURE_CASE_STUDIES: Partial<CaseStudy>[] = [
-  cs(1, 'Making AI Recruitment Feel Human', svgCover('#0f766e', '#134e4a', 'Recruit'), { discipline: 'brand', overview_data: { summary: 'Agentic ATS and AI recruitment platform. Solo designer working with founder, BD and marketing.', role: '', timeline: '', team: '', metrics: [] } }),
+  cs(1, 'Making AI Recruitment Feel Human', svgCover('#0f766e', '#134e4a', 'Recruit'), { blocks: [imageBlock(1, screen('#0ea5e9', '#1e3a8a', 'Home')), imageBlock(2, screen('#f59e0b', '#b45309', 'Search')), imageBlock(3, screen('#10b981', '#065f46', 'Offer'))], discipline: 'brand', overview_data: { summary: 'Agentic ATS and AI recruitment platform. Solo designer working with founder, BD and marketing.', role: '', timeline: '', team: '', metrics: [] } }),
   cs(2, 'A Distinct Voice in Technical Hiring', svgCover('#7c3aed', '#312e81', 'Tall · fill', 500, 900), { discipline: 'brand', overview_data: { summary: 'Brand assets, creative direction and ongoing marketing communication.', role: '', timeline: '', team: '', metrics: [] } }),
   cs(3, 'Street Food Safari', svgCover('#f97316', '#be123c', 'Tall · fit', 500, 900), { cover_fit: 'fit' }),
-  cs(4, 'HunchVue: AI-Assisted Interviewing', null, { discipline: 'ux' }),
+  cs(4, 'HunchVue: AI-Assisted Interviewing', null, { discipline: 'ux', blocks: [imageBlock(4, screen('#6366f1', '#312e81', 'Editor')), imageBlock(5, screen('#ec4899', '#9d174d', 'Review'))] }),
   cs(5, 'FarmVilla: A Three-Sided Marketplace', svgCover('#16a34a', '#0e7490', 'Stays'), { nda_enabled: true }),
 ]
 
