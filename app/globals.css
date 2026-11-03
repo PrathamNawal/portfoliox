@@ -507,11 +507,24 @@ a { text-decoration: none; color: inherit; }
 .pxs-rb__bar:hover .pxs-rb__tip, .pxs-rb__bar:focus-within .pxs-rb__tip { display: block; }
 .pxs-rb__tick, .pxs-rb__break { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 11px; font-variant-numeric: tabular-nums; color: var(--px-text-3); }
 .pxs-rb__break { bottom: 8px; font-weight: 700; letter-spacing: -.1em; color: var(--px-text-2); }
+.pxs-rb__scroll { position: relative; }
 @media (max-width: 800px) {
   .pxs-rb { position: static; box-shadow: none; padding-top: 0; }
   .pxs-rb__name { display: none; }
   .pxs-rb__legend { margin-left: 0; }
   .pxs-chapter { scroll-margin-top: 72px; }
+}
+@media (max-width: 640px) {
+  /* phone: the axis keeps a readable width and scrolls sideways, so every bar shows its logo and name */
+  .pxs-rb { margin-bottom: 28px; }
+  .pxs-rb__head { margin-bottom: 10px; }
+  .pxs-rb__legend { width: 100%; }
+  .pxs-rb__scroll { margin: 0 -16px; padding: 0 16px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .pxs-rb__scroll::-webkit-scrollbar { display: none; }
+  .pxs-rb__track { min-width: 620px; margin: 0 14px 0 14px; }
+  .pxs-rb__name { display: block; }
+  .pxs-rb__bar[data-w="s"] .pxs-rb__name { display: none; }
+  .pxs-rb__tip { display: none !important; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .pxs-rb[data-motion="on"] .pxs-rb__bar a { clip-path: inset(0 100% 0 0 round 11px); transition: clip-path .75s cubic-bezier(.2, .8, .3, 1) calc(var(--i, 0) * 90ms), filter .2s ease, opacity .2s ease, outline-color .2s ease; }
