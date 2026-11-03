@@ -10,6 +10,9 @@ interface Props {
   onChange: (screens: ExperienceScreen[]) => void
   /** True while files are compressing or uploading, so the modal can hold the save button. */
   onBusyChange?: (busy: boolean) => void
+  /** How many images at most (default 12). */
+  max?: number
+  label?: string
 }
 
 const ACCEPT = 'image/png,image/jpeg,image/webp'
@@ -42,7 +45,7 @@ async function uploadScreen(file: File): Promise<ExperienceScreen> {
 }
 
 /** Screens for the Story layout: pick or drop images, reorder, caption, remove. Up to 12. */
-export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
+export function ScreensEditor({ value, onChange, onBusyChange, max = MAX_SCREENS, label = 'Screens' }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const latest = useRef(value)
   latest.current = value
@@ -56,12 +59,12 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
   const addFiles = async (list: FileList | File[]) => {
     const files = Array.from(list).filter(f => /^image\/(png|jpe?g|webp)$/.test(f.type))
     const rejected = Array.from(list).length - files.length
-    const room = MAX_SCREENS - latest.current.length
+    const room = max - latest.current.length
     if (files.length === 0) { setError(rejected ? 'Only PNG, JPG or WebP images.' : ''); return }
     const take = files.slice(0, Math.max(0, room))
     const notes: string[] = []
     if (rejected) notes.push('Some files were not PNG, JPG or WebP and were skipped.')
-    if (files.length > take.length) notes.push(`Limit is ${MAX_SCREENS} screens; ${files.length - take.length} not added.`)
+    if (files.length > take.length) notes.push(`Limit is ${max} screens; ${files.length - take.length} not added.`)
     setError(notes.join(' '))
     if (take.length === 0) return
     setBusyCount(take.length)
@@ -70,7 +73,7 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
     await Promise.all(take.map(async f => {
       try {
         const s = await uploadScreen(f)
-        onChange([...latest.current, s].slice(0, MAX_SCREENS))
+        onChange([...latest.current, s].slice(0, max))
         latest.current = [...latest.current, s]
       } catch { failed++ }
       finally { pending--; setBusyCount(pending) }
@@ -80,7 +83,7 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
 
   // Capture a screen from a page URL: the server takes the screenshot and stores it like an upload.
   const capture = async () => {
-    if (!pageUrl.trim() || busy > 0 || latest.current.length >= MAX_SCREENS) return
+    if (!pageUrl.trim() || busy > 0 || latest.current.length >= max) return
     setError('')
     setBusyCount(1)
     try {
@@ -110,14 +113,14 @@ export function ScreensEditor({ value, onChange, onBusyChange }: Props) {
     return v ? { ...rest, caption: v.slice(0, MAX_CAPTION) } : rest
   }))
 
-  const full = value.length >= MAX_SCREENS
+  const full = value.length >= max
   const btn: React.CSSProperties = { height: 26, minWidth: 26, padding: '0 6px', fontSize: 12, fontWeight: 700, lineHeight: 1, color: 'var(--px-text)', background: 'var(--px-surface)', border: '1px solid var(--px-border)', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)' }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>Screens</span>
-        <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>{value.length} / {MAX_SCREENS}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>{label}</span>
+        <span style={{ fontSize: 11, color: 'var(--px-text-3)' }}>{value.length} / {max}</span>
       </div>
 
       <div

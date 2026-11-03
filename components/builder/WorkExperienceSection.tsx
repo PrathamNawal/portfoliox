@@ -10,7 +10,7 @@ import type { WorkExperience, ExperienceScreen } from '@/types'
 import { sortExperience } from '@/lib/experience'
 import { SceneToggle } from '@/components/builder/SceneToggle'
 import { ScreensEditor } from '@/components/builder/ScreensEditor'
-import { MAX_HEADLINE, MAX_STAT_VALUE, MAX_STAT_LABEL } from '@/lib/experience-story'
+import { MAX_HEADLINE, MAX_STAT_VALUE, MAX_STAT_LABEL, MAX_AWARD_TITLE, MAX_AWARD_NOTE } from '@/lib/experience-story'
 
 // ── Lightweight rich-text editor ─────────────────────────────────────────────
 function RichTextEditor({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
@@ -244,6 +244,9 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
   const [statLabel, setStatLabel] = useState(initial?.stat_label || '')
   const [screens, setScreens] = useState<ExperienceScreen[]>(initial?.screens || [])
   const [screensBusy, setScreensBusy] = useState(false)
+  const [awardTitle, setAwardTitle] = useState(initial?.award?.title || '')
+  const [awardNote, setAwardNote] = useState(initial?.award?.note || '')
+  const [awardImage, setAwardImage] = useState<ExperienceScreen[]>(initial?.award?.image ? [initial.award.image] : [])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -256,6 +259,7 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
       setTag(initial?.discipline_tag || ''); setError('')
       setHeadline(initial?.headline || ''); setStatValue(initial?.stat_value || ''); setStatLabel(initial?.stat_label || '')
       setScreens(initial?.screens || []); setScreensBusy(false)
+      setAwardTitle(initial?.award?.title || ''); setAwardNote(initial?.award?.note || ''); setAwardImage(initial?.award?.image ? [initial.award.image] : [])
     }
   }, [open, initial])
 
@@ -272,6 +276,7 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
         start_month: startMonth, end_month: isCurrent ? null : endMonth || null,
         is_current: isCurrent, description: description.trim() || null, discipline_tag: tag || null,
         headline: headline.trim() || null, stat_value: statValue.trim() || null, stat_label: statLabel.trim() || null, screens,
+        award: awardTitle.trim() ? { title: awardTitle.trim(), note: awardNote.trim() || undefined, image: awardImage[0] } : null,
       }) })
       if (!res.ok) { const d = await res.json(); setError(d.error || 'Save failed'); return }
       onSaved(await res.json()); onClose()
@@ -313,6 +318,17 @@ function ExperienceModal({ open, onClose, initial, onSaved }: {
             <Input label="Stat label" value={statLabel} onChange={v => setStatLabel(v.slice(0, MAX_STAT_LABEL))} placeholder="lower bounce rate" />
           </div>
           <ScreensEditor value={screens} onChange={setScreens} onBusyChange={setScreensBusy} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 14, border: '1px solid var(--px-border)', borderRadius: 'var(--px-r-lg)', background: 'var(--px-surface-2)' }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--px-text)', letterSpacing: '-0.01em' }}>Award (optional)</div>
+            <p style={{ fontSize: 11, color: 'var(--px-text-3)', margin: '2px 0 0', lineHeight: 1.45 }}>Recognition earned in this role. Shown as a badge on the role, with the certificate if you add one.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: 10 }}>
+            <Input label="Title" value={awardTitle} onChange={v => setAwardTitle(v.slice(0, MAX_AWARD_TITLE))} placeholder="Certificate of Appreciation" />
+            <Input label="When" value={awardNote} onChange={v => setAwardNote(v.slice(0, MAX_AWARD_NOTE))} placeholder="Sep 2024" />
+          </div>
+          <ScreensEditor value={awardImage} onChange={setAwardImage} onBusyChange={setScreensBusy} max={1} label="Certificate" />
         </div>
         {error && <p role="alert" style={{ fontSize: 12, color: '#C94040', margin: 0 }}>{error}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>

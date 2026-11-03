@@ -96,6 +96,7 @@ create table if not exists work_experience (
   stat_value       text check (char_length(stat_value) <= 12),
   stat_label       text check (char_length(stat_label) <= 40),
   screens          jsonb not null default '[]' check (jsonb_typeof(screens) = 'array' and jsonb_array_length(screens) <= 12),
+  award            jsonb check (award is null or (jsonb_typeof(award) = 'object' and char_length(award->>'title') between 1 and 80)),
   display_order    integer not null default 0,
   created_at       timestamptz not null default now()
 );

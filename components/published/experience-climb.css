@@ -18,6 +18,13 @@
 .pxc-company { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
 .pxc-company em { padding: 2px 8px; border-radius: 999px; background: var(--px-accent); font-size: 10px; font-style: normal; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--px-accent-fg, #fff); }
 .pxc-role { margin: 2px 0 0; font-size: 14px; color: var(--px-text-2); }
+.pxc-award { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; margin: 8px 0 0; padding: 4px 11px 4px 9px; border: 1px solid #d9a93a; border-radius: 999px; background: #fff3cf; font: inherit; font-size: 12px; color: #6b4a00; }
+button.pxc-award { cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
+button.pxc-award:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(217, 169, 58, .35); }
+button.pxc-award:focus-visible { outline: 3px solid var(--px-accent); outline-offset: 3px; }
+.pxc-award b { font-weight: 700; }
+.pxc-award span { font-weight: 500; opacity: .75; }
+.pxc-award span::before { content: '· '; }
 .pxc-when { display: flex; flex-direction: column; align-items: flex-end; margin: 0 0 0 auto; font-size: 13px; color: var(--px-text-2); }
 .pxc-when b { font-weight: 700; color: var(--px-text); }
 .pxc-body { display: grid; gap: 24px; align-items: center; min-width: 0; }
