@@ -10,6 +10,7 @@ import { ExperienceStory } from './ExperienceStory'
 import { CaseCardLink } from './CaseCardLink'
 import { ViewTransitionGate } from './ViewTransitionGate'
 import { PrototypeLoop } from './PrototypeLoop'
+import { RecommendationStage } from './RecommendationStage'
 import { cardLoop } from '@/lib/case-screens'
 import { parseMonthYear, sortExperience, durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import type { MotionLevel } from '@/lib/motion'
@@ -17,6 +18,8 @@ import type { MotionLevel } from '@/lib/motion'
 // The designer scene (SVG + a large generated stylesheet) is only loaded for portfolios that turn it on.
 // Moment of the loop shown when Motion is Still: seated at the desk, board filled, screen built.
 const STILL_FRAME = 0.7
+// Up to this many recommendations are shown one at a time (RecommendationStage); more stay a marquee.
+const STAGE_MAX = 7
 const DesignerScene = dynamic(() => import('@/components/scene/DesignerScene').then(m => m.DesignerScene))
 const ContactScene = dynamic(() => import('@/components/scene/ContactScene').then(m => m.ContactScene))
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
@@ -152,22 +155,27 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           <ScrollReveal delay={80}>
             <section className="pxp-section" aria-label="Recommendations">
               <p className="pxp-kicker pxp-kicker--center">Recommendations</p>
-              <Marquee seconds={48} gap={20} bleed padding="4px 40px 4px" label="Recommendations">
-                {testimonials.map((t, i) => (
-                  <figure key={i} className="pxp-surface pxp-quote" data-i={i % 2} style={{ margin: 0 }}>
-                    <blockquote className="pxp-quote__text" style={{ margin: '0 0 28px' }}>&ldquo;{t.quote}&rdquo;</blockquote>
-                    <figcaption className="pxp-quote__by">
-                      {t.photo_url
-                        ? <img className="pxp-quote__photo" src={t.photo_url} alt="" />
-                        : <div className="pxp-quote__photo pxp-quote__photo--fallback" aria-hidden="true">{t.name[0]}</div>}
-                      <div>
-                        <div className="pxp-quote__name">{t.name}</div>
-                        <div className="pxp-quote__role">{t.title_and_company}</div>
-                      </div>
-                    </figcaption>
-                  </figure>
-                ))}
-              </Marquee>
+              {testimonials.length < STAGE_MAX ? (
+                <RecommendationStage testimonials={testimonials} roles={experience} linkRoles={expStory} animate={motion !== 'still'} />
+              ) : (
+                // a long list stays a strip
+                <Marquee seconds={48} gap={20} bleed padding="4px 40px 4px" label="Recommendations">
+                  {testimonials.map((t, i) => (
+                    <figure key={i} className="pxp-surface pxp-quote" data-i={i % 2} style={{ margin: 0 }}>
+                      <blockquote className="pxp-quote__text" style={{ margin: '0 0 28px' }}>&ldquo;{t.quote}&rdquo;</blockquote>
+                      <figcaption className="pxp-quote__by">
+                        {t.photo_url
+                          ? <img className="pxp-quote__photo" src={t.photo_url} alt="" />
+                          : <div className="pxp-quote__photo pxp-quote__photo--fallback" aria-hidden="true">{t.name[0]}</div>}
+                        <div>
+                          <div className="pxp-quote__name">{t.name}</div>
+                          <div className="pxp-quote__role">{t.title_and_company}</div>
+                        </div>
+                      </figcaption>
+                    </figure>
+                  ))}
+                </Marquee>
+              )}
             </section>
           </ScrollReveal>
         )}
