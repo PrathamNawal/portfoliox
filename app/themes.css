@@ -1261,3 +1261,57 @@
 .px-row { display: flex; gap: 10px; width: min(100%, var(--max, 100%)); align-items: flex-start; }
 .px-row__item { flex: 1 1 0; min-width: 0; margin: 0; }
 @media (max-width: 640px) { .px-row { flex-direction: column; width: 100%; } .px-row__item { flex-grow: 0 !important; width: 100%; } }
+
+/* ── Case study (app/[slug]/case/[caseId]/CaseStudyPageClient.tsx, components/published/CaseRail.tsx, lib/case-copy.ts) ──
+   An editorial reading layout: a header with skim cards (problem / approach / outcome), a sticky chapter rail beside
+   numbered chapters (a compact "3 / 6" bar with a jump menu under 960px), and reading aids built from the owner's own
+   text: lead paragraphs, numbered step headings, small labels, stat rows. Images use the "Images" rules above. */
+.px-cs { max-width: 1180px; margin: 0 auto; padding: clamp(32px, 5vw, 56px) clamp(16px, 4vw, 40px) 96px; }
+.px-cs__title { margin: 0 0 28px; max-width: 900px; font-size: clamp(28px, 5vw, 52px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.08; color: var(--px-text); }
+.px-skim { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 0 0 40px; }
+.px-skim__card { display: block; padding: 18px 20px; border: 1px solid var(--px-border); border-radius: 14px; background: var(--px-surface); color: inherit; text-decoration: none; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.px-skim__card:hover, .px-skim__card:focus-visible { transform: translateY(-2px); border-color: var(--px-accent); box-shadow: 0 8px 22px rgba(0, 0, 0, .08); }
+.px-skim__card span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--px-accent); }
+.px-skim__card p { margin: 8px 0 0; font-size: 14px; line-height: 1.55; color: var(--px-text-2); }
+.px-cs__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 56px; }
+.px-cs__grid[data-rail] { grid-template-columns: 200px minmax(0, 1fr); }
+.px-cs__rail { position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 110px); overflow-y: auto; }
+.px-cs__rail p { margin: 0 0 12px; font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--px-text-3); }
+.px-cs__rail ol, .px-cs__bar ol { margin: 0; padding: 0; list-style: none; }
+.px-cs__rail a, .px-cs__bar ol a { display: flex; gap: 10px; align-items: baseline; padding: 8px 0 8px 14px; border-left: 2px solid var(--px-border); font-size: 13px; line-height: 1.35; color: var(--px-text-3); text-decoration: none; transition: color .2s ease, border-color .2s ease; }
+.px-cs__rail a b, .px-cs__bar ol a b { font-size: 11px; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.px-cs__rail a:hover, .px-cs__bar ol a:hover { color: var(--px-text); }
+.px-cs__rail a[data-on], .px-cs__bar ol a[data-on] { border-left-color: var(--px-accent); color: var(--px-text); font-weight: 600; }
+.px-cs__rail a[data-on] b, .px-cs__bar ol a[data-on] b { color: var(--px-accent); }
+.px-cs__bar { display: none; }
+@media (max-width: 960px) {
+  .px-cs__grid[data-rail] { grid-template-columns: minmax(0, 1fr); }
+  .px-cs__rail { display: none; }
+  .px-cs__bar { display: block; position: sticky; top: 52px; z-index: 9; margin: 0 calc(-1 * clamp(16px, 4vw, 40px)) 28px; padding: 0 clamp(16px, 4vw, 40px); background: var(--px-surface); border-bottom: 1px solid var(--px-border); }
+  .px-cs__bar summary { display: flex; align-items: baseline; gap: 10px; padding: 12px 0; font-size: 13px; color: var(--px-text); cursor: pointer; list-style: none; }
+  .px-cs__bar summary::-webkit-details-marker { display: none; }
+  .px-cs__bar summary b { font-size: 11px; color: var(--px-accent); font-variant-numeric: tabular-nums; }
+  .px-cs__bar summary span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .px-cs__bar summary i { font-size: 11px; font-style: normal; color: var(--px-text-3); }
+  .px-cs__bar ol { padding-bottom: 12px; }
+}
+.px-ch { margin-bottom: 72px; }
+.px-ch__head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-top: 22px; border-top: 1px solid var(--px-border); }
+.px-ch__n { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .06em; color: var(--px-accent); }
+.px-ch__head h2 { margin: 0; scroll-margin-top: 96px; font-size: clamp(24px, 3.4vw, 34px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; color: var(--px-text); }
+.px-prose-col { max-width: 660px; }
+.px-p { margin: 0 0 18px; font-size: 16px; line-height: 1.75; color: var(--px-text-2); font-family: var(--px-font-body); white-space: pre-wrap; }
+.px-p--lead { font-size: clamp(18px, 2vw, 21px); line-height: 1.6; font-weight: 500; letter-spacing: -0.01em; color: var(--px-text); }
+.px-label { margin: 28px 0 10px; font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--px-accent); }
+.px-step { display: flex; gap: 14px; align-items: baseline; margin: 38px 0 12px; font-size: clamp(18px, 2.2vw, 22px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.3; color: var(--px-text); }
+.px-step span { flex: none; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--px-accent) 12%, transparent); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--px-accent); }
+.px-ul, .px-ol { margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.px-ul { list-style: none; }
+.px-ol { padding-left: 22px; }
+.px-ul li, .px-ol li { font-size: 16px; line-height: 1.7; color: var(--px-text-2); font-family: var(--px-font-body); }
+.px-ul li { position: relative; padding-left: 20px; }
+.px-ul li::before { content: ''; position: absolute; left: 3px; top: .72em; width: 6px; height: 6px; border-radius: 50%; background: var(--px-accent); }
+.px-ul .px-ul__stat { display: flex; gap: 16px; align-items: baseline; padding: 14px 16px; border: 1px solid var(--px-border); border-radius: 12px; background: var(--px-surface); }
+.px-ul .px-ul__stat::before { content: none; }
+.px-ul__stat b { flex: none; min-width: 4.2ch; font-size: clamp(26px, 4vw, 34px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: var(--px-accent); }
+.px-ul__stat span { min-width: 0; }

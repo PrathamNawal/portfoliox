@@ -11,6 +11,8 @@ import { CoverImage } from '@/components/published/CoverImage'
 import { ViewTransitionGate } from '@/components/published/ViewTransitionGate'
 import { transitionClick } from '@/lib/view-transition'
 import { mergeImageBlocks } from '@/lib/image-shape'
+import { CaseRail } from '@/components/published/CaseRail'
+import { asLabel, asStat, asStep, skimOf } from '@/lib/case-copy'
 import { SECTION_DEFS } from '@/lib/case-study-templates'
 import type { Profile, CaseStudy, CaseSection, OverviewData } from '@/types'
 
@@ -72,28 +74,35 @@ function renderNarrative(text: string): React.ReactNode {
   return parseNarrativeBlocks(text).map((block, bi) => {
     if (block.kind === 'ul') {
       return (
-        <ul key={bi} style={{ paddingLeft: 20, margin: '0 0 18px', display: 'flex', flexDirection: 'column', gap: 8, listStyle: 'disc' }}>
-          {block.lines.map((l, li) => (
-            <li key={li} style={{ ...BODY_TEXT_STYLE, paddingLeft: 4 }}>
-              <InlineMarkdown text={l} />
-            </li>
-          ))}
+        <ul key={bi} className="px-ul">
+          {block.lines.map((l, li) => {
+            const stat = asStat(l)
+            return stat ? (
+              <li key={li} className="px-ul__stat"><b>{stat.value}</b><span><InlineMarkdown text={stat.text} /></span></li>
+            ) : (
+              <li key={li}><InlineMarkdown text={l} /></li>
+            )
+          })}
         </ul>
       )
     }
     if (block.kind === 'ol') {
       return (
-        <ol key={bi} style={{ paddingLeft: 22, margin: '0 0 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {block.lines.map((l, li) => (
-            <li key={li} style={{ ...BODY_TEXT_STYLE, paddingLeft: 4 }}>
-              <InlineMarkdown text={l} />
-            </li>
-          ))}
+        <ol key={bi} className="px-ol">
+          {block.lines.map((l, li) => <li key={li}><InlineMarkdown text={l} /></li>)}
         </ol>
       )
     }
+    if (block.lines.length === 1) {
+      const step = asStep(block.lines[0])
+      if (step) return <h3 key={bi} className="px-step"><span>{step.n}</span>{step.title}</h3>
+      const label = asLabel(block.lines[0])
+      if (label) return <p key={bi} className="px-label">{label}</p>
+    }
+    // a section that opens with a paragraph gets a lead; one that opens with a step or label does not
+    const isLead = bi === 0 && block.lines.join(' ').length >= 60
     return (
-      <p key={bi} style={{ ...BODY_TEXT_STYLE, margin: '0 0 18px', whiteSpace: 'pre-wrap' }}>
+      <p key={bi} className={isLead ? 'px-p px-p--lead' : 'px-p'}>
         <InlineMarkdown text={block.lines.join('\n')} />
       </p>
     )
@@ -166,7 +175,11 @@ function MetaPill({ label, value }: { label: string; value: string }) {
 }
 
 // ── Content section ───────────────────────────────────────────────────────────
-function ContentSection({ section }: { section: CaseSection }) {
+function hasContent(section: CaseSection) {
+  return section.narrative?.trim().length > 0 || section.blocks?.length > 0
+}
+
+function ContentSection({ section, n }: { section: CaseSection; n: number }) {
   const def = SECTION_DEFS[section.type] || SECTION_DEFS.custom
   const hasNarrative = section.narrative?.trim().length > 0
   const hasBlocks = section.blocks?.length > 0
@@ -174,15 +187,16 @@ function ContentSection({ section }: { section: CaseSection }) {
   if (!hasNarrative && !hasBlocks) return null
 
   return (
-    <div className="px-rise" style={{ marginBottom: 64 }}>
-      {/* Section title — the actual heading */}
-      <h2 style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 800, letterSpacing: '-0.015em', color: 'var(--px-text)', lineHeight: 1.2, marginBottom: 20 }}>
-        {section.title || def.title}
-      </h2>
+    <section className="px-ch px-rise" aria-labelledby={`cs-${section.id}`}>
+      {/* Chapter header: number, title, hairline */}
+      <header className="px-ch__head">
+        <span className="px-ch__n" aria-hidden="true">{String(n).padStart(2, '0')}</span>
+        <h2 id={`cs-${section.id}`}>{section.title || def.title}</h2>
+      </header>
 
-      {/* Narrative — kept to a readable line length even though the canvas is wide */}
+      {/* Narrative: a readable line length even though the canvas is wide */}
       {hasNarrative && (
-        <div style={{ maxWidth: 620, marginBottom: hasBlocks ? 32 : 0 }}>
+        <div className="px-prose-col" style={{ marginBottom: hasBlocks ? 32 : 0 }}>
           {renderNarrative(section.narrative)}
         </div>
       )}
@@ -198,7 +212,7 @@ function ContentSection({ section }: { section: CaseSection }) {
           })}
         </div>
       )}
-    </div>
+    </section>
   )
 }
 
@@ -215,6 +229,8 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
   const sections = cs.sections || []
   const overviewSection = sections.find(s => s.type === 'overview')
   const contentSections = sections.filter(s => s.type !== 'overview')
+  const chapters = contentSections.filter(hasContent).map(s => ({ id: s.id, title: s.title || (SECTION_DEFS[s.type] || SECTION_DEFS.custom).title }))
+  const skim = skimOf(contentSections)
   const overviewData = cs.overview_data
 
   return (
@@ -252,28 +268,37 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
             <div data-vt-hero style={{ width: '100%', height: 300, background: 'linear-gradient(135deg,#2A1B4A 0%,#5B3FA6 60%,#7B5EE0 100%)' }} />
           )}
 
-          {/* Content — wide canvas so visual blocks have room; prose stays narrow within it */}
-          <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(32px, 5vw, 56px) clamp(16px, 4vw, 40px) 96px' }}>
+          {/* Content: a header (title, skim cards, overview) over a grid of chapter rail + chapters */}
+          <div className="px-cs">
 
             {/* Title */}
-            <h1 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--px-text)', lineHeight: 1.15, marginBottom: 32 }}>
-              {cs.title}
-            </h1>
+            <h1 className="px-cs__title">{cs.title}</h1>
+
+            {/* Skim: problem / approach / outcome in a few seconds */}
+            {skim.length > 0 && (
+              <div className="px-skim" role="group" aria-label="At a glance">
+                {skim.map(k => (
+                  <a key={k.id} href={`#cs-${k.id}`} className="px-skim__card" onClick={e => { const el = document.getElementById(`cs-${k.id}`); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }) } }}>
+                    <span>{k.label}</span>
+                    <p>{k.text}</p>
+                  </a>
+                ))}
+              </div>
+            )}
 
             {/* Overview: metrics + meta */}
             {overviewData && (overviewData.summary || overviewData.role || overviewData.metrics?.some(m => m.value)) && (
               <OverviewSection data={overviewData} summary={overviewSection?.narrative || overviewData.summary} />
             )}
 
-            {/* Divider before sections */}
-            {contentSections.length > 0 && (
-              <div style={{ height: 1, background: 'var(--px-border)', marginBottom: 48 }} />
-            )}
+            <div className="px-cs__grid" data-rail={chapters.length > 1 || undefined}>
+              <CaseRail chapters={chapters} />
+              <div className="px-cs__main">
 
-            {/* Content sections */}
-            {contentSections.map(section => (
-              <ContentSection key={section.id} section={section} />
-            ))}
+                {/* Content sections */}
+                {contentSections.filter(hasContent).map((section, i) => (
+                  <ContentSection key={section.id} section={section} n={i + 1} />
+                ))}
 
             {/* Footer */}
             <div style={{ marginTop: 32, paddingTop: 32, borderTop: '1px solid var(--px-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
@@ -286,6 +311,8 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
               <a href="mailto:?subject=Let's work together" style={{ display: 'inline-flex', alignItems: 'center', height: 36, padding: '0 16px', fontSize: 13, fontWeight: 600, background: 'var(--px-accent)', color: 'var(--px-accent-fg)', borderRadius: 8, textDecoration: 'none' }}>
                 Get in touch
               </a>
+            </div>
+              </div>
             </div>
           </div>
         </>
