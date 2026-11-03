@@ -89,33 +89,34 @@
 }
 
 /* ── Perched: she sits on the top edge of the View Resume card (.pxp-cta__perch in CanvasLayout) ───────────────
-   The scene is positioned so her seat (y 285 of the 220x284 viewBox, 75 units above its bottom) lies on the card's
-   top edge; her legs hang over the card's empty middle, clear of the icon, label and arrow. */
+   The scene is positioned so the underside of her thighs (y 290 of the 220x284 viewBox, 70 units above its bottom)
+   lies on the card's top edge. Thighs run sideways along the edge (hips turned out ~75deg) and only the lower legs
+   hang down over the card's empty middle, clear of the icon, label and arrow: the front view of someone on a ledge. */
 .pxp-cta__perch { position: relative; --w: 200px; }
-.pxp-cta__perch--on { margin-top: calc(var(--w) * 209 / 220 + 14px); }
-.pxp-cta__perch .cta-root { position: absolute; left: 0; right: 0; bottom: calc(100% - var(--w) * 75 / 220); z-index: 2; width: var(--w); max-width: none; margin: 0 auto; pointer-events: none; transition: transform .2s ease; }
+.pxp-cta__perch--on { margin-top: calc(var(--w) * 214 / 220 + 14px); }
+.pxp-cta__perch .cta-root { position: absolute; left: 0; right: 0; bottom: calc(100% - var(--w) * 70 / 220); z-index: 2; width: var(--w); max-width: none; margin: 0 auto; pointer-events: none; transition: transform .2s ease; }
 .pxp-cta__perch:has(.pxp-linkcard:hover) .cta-root { transform: var(--t-linkcard-hover-t, none); }
 
-/* sitting pose (calm frame for Still / reduced motion): legs hang a little apart, waving arm up, other hand on the edge */
-.cta-root--perch .j-hipL { transform: rotate(7deg); }
-.cta-root--perch .j-hipR { transform: rotate(-7deg); }
-.cta-root--perch .j-shL { transform: rotate(14deg); }
+/* sitting pose (calm frame for Still / reduced motion): shins hang straight down, one hand planted on the edge, the other waving */
+.cta-root--perch .j-hipL { transform: rotate(75deg); }
+.cta-root--perch .j-hipR { transform: rotate(-75deg); }
+.cta-root--perch .j-kneeL { transform: rotate(-75deg); }
+.cta-root--perch .j-kneeR { transform: rotate(75deg); }
+.cta-root--perch .j-torso { transform: rotate(-2deg); }
+.cta-root--perch .j-shL { transform: rotate(34deg); }
 .cta-root--perch .j-shR { transform: rotate(-134deg); }
 .cta-root--perch .cta-cast { opacity: .26; }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* legs dangle and swing out of step; she waves most of the time, with a short rest */
-  .cta-root--perch[data-motion="on"] .j-hipL { animation: cta-dangle 3.4s ease-in-out infinite; }
-  .cta-root--perch[data-motion="on"] .j-hipR { animation: cta-dangle-r 3.4s ease-in-out -1.7s infinite; }
-  .cta-root--perch[data-motion="on"] .j-kneeL { animation: cta-knee 3.4s ease-in-out -.4s infinite; }
-  .cta-root--perch[data-motion="on"] .j-kneeR { animation: cta-knee 3.4s ease-in-out -2.1s infinite; }
+  /* lower legs swing out of step; she waves most of the time, with a short rest */
+  .cta-root--perch[data-motion="on"] .j-hipL, .cta-root--perch[data-motion="on"] .j-hipR { animation: none; }
+  .cta-root--perch[data-motion="on"] .j-kneeL { animation: cta-swing-l 3.2s ease-in-out infinite; }
+  .cta-root--perch[data-motion="on"] .j-kneeR { animation: cta-swing-r 3.2s ease-in-out -1.6s infinite; }
   .cta-root--perch[data-motion="on"] .j-shR { animation: cta-perch-wave 4.2s linear infinite; }
   .cta-root--perch[data-motion="on"] .j-head { animation: cta-perch-nod 4.2s ease-in-out infinite; }
-  .cta-root--perch[data-motion="on"] .j-shL { animation: cta-perch-rest 3.2s ease-in-out infinite; }
-  @keyframes cta-dangle { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(14deg); } }
-  @keyframes cta-dangle-r { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(-14deg); } }
-  @keyframes cta-knee { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(9deg); } }
-  @keyframes cta-perch-rest { 0%, 100% { transform: rotate(14deg); } 50% { transform: rotate(11deg); } }
+  .cta-root--perch[data-motion="on"] .j-shL { animation: none; }
+  @keyframes cta-swing-l { 0%, 100% { transform: rotate(-64deg); } 50% { transform: rotate(-88deg); } }
+  @keyframes cta-swing-r { 0%, 100% { transform: rotate(64deg); } 50% { transform: rotate(88deg); } }
   @keyframes cta-perch-wave {
     0% { transform: rotate(-12deg); animation-timing-function: var(--e-out); }
     8% { transform: rotate(-124deg); animation-timing-function: ease-in-out; }
@@ -129,10 +130,10 @@
   }
   @keyframes cta-perch-nod { 0%, 8%, 70%, 100% { transform: rotate(0); } 18%, 60% { transform: rotate(-4deg); } }
 
-  /* cheer on "Get in touch": a seated bounce instead of the standing jump, legs kick */
+  /* cheer on "Get in touch": a seated bounce instead of the standing jump, shins kick */
   .pxp-cta:has(.pxp-linkcard--accent:is(:hover, :focus-visible)) .cta-root--perch[data-motion="on"] .r-bob { animation: cta-perch-hop 1.7s linear 1; }
-  .pxp-cta:has(.pxp-linkcard--accent:is(:hover, :focus-visible)) .cta-root--perch[data-motion="on"] .j-hipL { animation: cta-kick .5s ease-in-out 3; }
-  .pxp-cta:has(.pxp-linkcard--accent:is(:hover, :focus-visible)) .cta-root--perch[data-motion="on"] .j-hipR { animation: cta-kick-r .5s ease-in-out -.25s 3; }
+  .pxp-cta:has(.pxp-linkcard--accent:is(:hover, :focus-visible)) .cta-root--perch[data-motion="on"] .j-kneeL { animation: cta-kick-l .5s ease-in-out 3; }
+  .pxp-cta:has(.pxp-linkcard--accent:is(:hover, :focus-visible)) .cta-root--perch[data-motion="on"] .j-kneeR { animation: cta-kick-r .5s ease-in-out -.25s 3; }
   @keyframes cta-perch-hop {
     0% { transform: translateY(0) scale(1, 1); animation-timing-function: var(--e-io); }
     14% { transform: translateY(2px) scale(1.04, .95); animation-timing-function: var(--e-out); }
@@ -141,6 +142,6 @@
     76% { transform: translateY(-5px) scale(.99, 1.01); animation-timing-function: var(--e-in); }
     90%, 100% { transform: translateY(0) scale(1, 1); }
   }
-  @keyframes cta-kick { 0%, 100% { transform: rotate(6deg); } 50% { transform: rotate(24deg); } }
-  @keyframes cta-kick-r { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(-24deg); } }
+  @keyframes cta-kick-l { 0%, 100% { transform: rotate(-60deg); } 50% { transform: rotate(-100deg); } }
+  @keyframes cta-kick-r { 0%, 100% { transform: rotate(60deg); } 50% { transform: rotate(100deg); } }
 }

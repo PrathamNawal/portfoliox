@@ -49,7 +49,7 @@ export function ContactScene({ animate = true, perched = false }: { animate?: bo
                 <feGaussianBlur stdDeviation="3" />
               </filter>
             </defs>
-            <ellipse cx="0" cy="288" rx="30" ry="3.6" fill="#1b1538" opacity=".22" />
+            <ellipse cx="0" cy="294" rx="34" ry="4" fill="#1b1538" opacity=".24" />
             <g className="cta-cast" filter={`url(#${shadowId})`} opacity=".26" transform="translate(9 6)"><Character seated /></g>
           </>
         )}

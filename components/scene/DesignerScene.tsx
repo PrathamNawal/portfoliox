@@ -170,7 +170,7 @@ function Stub({ len, w, color, from = 0 }: { len: number; w: number; color: stri
 
 // seated: shorter legs, so a character perched on an edge reads as sitting rather than standing behind it
 function Leg({ x, side, seated = false }: { x: number; side: 'L' | 'R'; seated?: boolean }) {
-  const thigh = seated ? 15 : 28, shin = seated ? 14 : 26
+  const thigh = seated ? 14 : 28, shin = seated ? 21 : 26
   return (
     <g transform={`translate(${x} -60)`}>
       <g className={`j-hip${side}`}>
