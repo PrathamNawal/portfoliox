@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { DISCIPLINE_LABEL, DISCIPLINE_SHORT, layoutRibbon, type Discipline } from '@/lib/career-ribbon'
-import type { WorkExperience } from '@/types'
+import { excerptOf } from '@/lib/recs'
+import type { Testimonial, WorkExperience } from '@/types'
 import { Chip } from './StoryChip'
 
 // The career as one ribbon: a bar per role, as wide as the role was long, on a single time axis (long gaps are
@@ -13,7 +14,7 @@ import { Chip } from './StoryChip'
 
 const LANE = 38
 
-export function CareerRibbon({ roles, animate }: { roles: WorkExperience[]; animate: boolean }) {
+export function CareerRibbon({ roles, animate, proofs }: { roles: WorkExperience[]; animate: boolean; proofs?: Map<string, Testimonial[]> }) {
   const ribbon = useMemo(() => layoutRibbon(roles), [roles])
   const byId = useMemo(() => new Map(roles.map(r => [r.id, r])), [roles])
   const [active, setActive] = useState<string | null>(null)
@@ -57,9 +58,10 @@ export function CareerRibbon({ roles, animate }: { roles: WorkExperience[]; anim
       <ol className="pxs-rb__track" style={{ ['--lanes' as string]: ribbon.lanes, ['--lane' as string]: `${LANE}px` }}>
         {ribbon.bars.map((b, i) => {
           const role = byId.get(b.id)
+          const say = proofs?.get(b.id)?.[0]
           const align = b.left < 14 ? 'start' : b.left + b.width > 86 ? 'end' : 'mid'
           return (
-            <li key={b.id} className="pxs-rb__bar" data-d={b.discipline} data-current={b.current || undefined} data-on={active === b.id || undefined} data-align={align}
+            <li key={b.id} className="pxs-rb__bar" data-d={b.discipline} data-current={b.current || undefined} data-proof={say ? '' : undefined} data-on={active === b.id || undefined} data-align={align}
               style={{ left: `${b.left}%`, width: `${b.width}%`, top: b.lane * LANE, ['--i' as string]: i }}>
               <a href={`#pxs-${b.id}`} aria-label={`${b.company}, ${b.role}, ${b.range}, ${b.duration}`}>
                 <Chip company={b.company} logoUrl={role?.logo_url} small />
@@ -70,6 +72,7 @@ export function CareerRibbon({ roles, animate }: { roles: WorkExperience[]; anim
                 <span>{b.role}</span>
                 <i>{b.range} · {b.duration}</i>
                 {b.stat && <em>{b.stat}</em>}
+                {say && <q>{excerptOf(say.quote, 90).map(p => p.text).join('')} <small>{say.name}</small></q>}
                 <u>{DISCIPLINE_LABEL[b.discipline]}</u>
               </span>
             </li>

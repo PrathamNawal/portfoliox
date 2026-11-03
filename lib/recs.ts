@@ -100,3 +100,46 @@ export function matchRole<T extends RoleLike>(t: Pick<Testimonial, 'title_and_co
   })
   return hit.length ? hit.reduce((a, b) => (b.is_current || (!a.is_current && b.start_month > a.start_month) ? b : a)) : null
 }
+
+/**
+ * The part of a quote worth showing next to a role: the sentence that holds its strongest claim (highlighted),
+ * cut to about `max` characters around that claim if it is long.
+ */
+export function excerptOf(quote: string, max = 200): { text: string; hl: boolean }[] {
+  const text = cleanQuote(quote)
+  const spans = highlightsOf(quote)
+  const ends = Array.from(text.matchAll(/[.!?](?=\s|$)/g)).map(m => (m.index ?? 0) + 1)
+  const anchor = spans[0]?.[0] ?? 0
+  let a = 0, b = text.length
+  for (const e of ends) { if (e <= anchor) a = e; else { b = e; break } }
+  while (a < b && /\s/.test(text[a])) a++
+  if (b - a > max) {
+    const from = Math.max(a, (spans[0]?.[0] ?? a) - 40)
+    a = from > a ? text.indexOf(' ', from) + 1 || from : a
+    b = Math.min(b, a + max)
+    const cut = text.lastIndexOf(' ', b)
+    if (cut > a + max / 2) b = cut
+  }
+  const sliceSpans = spans.map(([x, y]) => [Math.max(x, a), Math.min(y, b)] as [number, number]).filter(([x, y]) => y > x)
+  const out: { text: string; hl: boolean }[] = []
+  let at = a
+  if (a > 0) out.push({ text: '…', hl: false })
+  for (const [x, y] of sliceSpans) {
+    if (x > at) out.push({ text: text.slice(at, x), hl: false })
+    out.push({ text: text.slice(x, y), hl: true })
+    at = y
+  }
+  if (at < b) out.push({ text: text.slice(at, b), hl: false })
+  if (b < text.length && !/[.!?]$/.test(text.slice(a, b))) out.push({ text: '…', hl: false })
+  return out
+}
+
+/** Recommendations grouped by the role they belong to. */
+export function proofsByRole<T extends RoleLike>(testimonials: readonly Testimonial[], roles: readonly T[]): Map<string, Testimonial[]> {
+  const m = new Map<string, Testimonial[]>()
+  for (const t of testimonials) {
+    const r = matchRole(t, roles)
+    if (r) m.set(r.id, [...(m.get(r.id) ?? []), t])
+  }
+  return m
+}

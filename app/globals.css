@@ -520,3 +520,24 @@ a { text-decoration: none; color: inherit; }
   .pxs-rb[data-motion="on"][data-in] .pxs-rb__bar[data-current]::after { opacity: 1; animation: pxs-rb-pulse 2.2s ease-out 1.2s infinite; }
   @keyframes pxs-rb-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--px-text) 45%, transparent); } 80%, 100% { box-shadow: 0 0 0 10px transparent; } }
 }
+
+/* Claim next to proof (ExperienceStory Proof, CareerRibbon): a recommendation from someone at that company sits in the
+   role's card; the ribbon marks roles that have one; jumping to a role from a recommendation flashes its card. */
+.pxs-proof { margin: 16px 0 0; padding: 14px 18px; border-left: 4px solid var(--px-accent); border-radius: 4px 14px 14px 4px; background: color-mix(in srgb, var(--px-accent) 7%, transparent); }
+.pxs-proof blockquote { margin: 0 0 12px; font-size: 15px; line-height: 1.6; color: var(--px-text); }
+.pxs-proof mark { padding: 0; background: linear-gradient(var(--px-accent), var(--px-accent)) no-repeat 0 94% / 100% .22em; color: inherit; }
+.pxs-proof figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; font-size: 12px; color: var(--px-text-2); }
+.pxs-proof figcaption img, .pxs-proof figcaption > span:first-child { flex: none; width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.pxs-proof figcaption > span:first-child { display: grid; place-items: center; background: var(--px-surface-2, rgba(0, 0, 0, .06)); font-weight: 700; color: var(--px-text); }
+.pxs-proof figcaption > span:nth-child(2), .pxs-proof figcaption > img + span { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.pxs-proof figcaption b { font-size: 13px; color: var(--px-text); }
+.pxs-proof figcaption i { font-style: normal; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--px-text-3); }
+.pxs-proof figcaption a { margin-left: auto; font-weight: 700; color: var(--px-accent); text-decoration: none; }
+.pxs-proof figcaption a:hover { text-decoration: underline; }
+.pxs-rb__bar[data-proof]::before { content: ''; position: absolute; left: -3px; top: -4px; z-index: 2; width: 11px; height: 11px; border: 2px solid var(--px-surface); border-radius: 50% 50% 50% 2px; background: var(--px-text); }
+.pxs-rb__tip q { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--px-border); font-style: italic; color: var(--px-text); quotes: '\201C' '\201D'; }
+.pxs-rb__tip q small { display: block; margin-top: 3px; font-size: 11px; font-style: normal; font-weight: 700; color: var(--px-text-3); }
+@media (prefers-reduced-motion: no-preference) {
+  .pxs-chapter:target .pxs-card { animation: pxs-flash 1.8s ease-out; }
+  @keyframes pxs-flash { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--px-accent) 55%, transparent); } 40% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--px-accent) 22%, transparent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+}
