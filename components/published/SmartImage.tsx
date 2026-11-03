@@ -8,10 +8,10 @@ import { useImageRatio } from './useImageRatio'
 // The shape is read when the image loads, so existing portfolios are fixed without any data change.
 // Rules in lib/image-shape.ts; styles: "Images" in app/themes.css.
 
-export function SmartImage({ src, alt }: { src: string; alt: string }) {
-  const [ratio, setRatio] = useState<number | null>(null)
+export function SmartImage({ src, alt, initialRatio, onRatio }: { src: string; alt: string; initialRatio?: number; onRatio?: (ratio: number) => void }) {
+  const [ratio, setRatio] = useState<number | null>(initialRatio ?? null)
   const shape = ratio === null ? 'wide' : shapeOf(ratio)
-  const img = useImageRatio(setRatio)
+  const img = useImageRatio(r => { setRatio(r); onRatio?.(r) })
 
   if (shape === 'tall') {
     return (

@@ -4,7 +4,8 @@
 //   poster    0.45 .. 1.2    square and portrait: one fixed width (POSTER_W), capped in height (POSTER_MAX_H),
 //                            left-aligned with the text
 //   tall      < 0.45         full-page screenshots: a browser frame that pans as the page scrolls
-// Two or more neighbouring images become justified rows (at most ROW_MAX per row, ROW_MAX_H tall at most).
+// Two or more neighbouring images become justified rows (at most ROW_MAX per row, between MIN_ROW_H and ROW_MAX_H tall),
+// or stack one per line when the column is too narrow for that.
 
 import type { Block } from '@/types'
 
@@ -26,13 +27,35 @@ export function shapeOf(ratio: number): ImageShape {
   return 'tall'
 }
 
-/** Split n images into rows of at most ROW_MAX with sizes as even as possible (4 -> 2+2, 5 -> 3+2, 7 -> 3+2+2). */
-export function rowSizes(n: number): number[] {
-  const rows = Math.ceil(n / ROW_MAX)
-  const sizes: number[] = []
-  let left = n
-  for (let r = rows; r > 0; r--) { const k = Math.ceil(left / r); sizes.push(k); left -= k }
-  return sizes
+export const ROW_GAP = 10
+export const MIN_ROW_H = 300
+
+const rowHeight = (rs: number[], width: number) => (width - ROW_GAP * (rs.length - 1)) / rs.reduce((a, b) => a + b, 0)
+
+/** n images in `rows` rows, as even as possible (5 in 2 rows is 3 + 2). */
+function evenSizes(n: number, rows: number): number[] {
+  const base = Math.floor(n / rows), extra = n % rows
+  return Array.from({ length: rows }, (_, i) => base + (i < extra ? 1 : 0))
+}
+
+/**
+ * How many images go in each row of a set, for a column `width` px wide. Images share a row only while the row stays at
+ * least MIN_ROW_H tall, so a narrow column (a split chapter) never shrinks images to thumbnails: they stack instead,
+ * one per line at the shared widths. Fewest rows first; if no arrangement fits, every image gets its own line.
+ */
+export function packRows(ratios: number[], width: number): number[] {
+  const n = ratios.length
+  for (let rows = Math.ceil(n / ROW_MAX); rows < n; rows++) {
+    const sizes = evenSizes(n, rows)
+    let at = 0
+    let ok = true
+    for (const k of sizes) {
+      if (k > 1 && rowHeight(ratios.slice(at, at + k), width) < MIN_ROW_H) { ok = false; break }
+      at += k
+    }
+    if (ok) return sizes
+  }
+  return ratios.map(() => 1)
 }
 
 /** Neighbouring image and gallery blocks become one gallery block (the first block's label), so they lay out as rows. */
