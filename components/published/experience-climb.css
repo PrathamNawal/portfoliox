@@ -27,16 +27,14 @@
 .pxc-num { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 16px 0 0; }
 .pxc-num b { font-size: clamp(40px, 5vw, 64px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: var(--px-accent); }
 .pxc-num span { max-width: 30em; font-size: 14px; line-height: 1.5; color: var(--px-text-2); }
-.pxc-detail { min-height: 0; overflow: auto; font-size: 15px; line-height: 1.6; }
-.pxc-card[data-open] .pxc-body { display: none; }
+.pxc-detail { min-height: 0; font-size: 15px; line-height: 1.6; }
+.pxc-more { display: grid; gap: 24px; align-items: start; min-width: 0; }
+.pxc-more[data-two] { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 1000px) { .pxc-more[data-two] { grid-template-columns: minmax(0, 1fr); } }
 .pxc-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: auto; }
 .pxc-adds { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .pxc-adds li { padding: 4px 10px; border: 1px dashed var(--px-border-strong); border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--px-text-2); }
 .pxc-adds li::before { content: '+ '; color: var(--px-accent); }
-.pxc-actions { display: flex; gap: 8px; margin-left: auto; }
-.pxc-actions button { padding: 7px 14px; border: 1px solid var(--px-border-strong); border-radius: 999px; background: transparent; font: inherit; font-size: 13px; font-weight: 700; color: var(--px-text); cursor: pointer; transition: border-color .2s ease, background .2s ease; }
-.pxc-actions button:hover { border-color: var(--px-accent); }
-.pxc-actions button:focus-visible, .pxc-stones button:focus-visible { outline: 3px solid var(--px-accent); outline-offset: 3px; }
 .pxc-card:target { animation: pxc-flash 1.8s ease-out; }
 @keyframes pxc-flash { 0% { box-shadow: 0 0 0 4px var(--px-accent); } 100% { box-shadow: 0 0 0 4px transparent; } }
 
@@ -45,10 +43,10 @@
 .pxc-stage { position: sticky; top: var(--pxc-top); display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 14px; height: calc(100vh - var(--pxc-top)); height: calc(100svh - var(--pxc-top)); padding-bottom: 16px; }
 .pxc[data-mode="pin"] .pxc-head { margin-bottom: 0; }
 
-.pxc-path { padding: 0 76px; }
+.pxc-path { padding: 16px 76px 0; }
 .pxc-rail { position: relative; }
 .pxc-walkzone { position: relative; height: 220px; }
-.pxc .pxc-walker.sc-root.wk-root { position: absolute; left: calc(var(--cp, 0) * 100%); bottom: -6px; z-index: 2; width: 130px; max-width: none; margin: 0; transform: translateX(-50%); pointer-events: none; }
+.pxc .pxc-walker.sc-root.wk-root { position: absolute; left: calc(var(--cp, 0) * 100%); bottom: -6px; z-index: 2; width: min(130px, calc((100vw - 80px) * .203)); max-width: none; margin: 0; transform: translateX(-50%); pointer-events: none; }
 .pxc-walker svg { display: block; width: 100%; height: auto; }
 .pxc-pinmark { position: absolute; left: calc(var(--cp, 0) * 100%); bottom: 4px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--px-accent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--px-accent) 25%, transparent); }
 .pxc-line { position: relative; height: 4px; border-radius: 2px; background: var(--px-border-strong); }
@@ -92,3 +90,4 @@
   .pxc-when { align-items: flex-start; margin-left: 0; }
   .pxc-actions { margin-left: 0; }
 }
+.pxc-stones button:focus-visible { outline: 3px solid var(--px-accent); outline-offset: 3px; }

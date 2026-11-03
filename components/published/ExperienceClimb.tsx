@@ -29,18 +29,19 @@ const HOP_MS = 950
 type Vars = CSSProperties & Record<`--${string}`, string | number>
 
 export function ExperienceClimb({ experience, walker = false, animate = false, testimonials = [] }: { experience: WorkExperience[]; walker?: boolean; animate?: boolean; testimonials?: Testimonial[] }) {
-  const roles = useMemo(() => inOrder(experience), [experience])
+  // Newest first: the page opens on the current role and the walk rewinds to the first one. Skills are worked out
+  // oldest first (where each one first showed up), then laid out in the same newest-first order as the roles.
+  const roles = useMemo(() => inOrder(experience).reverse(), [experience])
   const n = roles.length
   const summary = useMemo(() => layoutRibbon(roles), [roles])
   const beats = useMemo(() => roles.map(beatOf), [roles])
-  const added = useMemo(() => skillsAdded(roles), [roles])
+  const added = useMemo(() => skillsAdded([...roles].reverse()).reverse(), [roles])
   const proofs = useMemo(() => proofsByRole(testimonials, roles), [testimonials, roles])
 
   const root = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
   const [pin, setPin] = useState(false)
-  const [active, setActive] = useState(n - 1)
-  const [detail, setDetail] = useState(false)
+  const [active, setActive] = useState(0)
   const [lightbox, setLightbox] = useState<{ index: number; start: number } | null>(null)
   const openerRef = useRef<HTMLElement | null>(null)
 
@@ -91,7 +92,6 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
       const w = walkerEl()
       if (index !== lastIndex) {
         setActive(index)
-        setDetail(false)
         if (lastIndex >= 0 && w) {
           flip = !flip
           w.setAttribute('data-hop', flip ? 'a' : 'b')
@@ -155,14 +155,15 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
 
   if (!n) return null
   const year = startYear(roles[active].start_month) ?? ''
-  const toolkit = added.slice(0, active + 1)
+  // the toolkit as of the role on screen: its skills and every earlier role's (the ones after it in this order)
+  const toolkit = added.slice(active).reverse()
 
   const stage = (
     <>
       <div className="pxc-head">
         <div>
           <h3 className="pxc-title">{summary.headline}</h3>
-          {summary.experience && <p className="pxc-exp">{summary.experience} of experience</p>}
+          {summary.experience && <p className="pxc-exp">{summary.experience} of experience{pin && n > 1 && ` · scroll to rewind from ${roles[0].company} to ${roles[n - 1].company}`}</p>}
         </div>
         {pin && year && <div className="pxc-year" aria-hidden="true"><span key={year}>{year}</span></div>}
       </div>
@@ -180,7 +181,7 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
                   <button type="button" onClick={() => jump(i)} aria-label={`${r.role}, ${r.company}`} aria-current={i === active ? 'step' : undefined}>
                     <span className="pxc-dot" />
                     <span className="pxc-stone-co">{r.company}</span>
-                    <span className="pxc-stone-yr">{startYear(r.start_month)}</span>
+                    <span className="pxc-stone-yr">{r.is_current ? 'Today' : startYear(r.start_month)}</span>
                   </button>
                 </li>
               ))}
@@ -196,9 +197,8 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
           const screens = (Array.isArray(r.screens) ? r.screens : []) as ExperienceScreen[]
           const bullets = bulletsOf(r.description)
           const pos = !pin ? undefined : i < active ? 'before' : i === active ? 'current' : 'after'
-          const open = pin && i === active && detail
           return (
-            <li key={r.id} id={`pxs-${r.id}`} className="pxc-card" data-pos={pos} data-open={open ? '' : undefined} data-current={r.is_current ? '' : undefined} aria-label={`${r.role}, ${r.company}`}>
+            <li key={r.id} id={`pxs-${r.id}`} className="pxc-card" data-pos={pos} data-current={r.is_current ? '' : undefined} aria-label={`${r.role}, ${r.company}`}>
               <div className="pxc-who">
                 <Chip company={r.company} logoUrl={r.logo_url} />
                 <div className="pxc-id">
@@ -218,11 +218,12 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
                 {proof && <Proof t={proof} />}
               </div>
 
-              {open && bullets.length > 0 && (
-                <div className="pxc-detail pxp-exp-desc" dangerouslySetInnerHTML={{ __html: highlightMetrics(r.description ?? '') }} />
+              {(bullets.length > 0 || screens.length > 0) && (
+                <div className="pxc-more" data-two={bullets.length > 0 && screens.length > 0 ? '' : undefined}>
+                  {bullets.length > 0 && <div className="pxc-detail pxp-exp-desc" dangerouslySetInnerHTML={{ __html: highlightMetrics(r.description ?? '') }} />}
+                  {screens.length > 0 && <Exhibit screens={screens} featured={false} role={r.role} onOpen={(k, el) => show(i, k, el)} />}
+                </div>
               )}
-
-              {!pin && screens.length > 0 && <Exhibit screens={screens} featured={false} role={r.role} onOpen={(k, el) => show(i, k, el)} />}
 
               <div className="pxc-foot">
                 {added[i].length > 0 && (
@@ -230,14 +231,6 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
                     {added[i].map(s => <li key={s}>{s}</li>)}
                   </ul>
                 )}
-                <div className="pxc-actions">
-                  {bullets.length > 0 && pin && (
-                    <button type="button" onClick={() => setDetail(d => !d)} aria-expanded={open} tabIndex={i === active ? 0 : -1}>{open ? 'Back' : 'Details'}</button>
-                  )}
-                  {pin && screens.length > 0 && (
-                    <button type="button" tabIndex={i === active ? 0 : -1} onClick={e => show(i, 0, e.currentTarget)}>Screens · {screens.length}</button>
-                  )}
-                </div>
               </div>
             </li>
           )
@@ -248,7 +241,7 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
         <div className="pxc-skills">
           <span className="pxc-skills__label">Toolkit</span>
           <ul>
-            {toolkit.map((list, i) => list.map(s => <li key={s} data-new={i === active ? '' : undefined}>{s}</li>))}
+            {toolkit.map((list, i) => list.map(s => <li key={s} data-new={i === toolkit.length - 1 ? '' : undefined}>{s}</li>))}
           </ul>
         </div>
       )}
