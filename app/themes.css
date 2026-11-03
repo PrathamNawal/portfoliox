@@ -1100,8 +1100,8 @@
 /* ==========================================================================
    Motion  (.pxp[data-motion] = still | subtle | expressive; "still" has no rules here)
    subtle     intro choreography, headline wipe, colour-from-work glow, tighter hero
-   expressive + moodboard wall of covers in the hero margins (>= 1360px wide)
-   Components: components/published/HeroMotion.tsx. Tokens: --t-ease, --t-glow-opacity.
+   expressive + the hero scene's side stories in the margins (>= 1360px wide): 01 Research, 02 Design, 03 Ship
+   Components: components/published/HeroMotion.tsx, components/scene/HeroFlanks.tsx. Tokens: --t-ease, --t-glow-opacity.
    Everything animates transform / opacity / clip-path only; reduced motion is handled by
    the global rule near the top of this file (durations collapse, nothing is hidden).
    ========================================================================== */
@@ -1154,27 +1154,7 @@
 .pxp:is([data-motion="subtle"], [data-motion="expressive"]) .pxp-hero > .pxp-actions { animation: pxp-rise 0.8s var(--t-ease) 0.5s backwards; }
 
 /* Designer scene (expressive): the looping illustration under the hero buttons (components/scene) */
-.pxp-scene-wrap { max-width: 640px; margin: 40px auto 0; }
-
-/* Moodboard wall (expressive): covers pinned in the margins, decorative */
-.pxp-wall__slot {
-  position: absolute; display: none; pointer-events: auto;
-  width: calc(clamp(120px, 11vw, 196px) * var(--w, 1));
-  transform: translate3d(calc(var(--mx, 0) * var(--depth, 1) * 16px), calc(var(--my, 0) * var(--depth, 1) * 12px), 0);
-  transition: transform 0.6s var(--t-ease);
-}
-@media (min-width: 1360px) { .pxp-wall__slot { display: block; } }
-@keyframes pxp-wall-in { from { opacity: 0; transform: translateY(-36px) rotate(calc(var(--rot) + 10deg)) scale(0.88); } to { opacity: 1; transform: rotate(var(--rot)); } }
-@keyframes pxp-wall-drift { from { transform: rotate(var(--rot)) translateY(0); } to { transform: rotate(calc(var(--rot) + 1.4deg)) translateY(-10px); } }
-.pxp-wall__tile {
-  position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 3;
-  background: var(--t-card-bg); border: var(--t-bw) solid var(--t-border); border-radius: var(--t-card-r); box-shadow: var(--t-shadow);
-  transform: rotate(var(--rot));
-  animation: pxp-wall-in 0.9s var(--t-ease) var(--delay, 0s) backwards, pxp-wall-drift var(--dur, 10s) ease-in-out calc(var(--delay, 0s) + 0.9s) infinite alternate;
-  transition: scale 0.35s var(--t-ease);
-}
-.pxp-wall__tile .px-cover { inset: calc(var(--t-media-inset) * 0.5); border-radius: var(--t-media-r); }
-.pxp-wall__slot:hover .pxp-wall__tile { animation-play-state: paused; scale: 1.08; z-index: 2; }
+.pxp-scene-wrap { position: relative; max-width: 640px; margin: 40px auto 0; }
 
 /* ── View transitions (lib/view-transition.ts, ViewTransitionGate) ──────────────────────────────────────────
    A case-study card cover morphs into the case-study hero and back. The names exist only during a transition.

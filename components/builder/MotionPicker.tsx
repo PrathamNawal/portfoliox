@@ -12,7 +12,7 @@ interface Props {
 const LABELS: Record<MotionLevel, { label: string; hint: string }> = {
   still: { label: 'Still', hint: 'No animation. Hover effects only.' },
   subtle: { label: 'Subtle', hint: 'Intro animation, headline wipe and a colour glow taken from your covers. Your work shows higher on the page.' },
-  expressive: { label: 'Expressive', hint: 'Subtle, plus your covers floating in the hero margins on wide screens.' },
+  expressive: { label: 'Expressive', hint: 'Subtle, plus a research, design and ship story in the hero margins on wide screens.' },
 }
 
 /** Still / Subtle / Expressive. Radiogroup with arrow-key navigation (roving tabindex). */
