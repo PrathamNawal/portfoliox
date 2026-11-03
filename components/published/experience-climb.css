@@ -47,8 +47,8 @@
 
 .pxc-path { padding: 0 76px; }
 .pxc-rail { position: relative; }
-.pxc-walkzone { position: relative; height: 132px; }
-.pxc .pxc-walker.sc-root.wk-root { position: absolute; left: calc(var(--cp, 0) * 100%); bottom: -6px; z-index: 2; width: 60px; max-width: none; margin: 0; transform: translateX(-50%); pointer-events: none; }
+.pxc-walkzone { position: relative; height: 210px; }
+.pxc .pxc-walker.sc-root.wk-root { position: absolute; left: calc(var(--cp, 0) * 100%); bottom: -6px; z-index: 2; width: 130px; max-width: none; margin: 0; transform: translateX(-50%); pointer-events: none; }
 .pxc-walker svg { display: block; width: 100%; height: auto; }
 .pxc-pinmark { position: absolute; left: calc(var(--cp, 0) * 100%); bottom: 4px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--px-accent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--px-accent) 25%, transparent); }
 .pxc-line { position: relative; height: 4px; border-radius: 2px; background: var(--px-border-strong); }
@@ -81,8 +81,8 @@
 @keyframes pxc-pop { from { transform: scale(.7); opacity: 0; } to { transform: none; opacity: 1; } }
 
 @media (max-height: 700px) {
-  .pxc-walkzone { height: 112px; }
-  .pxc .pxc-walker.sc-root.wk-root { width: 50px; }
+  .pxc-walkzone { height: 160px; }
+  .pxc .pxc-walker.sc-root.wk-root { width: 100px; }
   .pxc-lead { font-size: 18px; }
   .pxc-num b { font-size: 40px; }
   .pxc-card { gap: 12px; padding: 18px 24px; }
