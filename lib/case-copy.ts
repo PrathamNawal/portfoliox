@@ -117,7 +117,8 @@ const SKIM: { label: string; type: CaseSection['type'][]; title: RegExp }[] = [
 export function skimOf(sections: CaseSection[]): Skim[] {
   const out: Skim[] = []
   for (const q of SKIM) {
-    const ok = (x: CaseSection) => !!lead(x.narrative) && !out.some(o => o.id === x.id)
+    // a section whose lead is already on another card (the same text pasted into two sections) is skipped
+    const ok = (x: CaseSection) => { const t = lead(x.narrative); return !!t && !out.some(o => o.id === x.id || o.text === t) }
     // the first listed type wins (a Solution over a Process), then any section whose title says so
     const s = q.type.map(t => sections.find(x => x.type === t && ok(x))).find(Boolean) ?? sections.find(x => q.title.test(x.title) && ok(x))
     if (s) out.push({ label: q.label, text: lead(s.narrative), id: s.id })

@@ -1,3 +1,4 @@
+import { scrubSampleContent } from '@/lib/sample-content'
 import { notFound } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { CanvasLayout } from '@/components/published/CanvasLayout'
@@ -131,7 +132,7 @@ export default async function PublishedPortfolio({ params }: Props) {
     expStory,
     expYears,
     profile: { ...profile, theme: resolveTheme((themeRes.data as { theme?: string } | null)?.theme) },
-    caseStudies: (caseStudies || []).map(cs => ({ ...cs, cover_fit: resolveCoverFit(fitById.get(cs.id)) })),
+    caseStudies: (caseStudies || []).map(cs => ({ ...scrubSampleContent(cs as never as Parameters<typeof scrubSampleContent>[0]), id: cs.id, cover_fit: resolveCoverFit(fitById.get(cs.id)) })),
     testimonials: testimonials || [],
     experience: sortExperience(experience),
     tools: tools || [],

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import type { Metadata } from 'next'
 import { CaseStudyPageClient } from './CaseStudyPageClient'
+import { scrubSampleContent } from '@/lib/sample-content'
 
 // Never cache case study pages — data changes in real time (edits, publish toggles, NDA state)
 export const revalidate = 0
@@ -72,7 +73,7 @@ export default async function CaseStudyPage({ params }: Props) {
   return (
     <CaseStudyPageClient
       profile={profile}
-      caseStudy={safeCs}
+      caseStudy={scrubSampleContent(safeCs)}
       ndaLocked={cs.nda_enabled && !ndaUnlocked}
       slug={slug}
     />
