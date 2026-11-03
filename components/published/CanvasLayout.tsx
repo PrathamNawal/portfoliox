@@ -21,6 +21,7 @@ const STILL_FRAME = 0.7
 // Up to this many recommendations are shown one at a time (RecommendationStage); more stay a marquee.
 const STAGE_MAX = 7
 const DesignerScene = dynamic(() => import('@/components/scene/DesignerScene').then(m => m.DesignerScene))
+const HeroFlanks = dynamic(() => import('@/components/scene/HeroFlanks').then(m => m.HeroFlanks))
 const ContactScene = dynamic(() => import('@/components/scene/ContactScene').then(m => m.ContactScene))
 import type { Profile, CaseStudy, Testimonial, WorkExperience, ToolStackItem } from '@/types'
 
@@ -110,7 +111,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
 
       <ViewTransitionGate mode="card" />
       <section className="pxp-hero">
-        {motion !== 'still' && <HeroMotion covers={wallCovers} slug={profile.slug!} level={motion} />}
+        {motion !== 'still' && <HeroMotion covers={wallCovers} />}
         {profile.avatar_url
           ? <img className="pxp-avatar" src={profile.avatar_url} alt={profile.name} />
           : <div className="pxp-avatar pxp-avatar--fallback" aria-hidden="true">{profile.name[0]}</div>}
@@ -122,7 +123,12 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
           {profile.resume_url && <a href={profile.resume_url} target="_blank" rel="noreferrer" className="pxp-btn pxp-btn--ghost">Resume ↗</a>}
           <a href="mailto:?subject=Hello" className="pxp-btn">Get in touch</a>
         </div>
-        {scene && <div className="pxp-scene-wrap"><DesignerScene freeze={motion === 'still' ? STILL_FRAME : undefined} /></div>}
+        {scene && (
+          <div className="pxp-scene-wrap">
+            <DesignerScene freeze={motion === 'still' ? STILL_FRAME : undefined} />
+            {motion === 'expressive' && <HeroFlanks />}
+          </div>
+        )}
       </section>
 
       <main className="pxp-main">
