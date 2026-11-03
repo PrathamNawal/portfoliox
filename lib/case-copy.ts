@@ -64,7 +64,24 @@ export function decisionOf(narrative: string): { text: string; label: string } |
   const ps = paragraphs(narrative)
   for (const p of ps.length > 1 ? ps.slice(1) : ps) {
     for (const sent of sentencesOf(p)) {
-      if (sent.length >= 50 && sent.length <= 230 && DECISION.test(sent)) return { text: sent, label: (LABEL_OF.find(([re]) => re.test(sent)) ?? [0, 'Takeaway'])[1] }
+      if (sent.length >= 50 && sent.length <= 230 && DECISION.test(sent) && !HEDGE.test(sent)) return { text: sent, label: (LABEL_OF.find(([re]) => re.test(sent)) ?? [0, 'Takeaway'])[1] }
+    }
+  }
+  return null
+}
+
+// An outcome is a sentence that reports something that happened (a figure, a launch, an adoption). Hedges and
+// next steps are not outcomes, and are never promoted to a headline.
+const SIGNAL = /\d[\d,.]*\s?(?:%|\u00d7|x\b|[kKmM]\+?\b|\+)|\b(?:launched|shipped|adopted|onboarded|increased|reduced|grew|doubled|won|saved|improved|achieved|featured|reached)\b/
+const HEDGE = /\b(?:rather than|attributable|not an outcome|still early|early in|natural next step|next step|would be to|will need to|context for|might|could have)\b/i
+
+/** A sentence reporting a real outcome, from a paragraph after the lead (the lead is already printed large). */
+export function outcomeOf(narrative: string): string | null {
+  const ps = paragraphs(narrative)
+  for (const p of ps.length > 1 ? ps.slice(1) : ps) {
+    for (const raw of sentencesOf(p)) {
+      const sent = raw.replace(/^[A-Z][^:.!?]{1,38}:\s+/, '') // drop a "Label: " lead-in
+      if (sent.length >= 40 && sent.length <= 230 && SIGNAL.test(sent) && !HEDGE.test(sent)) return sent
     }
   }
   return null
@@ -91,14 +108,12 @@ export function stageOf(section: CaseSection): Stage {
   if (text.length >= 200) {
     const stats = statsOf(text)
     const d = decisionOf(text)
-    if (section.type === 'impact' || /impact|outcome|result/i.test(section.title ?? '')) {
-      // the closing statement comes from the last paragraph, so it does not repeat the lead printed just above
-      const ps = paragraphs(text)
-      const last = ps.length > 1 ? sentencesOf(ps[ps.length - 1])[0] : ps[0] ? lead(text, 230) : undefined
-      band = { kind: 'finale', label: 'The outcome', text: d?.text ?? last }
-    }
-    else if (stats.length) band = { kind: 'stats', label: 'By the numbers', stats }
-    else if (d) band = { kind: 'quote', label: d.label, text: d.text }
+    if (stats.length) band = { kind: 'stats', label: 'By the numbers', stats }
+    else if (section.type === 'impact' || /impact|outcome|result/i.test(section.title ?? '')) {
+      // only when the chapter reports something that happened; otherwise no band at all
+      const o = outcomeOf(text)
+      band = o ? { kind: 'finale', label: 'The outcome', text: o } : null
+    } else if (d) band = { kind: 'quote', label: d.label, text: d.text }
     if (band && band.kind !== 'stats' && !band.text) band = null
   }
   return { layout, band }
