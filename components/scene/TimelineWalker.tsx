@@ -12,8 +12,7 @@ import './timeline-walker.css'
 // writes --wy (her feet, in px from the top of the timeline) so the fill line can follow her.
 // Decorative: aria-hidden. Not mounted for Motion: Still or reduced motion.
 
-const HEIGHT = 121 // px: 56px wide at the 130x280 viewBox
-const FEET = 5 // px from the bottom of the svg to her soles
+const FEET = 12 / 280 // her soles sit 12 of the viewBox's 280 units above its bottom edge
 const IDLE_MS = 160 // scroll pause after which she stops walking
 const HOP_MS = 950
 
@@ -45,7 +44,8 @@ export function TimelineWalker({ timeline }: { timeline: React.RefObject<HTMLOLi
       const r = tl.getBoundingClientRect()
       const y = Math.min(nodes[nodes.length - 1], Math.max(nodes[0], window.innerHeight * 0.6 - r.top))
       tl.style.setProperty('--wy', `${y}px`)
-      el.style.transform = `translateY(${y - HEIGHT + FEET}px)`
+      const h = el.offsetHeight
+      el.style.transform = `translateY(${y - h * (1 - FEET)}px)`
       const idx = nodes.filter(n => n <= y + 0.5).length
       if (lastIdx >= 0 && idx !== lastIdx) {
         flip = !flip
