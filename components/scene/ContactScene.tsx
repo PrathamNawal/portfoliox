@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useId, useRef, useState } from 'react'
 import { Character } from './DesignerScene'
 import './designer-scene.css'
 import './contact-scene.css'
@@ -8,6 +8,8 @@ import './contact-scene.css'
 // The designer from the hero, standing above the "Let's work together" links. She waves now and then;
 // hovering or focusing "Get in touch" makes her cheer (jump, arms up, confetti). It is the same puppet
 // as DesignerScene, posed and animated by contact-scene.css. Decorative, so hidden from assistive tech.
+// perched: she sits on the top edge of the View Resume card (the page positions her, see .pxp-cta__perch), legs
+// dangling and swinging, waving, with a soft cast shadow on the card and the wall behind her.
 // With animate=false (Motion: Still) or reduced motion she is one calm standing frame.
 
 const OUT = '#2a2347'
@@ -22,7 +24,8 @@ const CONFETTI = [
   { dx: -46, up: -50, dy: 150, rot: 220, d: 0.4 }, { dx: 50, up: -48, dy: 150, rot: -200, d: 0.42 },
 ]
 
-export function ContactScene({ animate = true }: { animate?: boolean }) {
+export function ContactScene({ animate = true, perched = false }: { animate?: boolean; perched?: boolean }) {
+  const shadowId = `cta-shadow-${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const ref = useRef<HTMLDivElement>(null)
   const [play, setPlay] = useState(false)
 
@@ -35,8 +38,21 @@ export function ContactScene({ animate = true }: { animate?: boolean }) {
   }, [animate])
 
   return (
-    <div ref={ref} className="sc-root cta-root" data-motion={animate ? 'on' : 'off'} data-play={animate && play ? 'true' : 'false'} aria-hidden="true">
+    <div ref={ref} className={`sc-root cta-root${perched ? ' cta-root--perch' : ''}`} data-motion={animate ? 'on' : 'off'} data-play={animate && play ? 'true' : 'false'} aria-hidden="true">
       <svg viewBox="-110 76 220 284" xmlns="http://www.w3.org/2000/svg">
+        {perched && (
+          <>
+            <defs>
+              {/* flat dark silhouette, softened: the shadow is the character itself, so it follows every pose */}
+              <filter id={shadowId} x="-30%" y="-20%" width="160%" height="150%">
+                <feColorMatrix type="matrix" values="0 0 0 0 .12  0 0 0 0 .09  0 0 0 0 .24  0 0 0 1 0" />
+                <feGaussianBlur stdDeviation="3" />
+              </filter>
+            </defs>
+            <ellipse cx="0" cy="288" rx="30" ry="3.6" fill="#1b1538" opacity=".22" />
+            <g className="cta-cast" filter={`url(#${shadowId})`} opacity=".26" transform="translate(9 6)"><Character /></g>
+          </>
+        )}
         <Character />
         <g className="cta-sparkles" fill="#ffd34d" stroke={OUT} strokeWidth="1.2" strokeLinejoin="round">
           <g transform="translate(-78 150)"><path className="sc-sp1" d={STAR} /></g>

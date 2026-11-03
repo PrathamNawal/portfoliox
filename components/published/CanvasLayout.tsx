@@ -220,9 +220,11 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
 
         <section className="pxp-cta" aria-labelledby="pxp-contact">
           <h2 id="pxp-contact" className="pxp-h2 pxp-h2--cta">Let&apos;s work together</h2>
-          {scene && <ContactScene animate={motion !== 'still'} />}
+          {scene && !profile.resume_url && <ContactScene animate={motion !== 'still'} />}
           <div className="pxp-cta__stack">
             {profile.resume_url && (
+              <div className={`pxp-cta__perch${scene ? ' pxp-cta__perch--on' : ''}`}>
+                {scene && <ContactScene animate={motion !== 'still'} perched />}
               <a href={profile.resume_url} target="_blank" rel="noreferrer" className="pxp-surface pxp-linkcard pxp-linkcard--between">
                 <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <span className="pxp-linkcard__icon" aria-hidden="true">📄</span>
@@ -230,6 +232,7 @@ export function CanvasLayout({ profile, caseStudies, testimonials, experience, t
                 </span>
                 <span className="pxp-linkcard__arrow" aria-hidden="true">↗</span>
               </a>
+              </div>
             )}
             <div className="pxp-cta__grid">
               {social.linkedin && <LinkCard href={`https://linkedin.com/in/${social.linkedin}`} icon="💼" label="LinkedIn" />}
