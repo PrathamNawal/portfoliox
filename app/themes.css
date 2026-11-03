@@ -1253,8 +1253,8 @@
     @keyframes px-fig-pan { from { object-position: 50% 0%; } to { object-position: 50% 100%; } }
   }
 }
-.px-set { display: flex; flex-direction: column; gap: 10px; margin: 0; }
-.px-set--one { gap: 8px; }
+.px-set { display: flex; flex-direction: column; gap: 16px; margin: 0; }
+.px-set__one { margin: 0; }
 .px-set figcaption { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--px-text-2); }
 .px-set--one figcaption { font-size: 14px; line-height: 1.6; }
 /* a row: widths follow each image's ratio, so every image in it ends up the same height; never taller than ROW_MAX_H */

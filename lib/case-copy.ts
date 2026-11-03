@@ -81,12 +81,12 @@ export function statsOf(narrative: string): { value: string; text: string }[] {
   return out.slice(0, 3)
 }
 
-const IMAGE_BLOCKS = new Set(['image', 'gallery', 'compare'])
 
 export function stageOf(section: CaseSection): Stage {
   const text = (section.narrative ?? '').trim()
-  const hasImage = (section.blocks ?? []).some(b => IMAGE_BLOCKS.has(b.type))
-  const layout: Stage['layout'] = !text ? 'visual' : hasImage && text.length <= 1800 ? 'split' : 'stack'
+  const imageCount = (section.blocks ?? []).reduce((n, b) => n + (b.type === 'image' ? (b.imageUrl ? 1 : 0) : b.type === 'gallery' ? (b.images ?? []).filter(i => i.url).length : b.type === 'compare' ? 2 : 0), 0)
+  // beside-the-text only fits a couple of images; a chapter with more gets the full column
+  const layout: Stage['layout'] = !text ? 'visual' : imageCount > 0 && imageCount <= 2 && text.length <= 1800 ? 'split' : 'stack'
   let band: Band | null = null
   if (text.length >= 200) {
     const stats = statsOf(text)
