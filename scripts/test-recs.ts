@@ -1,6 +1,6 @@
 // Run: npx tsx scripts/test-recs.ts
 // The two published recommendations (portfoliox-mu-nine.vercel.app) plus the fixtures.
-import { cleanQuote, highlightsOf, matchRole, segments, signalCounts } from '../lib/recs'
+import { cleanQuote, excerptOf, highlightsOf, matchRole, proofsByRole, segments, signalCounts } from '../lib/recs'
 
 const T = 'Muskan is a highly creative designer with a keen eye for detail. Her designs are visually appealing and well thought out, adding great value to our project. It was a pleasure working with her, and I look forward to seeing her future work!'
 const S = 'I had the privilege of collaborating with Muskan at Umbrella Room Ventures, where we jointly led end-to-end design for Luxorides—covering the Landing Page, Checkout Flow, and Luxury Car Rental Services. Muskan excels at translating user needs into elegant, intuitive designs, with an eye for detail t'
@@ -24,5 +24,12 @@ const roles = [{ id: 'a', company: 'Luxorides', start_month: 'Dec 2024', is_curr
 eq('Luxorides role matched', matchRole({ title_and_company: 'UX Designer, Luxorides', quote: S }, roles)?.id, 'a')
 eq('Soccal role matched', matchRole({ title_and_company: 'Co Founder, Soccal', quote: T }, roles)?.id, 'b')
 eq('no match when the company is not a role', matchRole({ title_and_company: 'Head of Product, Hiver', quote: 'Great.' }, roles), null)
+const ex = (q: string) => excerptOf(q).map(p => p.text).join('')
+const eT = ex(T), eS = ex(S)
+eq('excerpt is one sentence around the claim', eT.startsWith('Muskan is a highly creative designer') && eT.endsWith('detail.'), true)
+eq('excerpt of the long Luxorides quote stays short and keeps the claim', eS.length <= 215 && /end-to-end/.test(eS), true)
+eq('excerpt has a highlighted part', excerptOf(S).some(p => p.hl), true)
+const withTs = proofsByRole([{ id: 't1', title_and_company: 'Co Founder, Soccal', quote: T } as never, { id: 't2', title_and_company: 'UX Designer, Luxorides', quote: S } as never, { id: 't3', title_and_company: 'Head, Hiver', quote: 'Great.' } as never], roles)
+eq('proofs grouped by role', Array.from(withTs.entries()).map(([k, v]) => k + ':' + v.length).sort(), ['a:1', 'b:1'])
 console.log(bad ? `${bad} problem(s)` : 'ok')
 process.exit(bad ? 1 : 0)

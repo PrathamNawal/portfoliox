@@ -7,7 +7,8 @@ import { sortExperience, durationMonths, formatDuration, formatRange, highlightM
 import { isPortrait, screenRatio, startYear, storyHeadline, visibleScreens } from '@/lib/experience-story'
 import { CareerRibbon } from './CareerRibbon'
 import { Chip } from './StoryChip'
-import type { ExperienceScreen, WorkExperience } from '@/types'
+import { excerptOf, proofsByRole } from '@/lib/recs'
+import type { ExperienceScreen, Testimonial, WorkExperience } from '@/types'
 
 // The walking designer is only loaded when the portfolio has the scene on and Motion is not Still.
 const TimelineWalker = dynamic(() => import('@/components/scene/TimelineWalker').then(m => m.TimelineWalker))
@@ -16,9 +17,11 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>
 
 interface Open { roleId: string; index: number }
 
-export function ExperienceStory({ experience, walker = false, animate = false }: { experience: WorkExperience[]; walker?: boolean; animate?: boolean }) {
+export function ExperienceStory({ experience, walker = false, animate = false, testimonials = [] }: { experience: WorkExperience[]; walker?: boolean; animate?: boolean; testimonials?: Testimonial[] }) {
   const roles = useMemo(() => sortExperience(experience), [experience])
   const byId = useMemo(() => new Map(roles.map(r => [r.id, r])), [roles])
+  // the recommendations that belong to each role: shown next to what was claimed there
+  const proofs = useMemo(() => proofsByRole(testimonials, roles), [testimonials, roles])
 
   const timelineRef = useRef<HTMLOListElement>(null)
   const [lightbox, setLightbox] = useState<Open | null>(null)
@@ -60,7 +63,7 @@ export function ExperienceStory({ experience, walker = false, animate = false }:
 
   return (
     <div className="pxs">
-      <CareerRibbon roles={roles} animate={animate} />
+      <CareerRibbon roles={roles} animate={animate} proofs={proofs} />
 
       <ol className="pxs-timeline" ref={timelineRef}>
         {walker && <TimelineWalker timeline={timelineRef} />}
@@ -93,6 +96,7 @@ export function ExperienceStory({ experience, walker = false, animate = false }:
                     {exp.stat_label && <span>{exp.stat_label}</span>}
                   </p>
                 )}
+                {proofs.get(exp.id)?.[0] && <Proof t={proofs.get(exp.id)![0]} />}
                 {screens.length > 0 && <Exhibit screens={screens} featured={featured} role={exp.role} onOpen={(i, el) => show(exp.id, i, el)} />}
                 {bullets && (
                   <details className="pxp-exp-more pxs-more" open={featured}>
@@ -111,6 +115,23 @@ export function ExperienceStory({ experience, walker = false, animate = false }:
 
       {lightbox && <Lightbox screens={(byId.get(lightbox.roleId)?.screens ?? []) as ExperienceScreen[]} start={lightbox.index} onClose={close} />}
     </div>
+  )
+}
+
+/** What someone who worked with her there said, next to what she claims about the role. */
+function Proof({ t }: { t: Testimonial }) {
+  return (
+    <figure className="pxs-proof">
+      <blockquote>&ldquo;{excerptOf(t.quote).map((p, i) => p.hl ? <mark key={i}>{p.text}</mark> : <React.Fragment key={i}>{p.text}</React.Fragment>)}&rdquo;</blockquote>
+      <figcaption>
+        {t.photo_url
+          // eslint-disable-next-line @next/next/no-img-element
+          ? <img src={t.photo_url} alt="" />
+          : <span aria-hidden="true">{t.name[0]}</span>}
+        <span><b>{t.name}</b><i>{t.title_and_company}</i></span>
+        <a href={`#rec-${t.id}`}>Read in full ↗</a>
+      </figcaption>
+    </figure>
   )
 }
 
