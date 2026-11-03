@@ -1307,15 +1307,15 @@
 .px-ch__head { display: flex; align-items: flex-end; gap: clamp(14px, 2vw, 28px); margin-bottom: clamp(24px, 3vw, 44px); padding-top: 24px; border-top: 1px solid var(--px-border); }
 .px-ch__n { font-size: clamp(56px, 8vw, 128px); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.06em; line-height: .78; color: transparent; -webkit-text-stroke: 1.5px var(--px-accent); }
 .px-ch__head h2 { margin: 0; scroll-margin-top: 96px; font-size: clamp(28px, 4vw, 60px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; color: var(--px-text); }
-.px-prose-col { max-width: calc(var(--cs-body) * 41); }
-.px-p { margin: 0 0 1.1em; font-size: var(--cs-body); line-height: 1.75; color: var(--px-text-2); font-family: var(--px-font-body); white-space: pre-wrap; }
+.px-prose-col { max-width: calc(var(--cs-body) * 36); }
+.px-p { margin: 0 0 1.1em; font-size: var(--cs-body); line-height: 1.75; color: var(--px-text-2); font-family: var(--px-font-body); white-space: pre-line; }
 .px-p--lead { font-size: calc(var(--cs-body) * 1.28); line-height: 1.55; font-weight: 500; letter-spacing: -0.012em; color: var(--px-text); }
 .px-label { margin: 28px 0 10px; font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--px-accent); }
 .px-step { display: flex; gap: 14px; align-items: baseline; margin: 38px 0 12px; font-size: clamp(18px, 2.2vw, 22px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.3; color: var(--px-text); }
 .px-step span { flex: none; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--px-accent) 12%, transparent); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--px-accent); }
 .px-ul, .px-ol { margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .px-ul { list-style: none; }
-.px-ol { padding-left: 22px; }
+.px-ol { padding-left: 24px; list-style: decimal; }
 .px-ul li, .px-ol li { font-size: var(--cs-body); line-height: 1.7; color: var(--px-text-2); font-family: var(--px-font-body); }
 .px-ul li { position: relative; padding-left: 20px; }
 .px-ul li::before { content: ''; position: absolute; left: 3px; top: .72em; width: 6px; height: 6px; border-radius: 50%; background: var(--px-accent); }
@@ -1371,3 +1371,18 @@
     @keyframes px-lift-in { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
   }
 }
+
+/* Content structure (lib/case-structure.ts): sub-headings, step cards, and video cards */
+.px-h3 { margin: 34px 0 10px; font-size: clamp(19px, 1.5vw + 8px, 26px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; color: var(--px-text); }
+.px-prose-col > .px-h3:first-child { margin-top: 0; }
+.px-defs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; margin: 8px 0 24px; }
+.px-def { padding: 18px 20px; border: 1px solid var(--px-border); border-radius: 14px; background: var(--px-surface); }
+.px-def__n { display: inline-block; margin-bottom: 10px; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--px-accent) 12%, transparent); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--px-accent); }
+.px-def h4 { margin: 0 0 6px; font-size: calc(var(--cs-body) * 1.08); font-weight: 700; letter-spacing: -0.015em; line-height: 1.3; color: var(--px-text); }
+.px-def p { margin: 0; font-size: calc(var(--cs-body) * .92); line-height: 1.6; color: var(--px-text-2); font-family: var(--px-font-body); }
+.px-videocard { display: inline-flex; align-items: center; gap: 14px; padding: 14px 20px 14px 14px; border: 1px solid var(--px-border); border-radius: 14px; background: var(--px-surface); color: inherit; text-decoration: none; transition: transform .2s ease, border-color .2s ease; }
+.px-videocard:hover, .px-videocard:focus-visible { transform: translateY(-2px); border-color: var(--px-accent); }
+.px-videocard__play { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--px-accent); color: var(--px-accent-fg, #fff); }
+.px-videocard__text { display: flex; flex-direction: column; gap: 2px; }
+.px-videocard__text b { font-size: 15px; font-weight: 700; color: var(--px-text); }
+.px-videocard__text i { font-size: 12px; font-style: normal; color: var(--px-text-3); }
