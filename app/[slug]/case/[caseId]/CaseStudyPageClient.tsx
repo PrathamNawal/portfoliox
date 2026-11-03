@@ -242,14 +242,10 @@ export function CaseStudyPageClient({ profile, caseStudy: initialCs, ndaLocked: 
         <NDAGate caseStudyId={cs.id} title={cs.title} onUnlocked={handleUnlock} />
       ) : (
         <>
-          {/* Hero */}
-          {cs.cover_image_url && cs.cover_fit === 'fit' ? (
-            <div data-vt-hero style={{ position: 'relative', width: '100%', height: 'min(520px, 56vw)' }}>
+          {/* Hero: the whole cover, never cropped. A blurred copy of it fills whatever the image's shape leaves over. */}
+          {cs.cover_image_url ? (
+            <div data-vt-hero style={{ position: 'relative', width: '100%', height: 'min(560px, 56vw)' }}>
               <CoverImage url={cs.cover_image_url} fit="fit" label={cs.title} />
-            </div>
-          ) : cs.cover_image_url ? (
-            <div data-vt-hero style={{ width: '100%', maxHeight: 520, overflow: 'hidden' }}>
-              <img src={cs.cover_image_url} alt={cs.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: 520 }} />
             </div>
           ) : (
             <div data-vt-hero style={{ width: '100%', height: 300, background: 'linear-gradient(135deg,#2A1B4A 0%,#5B3FA6 60%,#7B5EE0 100%)' }} />

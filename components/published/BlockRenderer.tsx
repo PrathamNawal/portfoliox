@@ -2,10 +2,16 @@
 
 import React, { useState, useRef, useCallback } from 'react'
 import type { Block } from '@/types'
+import { SmartImage } from './SmartImage'
+import { useImageRatio } from './useImageRatio'
+import { DEFAULT_RATIO } from '@/lib/image-shape'
 
 // ── Before/After slider (client-side interactive) ─────────────────────────────
 function CompareSlider({ beforeUrl, afterUrl }: { beforeUrl: string; afterUrl: string }) {
   const [pos, setPos] = useState(50)
+  // The slider takes the "before" image's own shape (16/9 until it loads); the "after" image is fitted to it.
+  const [ratio, setRatio] = useState(16 / 9)
+  const before = useImageRatio(setRatio)
   const containerRef = useRef<HTMLDivElement>(null)
   const dragging = useRef(false)
 
@@ -17,7 +23,7 @@ function CompareSlider({ beforeUrl, afterUrl }: { beforeUrl: string; afterUrl: s
 
   return (
     <div ref={containerRef}
-      style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', borderRadius: 8, cursor: 'col-resize', userSelect: 'none' }}
+      style={{ position: 'relative', width: ratio < 0.9 ? `min(100%, ${(70 * ratio).toFixed(1)}vh)` : '100%', margin: ratio < 0.9 ? '0 auto' : undefined, aspectRatio: String(ratio), overflow: 'hidden', borderRadius: 8, cursor: 'col-resize', userSelect: 'none' }}
       onMouseDown={() => (dragging.current = true)}
       onMouseUp={() => (dragging.current = false)}
       onMouseLeave={() => (dragging.current = false)}
@@ -28,7 +34,7 @@ function CompareSlider({ beforeUrl, afterUrl }: { beforeUrl: string; afterUrl: s
       <img src={afterUrl} alt="After" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
       {/* Before (clipped) */}
       <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', width: `${pos}%` }}>
-        <img src={beforeUrl} alt="Before" style={{ width: containerRef.current?.offsetWidth || '100%', height: '100%', objectFit: 'cover', minWidth: '100%' }} />
+        <img src={beforeUrl} alt="Before" ref={before.ref} onLoad={before.onLoad} style={{ width: containerRef.current?.offsetWidth || '100%', height: '100%', objectFit: 'cover', minWidth: '100%' }} />
       </div>
       {/* Handle */}
       <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${pos}%`, transform: 'translateX(-50%)', width: 2, background: '#fff', boxShadow: '0 0 8px rgba(0,0,0,0.4)' }}>
@@ -111,6 +117,30 @@ function FigmaEmbed({ url }: { url: string }) {
   )
 }
 
+// ── Gallery: justified rows ───────────────────────────────────────────────────
+// Every image keeps its own shape; each row is sized so the images in it share one height (4/3 until a shape is known).
+function Gallery({ images }: { images: { url: string; caption: string }[] }) {
+  return (
+    <div className="px-gal">
+      {images.map((img, idx) => <GalleryItem key={idx} url={img.url} caption={img.caption} />)}
+    </div>
+  )
+}
+
+function GalleryItem({ url, caption }: { url: string; caption: string }) {
+  const [r, setR] = useState(DEFAULT_RATIO)
+  const img = useImageRatio(setR)
+  return (
+    <figure className="px-gal__item" style={{ flexGrow: r * 100, flexBasis: `${r * 220}px` }}>
+      <div className="px-gal__frame" style={{ aspectRatio: String(r) }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt={caption || ''} loading="lazy" decoding="async" ref={img.ref} onLoad={img.onLoad} />
+      </div>
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  )
+}
+
 // ── Main block renderer ───────────────────────────────────────────────────────
 interface Props {
   block: Block
@@ -139,23 +169,14 @@ export function BlockRenderer({ block, accent = '#E53416' }: Props) {
       {/* Image */}
       {block.type === 'image' && block.imageUrl && (
         <div>
-          <img src={block.imageUrl} alt={block.caption || block.sectionLabel} style={{ width: '100%', borderRadius: 8, display: 'block', maxHeight: 600, objectFit: 'cover' }} />
+          <SmartImage src={block.imageUrl} alt={block.caption || block.sectionLabel} />
           {block.caption && <p style={{ fontSize: 14, color: 'var(--px-text-2)', marginTop: 8, lineHeight: 1.6 }}>{block.caption}</p>}
         </div>
       )}
 
       {/* Gallery */}
       {block.type === 'gallery' && block.images && block.images.some(i => i.url) && (
-        <div>
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${block.images.filter(i => i.url).length}, 1fr)`, gap: 10 }}>
-            {block.images.filter(i => i.url).map((img, idx) => (
-              <div key={idx}>
-                <img src={img.url} alt={img.caption || ''} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6, display: 'block' }} />
-                {img.caption && <p style={{ fontSize: 13, color: 'var(--px-text-2)', marginTop: 6, lineHeight: 1.5 }}>{img.caption}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
+        <Gallery images={block.images.filter(i => i.url)} />
       )}
 
       {/* Figma */}
