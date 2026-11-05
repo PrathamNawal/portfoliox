@@ -30,18 +30,27 @@ export function Proof({ t }: { t: Testimonial }) {
 
 const FLOW_STEP_MS = 1300
 
+/** ph = phone screen, ls = laptop screen, pg = full-page capture (very tall) shown in a laptop frame that scrolls through it. */
+const PAGE_RATIO = 0.4
+function kindOf(s: ExperienceScreen): 'ph' | 'ls' | 'pg' {
+  if (s.w / s.h < PAGE_RATIO) return 'pg'
+  return isPortrait(s) ? 'ph' : 'ls'
+}
+
 export function Exhibit({ screens, featured, role, onOpen }: { screens: ExperienceScreen[]; featured: boolean; role: string; onOpen: (index: number, el: HTMLElement) => void }) {
   const limit = visibleScreens(featured)
   const shown = screens.slice(0, limit)
   // Motion, chosen from the shape of the screens (no setting needed):
   //  - phones (portrait) rise in one after another when the exhibit scrolls into view
-  //  - laptop screens (landscape) fade in, then the camera drifts down the page like someone browsing it
+  //  - laptop screens (landscape) sit in a laptop frame whose lid opens; two or more cascade as a stack that slides over
+  //    itself while scrolling; a full-page capture (very tall) scrolls through inside the frame
   //  - three or more phones also play their flow once, one screen lit at a time, with a replay button
   // Everything stays off (images simply shown) under prefers-reduced-motion. Styles: .pxs-stage[data-phase] in app/globals.css.
   const stageRef = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState<'idle' | 'armed' | 'in'>('idle')
   const [step, setStep] = useState(-1)
-  const phones = shown.flatMap((s, i) => (isPortrait(s) ? [i] : []))
+  const phones = shown.flatMap((s, i) => (kindOf(s) === 'ph' ? [i] : []))
+  const stack = phones.length === 0 && shown.length >= 2
   const flow = phones.length >= 3
   useEffect(() => {
     const el = stageRef.current
@@ -65,13 +74,14 @@ export function Exhibit({ screens, featured, role, onOpen }: { screens: Experien
   const hidden = screens.length > limit ? screens.length - (limit - 1) : 0
   return (
     <div className="pxs-exhibit" role="group" aria-label={`${role}: screens`}>
-      <div className="pxs-stage" ref={stageRef} data-phase={phase}>
+      <div className="pxs-stage" ref={stageRef} data-phase={phase} data-stack={stack ? '' : undefined}>
         {shown.map((s, i) => {
           const more = hidden > 0 && i === shown.length - 1
-          const cls = isPortrait(s) ? 'pxs-shot pxs-shot--ph' : 'pxs-shot pxs-shot--ls'
+          const kind = kindOf(s)
+          const cls = kind === 'ph' ? 'pxs-shot pxs-shot--ph' : kind === 'pg' ? 'pxs-shot pxs-shot--ls pxs-shot--pg' : 'pxs-shot pxs-shot--ls'
           return (
-            <figure key={`${s.url}-${i}`} className={cls} data-flow={step < 0 || !isPortrait(s) ? undefined : phones[step] === i ? 'on' : 'off'}
-              style={{ '--r': screenRatio(s), '--i': i } as Vars}>
+            <figure key={`${s.url}-${i}`} className={cls} data-flow={step < 0 || kind !== 'ph' ? undefined : phones[step] === i ? 'on' : 'off'}
+              style={{ '--r': kind === 'pg' ? 1.6 : screenRatio(s), '--i': i, '--pan': kind === 'pg' ? `${((1 - s.w / s.h / 1.6) * 100).toFixed(1)}%` : undefined } as Vars}>
               <button type="button" className="pxs-shot__btn" onClick={e => onOpen(i, e.currentTarget)}
                 aria-label={more ? `Show all screens, ${hidden} more` : `Open screen ${i + 1}${s.caption ? `: ${s.caption}` : ''}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
