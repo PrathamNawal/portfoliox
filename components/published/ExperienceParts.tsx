@@ -28,19 +28,50 @@ export function Proof({ t }: { t: Testimonial }) {
   )
 }
 
+const FLOW_STEP_MS = 1300
+
 export function Exhibit({ screens, featured, role, onOpen }: { screens: ExperienceScreen[]; featured: boolean; role: string; onOpen: (index: number, el: HTMLElement) => void }) {
   const limit = visibleScreens(featured)
   const shown = screens.slice(0, limit)
+  // Motion, chosen from the shape of the screens (no setting needed):
+  //  - phones (portrait) rise in one after another when the exhibit scrolls into view
+  //  - laptop screens (landscape) fade in, then the camera drifts down the page like someone browsing it
+  //  - three or more phones also play their flow once, one screen lit at a time, with a replay button
+  // Everything stays off (images simply shown) under prefers-reduced-motion. Styles: .pxs-stage[data-phase] in app/globals.css.
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [phase, setPhase] = useState<'idle' | 'armed' | 'in'>('idle')
+  const [step, setStep] = useState(-1)
+  const phones = shown.flatMap((s, i) => (isPortrait(s) ? [i] : []))
+  const flow = phones.length >= 3
+  useEffect(() => {
+    const el = stageRef.current
+    if (!el || typeof IntersectionObserver === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    setPhase('armed')
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setPhase('in'); io.disconnect() } }, { threshold: 0.25 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  useEffect(() => {
+    if (phase !== 'in' || !flow) return
+    const t = setTimeout(() => setStep(0), 800 + phones.length * 90)
+    return () => clearTimeout(t)
+  }, [phase, flow, phones.length])
+  useEffect(() => {
+    if (step < 0) return
+    const t = setTimeout(() => setStep(s => (s + 1 >= phones.length ? -1 : s + 1)), FLOW_STEP_MS)
+    return () => clearTimeout(t)
+  }, [step, phones.length])
   // Past the limit the last tile carries "+N" (itself plus the hidden ones) and opens the lightbox there.
   const hidden = screens.length > limit ? screens.length - (limit - 1) : 0
   return (
     <div className="pxs-exhibit" role="group" aria-label={`${role}: screens`}>
-      <div className="pxs-stage">
+      <div className="pxs-stage" ref={stageRef} data-phase={phase}>
         {shown.map((s, i) => {
           const more = hidden > 0 && i === shown.length - 1
           const cls = isPortrait(s) ? 'pxs-shot pxs-shot--ph' : 'pxs-shot pxs-shot--ls'
           return (
-            <figure key={`${s.url}-${i}`} className={cls} style={{ '--r': screenRatio(s) } as Vars}>
+            <figure key={`${s.url}-${i}`} className={cls} data-flow={step < 0 || !isPortrait(s) ? undefined : phones[step] === i ? 'on' : 'off'}
+              style={{ '--r': screenRatio(s), '--i': i } as Vars}>
               <button type="button" className="pxs-shot__btn" onClick={e => onOpen(i, e.currentTarget)}
                 aria-label={more ? `Show all screens, ${hidden} more` : `Open screen ${i + 1}${s.caption ? `: ${s.caption}` : ''}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -52,6 +83,14 @@ export function Exhibit({ screens, featured, role, onOpen }: { screens: Experien
           )
         })}
       </div>
+      {flow && phase === 'in' && (
+        <div className="pxs-flow">
+          <span className="pxs-flow__dots" aria-hidden="true">
+            {phones.map((_, k) => <i key={k} data-on={step === k ? '' : undefined} />)}
+          </span>
+          {step < 0 && <button type="button" className="pxs-flow__replay" onClick={() => setStep(0)}>▶ Replay flow</button>}
+        </div>
+      )}
     </div>
   )
 }

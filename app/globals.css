@@ -397,7 +397,10 @@ a { text-decoration: none; color: inherit; }
 .pxs-shot__btn { display: block; position: relative; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: inherit; }
 .pxs-shot__btn:focus-visible { outline: 3px solid var(--px-accent); outline-offset: 3px; }
 .pxs-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; background: #fff; transition: transform var(--px-dur-base, 0.2s); }
-.pxs-shot--ls img { border: 1px solid var(--px-border-strong); border-radius: 10px; box-shadow: var(--px-shadow); }
+.pxs-shot--ls .pxs-shot__btn { overflow: hidden; border: 1px solid var(--px-border-strong); border-radius: 10px; box-shadow: var(--px-shadow); transition: transform var(--px-dur-base, 0.2s); }
+.pxs-shot--ls .pxs-shot__btn:hover { transform: translateY(-3px); }
+.pxs-shot--ls .pxs-shot__btn:hover img { transform: none; }
+.pxs-shot--ls img { transform-origin: 50% 0; }
 .pxs-shot--ph img { border: 5px solid var(--pxs-device); border-radius: 22px; box-shadow: 0 0 0 1px var(--px-border-strong), var(--px-shadow); }
 .pxs-shot__btn:hover img { transform: translateY(-3px); }
 .pxs-shot figcaption { position: absolute; left: 8px; right: 8px; bottom: 8px; padding: 4px 9px; border-radius: 8px; font-size: 11.5px; font-weight: 600; line-height: 1.25; background: var(--px-text); color: var(--t-surface-solid, var(--px-surface)); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; pointer-events: none; }
@@ -416,6 +419,27 @@ a { text-decoration: none; color: inherit; }
 .pxs-lb__prev { left: 12px; } .pxs-lb__next { right: 12px; }
 .pxs-lb__x:focus-visible, .pxs-lb__nav:focus-visible { outline: 3px solid var(--px-accent, #ff6a47); outline-offset: 3px; }
 
+/* motion (Exhibit in ExperienceParts.tsx): armed = waiting to scroll into view, in = playing */
+.pxs-flow { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 28px; margin-top: 12px; }
+.pxs-flow__dots { display: flex; gap: 6px; }
+.pxs-flow__dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--px-border-strong); transition: background .25s, transform .25s; }
+.pxs-flow__dots i[data-on] { background: var(--px-accent); transform: scale(1.5); }
+.pxs-flow__replay { padding: 4px 12px; border: 1px solid var(--px-border-strong); border-radius: 999px; background: var(--px-surface); color: var(--px-text); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.pxs-flow__replay:focus-visible { outline: 3px solid var(--px-accent); outline-offset: 2px; }
+.pxs-shot--ph[data-flow] .pxs-shot__btn { transition: transform .4s cubic-bezier(.34, 1.4, .5, 1), opacity .4s; }
+.pxs-shot--ph[data-flow="off"] .pxs-shot__btn { opacity: .45; transform: scale(.96); }
+.pxs-shot--ph[data-flow="on"] .pxs-shot__btn { transform: translateY(-8px) scale(1.04); }
+.pxs-shot--ph[data-flow="on"] img { box-shadow: 0 0 0 2px var(--px-accent), 0 14px 30px rgba(0, 0, 0, .28); }
+@media (prefers-reduced-motion: no-preference) {
+  .pxs-stage[data-phase="armed"] .pxs-shot { opacity: 0; }
+  .pxs-stage[data-phase="in"] .pxs-shot--ph { animation: pxs-rise .7s cubic-bezier(.34, 1.45, .5, 1) backwards; animation-delay: calc(var(--i) * 80ms); }
+  .pxs-stage[data-phase="in"] .pxs-shot--ls { animation: pxs-fade .6s ease-out backwards; animation-delay: calc(var(--i) * 80ms); }
+  .pxs-stage[data-phase="in"] .pxs-shot--ls img { transform: scale(1.12); animation: pxs-browse 7s ease-in-out 1.2s infinite alternate; }
+  .pxs-stage[data-phase="in"] .pxs-shot--ls .pxs-shot__btn:hover img { animation-play-state: paused; }
+  @keyframes pxs-rise { from { opacity: 0; transform: translateY(40px) scale(.95); } to { opacity: 1; transform: none; } }
+  @keyframes pxs-fade { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  @keyframes pxs-browse { from { transform: scale(1.12) translateY(0); } to { transform: scale(1.12) translateY(-10.7%); } }
+}
 @media (prefers-reduced-motion: reduce) {
   .pxs-shot img, .pxs-shot figcaption { transition: none; }
 }
