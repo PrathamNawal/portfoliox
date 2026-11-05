@@ -3,10 +3,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import dynamic from 'next/dynamic'
-import { durationMonths, formatDuration, formatRange, highlightMetrics } from '@/lib/experience'
+import { durationMonths, formatDuration, formatRange, highlightMetrics, splitBullets } from '@/lib/experience'
 import { startYear } from '@/lib/experience-story'
 import { layoutRibbon } from '@/lib/career-ribbon'
-import { beatOf, bulletsOf, inOrder, skillsAdded, stopAt } from '@/lib/climb'
+import { beatOf, bulletsOf, inOrder, skillsAdded, stopAt, withoutRepeats } from '@/lib/climb'
 import { proofsByRole } from '@/lib/recs'
 import { Chip } from './StoryChip'
 import { Exhibit, Lightbox, Proof } from './ExperienceParts'
@@ -24,6 +24,7 @@ const PIN_QUERY = '(min-width: 900px) and (min-height: 560px) and (prefers-reduc
 const STICK = 64 // px: the site header the pinned stage sits under (matches top in experience-climb.css)
 const LEAD_IN = 0.04 // share of the pinned scroll before the walk starts and after it ends
 const IDLE_MS = 160
+const DETAIL_SHOWN = 3 // bullets a role shows before "Show N more"
 const HOP_MS = 950
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>
@@ -209,6 +210,9 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
           const proof = proofs.get(r.id)?.[0]
           const screens = (Array.isArray(r.screens) ? r.screens : []) as ExperienceScreen[]
           const bullets = bulletsOf(r.description)
+          const desc = withoutRepeats(r.description, beat)
+          const parts = splitBullets(desc, DETAIL_SHOWN)
+          const html = (h: string) => ({ __html: highlightMetrics(h) })
           const pos = !pin ? undefined : i < active ? 'before' : i === active ? 'current' : 'after'
           return (
             <li key={r.id} id={`pxs-${r.id}`} className="pxc-card" data-pos={pos} data-current={r.is_current ? '' : undefined} aria-label={`${r.role}, ${r.company}`}>
@@ -234,7 +238,18 @@ export function ExperienceClimb({ experience, walker = false, animate = false, t
 
               {(bullets.length > 0 || screens.length > 0) && (
                 <div className="pxc-more" data-two={bullets.length > 0 && screens.length > 0 ? '' : undefined}>
-                  {bullets.length > 0 && <div className="pxc-detail pxp-exp-desc" dangerouslySetInnerHTML={{ __html: highlightMetrics(r.description ?? '') }} />}
+                  {bullets.length > 0 && (parts ? (
+                    <div className="pxc-detail">
+                      <div className="pxp-exp-desc" dangerouslySetInnerHTML={html(parts.head)} />
+                      <details className="pxp-exp-more">
+                        <summary>
+                          <span className="pxp-exp-more__show">Show {parts.restCount} more</span>
+                          <span className="pxp-exp-more__hide">Show less</span>
+                        </summary>
+                        <div className="pxp-exp-desc" dangerouslySetInnerHTML={html(parts.rest)} />
+                      </details>
+                    </div>
+                  ) : <div className="pxc-detail pxp-exp-desc" dangerouslySetInnerHTML={html(desc)} />)}
                   {screens.length > 0 && <Exhibit screens={screens} featured={false} role={r.role} onOpen={(k, el) => show(screens, k, el)} />}
                 </div>
               )}
