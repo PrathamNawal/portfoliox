@@ -44,7 +44,7 @@ const GRAD = [
 ]
 
 const HERO_DISCIPLINE: Record<string, string> = {
-  ux: 'Product Designer',
+  ux: 'Product and Graphic Designer',
   graphic: 'Visual Designer',
   brand: 'Brand Designer',
   motion: 'Motion Designer',
