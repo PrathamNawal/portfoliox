@@ -1,4 +1,5 @@
 import { monthIndex } from './experience'
+import { plainText } from './experience-story'
 import type { WorkExperience } from '@/types'
 
 // Content for the Work Experience "climb": the roles in the order they happened, and for each one a one-line lead,
@@ -43,6 +44,26 @@ export interface Beat {
   highlight: Highlight | null // the number and the sentence it comes from
 }
 
+/** Lower-case words only, no trailing ellipsis, so a shortened sentence still matches the bullet it came from. */
+function same(text: string): string {
+  return text.toLowerCase().replace(/[…]|\.{3}/g, '').replace(/[^a-z0-9+%$₹]+/g, ' ').trim()
+}
+
+/**
+ * The description HTML without the bullets the lead or the number's sentence already shows in full.
+ * Only a plain one-level bullet list is touched; anything else comes back as it was.
+ */
+export function withoutRepeats(html: string | null | undefined, beat: Beat): string {
+  const src = html ?? ''
+  const outer = src.trim().match(/^<ul\b[^>]*>([\s\S]*)<\/ul>$/i)
+  if (!outer || /<ul\b/i.test(outer[1])) return src
+  const items = outer[1].match(/<li\b[^>]*>[\s\S]*?<\/li>/gi)
+  if (!items || outer[1].replace(/<li\b[^>]*>[\s\S]*?<\/li>/gi, '').trim() !== '') return src
+  const shown = [beat.lead, beat.highlight?.text ?? ''].map(same).filter(t => t.length >= 12)
+  const kept = items.filter(li => { const b = same(plainText(li)); return !shown.some(t => t.includes(b)) })
+  return kept.length === items.length || kept.length === 0 ? src : `<ul>${kept.join('')}</ul>`
+}
+
 /** The role's number: the stored stat when there is one, else the first bullet that carries a measurable result. */
 export function beatOf(r: Pick<WorkExperience, 'headline' | 'stat_value' | 'stat_label' | 'description'>): Beat {
   const bullets = bulletsOf(r.description)
@@ -50,6 +71,9 @@ export function beatOf(r: Pick<WorkExperience, 'headline' | 'stat_value' | 'stat
   let used = -1
   if (r.stat_value && r.stat_value.trim()) {
     highlight = { value: r.stat_value.trim(), text: (r.stat_label ?? '').trim() }
+    // A caption copied out of a bullet says nothing the bullet below does not: keep the number, drop the repeat.
+    const cap = same(highlight.text)
+    if (cap.length >= 20 && bullets.some(b => same(b).includes(cap))) highlight = { value: highlight.value, text: '' }
   } else {
     for (let i = 0; i < bullets.length; i++) {
       const m = METRIC.exec(bullets[i])

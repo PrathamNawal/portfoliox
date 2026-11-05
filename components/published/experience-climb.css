@@ -93,7 +93,8 @@ button.pxc-award:focus-visible { outline: 3px solid var(--px-accent); outline-of
 }
 @media (max-width: 1000px) { .pxc-body[data-two] { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
-  .pxc-card { --H: 8rem; }
+  .pxc-card { --H: 8rem; padding: 16px 14px; gap: 14px; }
+  .pxc-detail .pxp-exp-desc li { padding-left: 14px; }
   .pxc-when { align-items: flex-start; margin-left: 0; }
   .pxc-actions { margin-left: 0; }
 }

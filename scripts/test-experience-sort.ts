@@ -81,4 +81,18 @@ eq('provider hosts', [isProviderImageHost('https://image.thum.io/x.png'), isProv
 const png = new Uint8Array(33); png.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]); new DataView(png.buffer).setUint32(16, 1280); new DataView(png.buffer).setUint32(20, 800)
 eq('pngSize', [pngSize(png), pngSize(new Uint8Array(40)), pngSize(new Uint8Array(3))], [{ w: 1280, h: 800 }, null, null])
 
+// ── climb: no repeats between the lead / number and the bullets ──
+import { beatOf, withoutRepeats } from '../lib/climb'
+{
+  const short = 'Led the checkout redesign'
+  const long = 'Own end-to-end design of HunchVue covering multi-file environments, real-time coding and proctoring controls, used by 500+ companies hiring engineering talent worldwide'
+  const html = `<ul><li>${short}</li><li>${long}</li><li>Mentored two juniors</li></ul>`
+  const kept = (h: string, b: any) => (withoutRepeats(h, b).match(/<li/g) ?? []).length
+  eq('repeat: headline equal to a bullet drops that bullet', kept(html, beatOf({ headline: short, stat_value: null, stat_label: null, description: html })), 2)
+  eq('repeat: untouched when nothing repeats', kept(html, beatOf({ headline: 'Something else entirely here', stat_value: null, stat_label: null, description: html })), 3)
+  eq('repeat: stat caption copied from a bullet is blanked, bullet kept', [beatOf({ headline: null, stat_value: '500+', stat_label: 'companies hiring engineering talent worldwide', description: html }).highlight?.text, kept(html, beatOf({ headline: 'x lead here ok', stat_value: '500+', stat_label: 'companies hiring engineering talent worldwide', description: html }))], ['', 3])
+  eq('repeat: a short own caption is kept', beatOf({ headline: null, stat_value: '8+', stat_label: 'client engagements', description: html }).highlight?.text, 'client engagements')
+  eq('repeat: non-list html is returned as is', withoutRepeats('<p>Led the checkout redesign</p>', beatOf({ headline: short, stat_value: null, stat_label: null, description: '' })), '<p>Led the checkout redesign</p>')
+}
+
 process.exit(fail ? 1 : 0)
