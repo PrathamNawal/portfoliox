@@ -434,11 +434,8 @@ a { text-decoration: none; color: inherit; }
   .pxs-stage[data-phase="armed"] .pxs-shot { opacity: 0; }
   .pxs-stage[data-phase="in"] .pxs-shot--ph { animation: pxs-rise .7s cubic-bezier(.34, 1.45, .5, 1) backwards; animation-delay: calc(var(--i) * 80ms); }
   .pxs-stage[data-phase="in"] .pxs-shot--ls { animation: pxs-fade .6s ease-out backwards; animation-delay: calc(var(--i) * 80ms); }
-  .pxs-stage[data-phase="in"] .pxs-shot--ls img { transform: scale(1.12); animation: pxs-browse 7s ease-in-out 1.2s infinite alternate; }
-  .pxs-stage[data-phase="in"] .pxs-shot--ls .pxs-shot__btn:hover img { animation-play-state: paused; }
   @keyframes pxs-rise { from { opacity: 0; transform: translateY(40px) scale(.95); } to { opacity: 1; transform: none; } }
   @keyframes pxs-fade { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-  @keyframes pxs-browse { from { transform: scale(1.12) translateY(0); } to { transform: scale(1.12) translateY(-10.7%); } }
 }
 @media (prefers-reduced-motion: reduce) {
   .pxs-shot img, .pxs-shot figcaption { transition: none; }
