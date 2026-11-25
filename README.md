@@ -16,6 +16,8 @@ A visual-first portfolio builder for designers. Instead of writing a case study 
 - **Analytics dashboard.** Page views, case-study views, and time-on-page are logged per visitor fingerprint and rolled up into a dashboard for the profile owner.
 - **Admin console.** A seeded admin (`role = 'admin'` in `profiles`) gets a user list, CSV export, plan/limit settings, and email-based admin invites — all behind server-side `requireAuthContext` checks, not just UI hiding.
 
+- **MCP server for AI assistants.** `/api/mcp` lets Claude (or any MCP client) build a full case study from a brief, process notes and a Figma link with one tool call (`build_case_study`), ask only the 2-3 questions that matter, and publish after the user confirms. Users create a token in Dashboard → Connect AI assistant. Design and runbook: [docs/mcp/ENGINEERING_PLAN.md](./docs/mcp/ENGINEERING_PLAN.md).
+
 ## Tech stack
 
 | Layer | Choice |

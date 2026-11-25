@@ -740,6 +740,10 @@ export function BuilderClient({ initialProfile, initialCaseStudies, initialTesti
                     <div style={{ height: 1, background: 'var(--px-border)', margin: '4px 0' }} />
                   </>
                 )}
+                <button onClick={() => { setShowUserMenu(false); router.push('/dashboard/mcp') }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: 'var(--px-text)', background: 'none', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left' }}>
+                  <Icon name="zap" size={14} /> Connect AI assistant
+                </button>
                 <button onClick={handleLogout}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', fontSize: 13, fontWeight: 600, color: '#C94040', background: 'none', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'var(--px-font)', textAlign: 'left' }}>
                   <Icon name="logout" size={14} color="#C94040" /> Sign out
